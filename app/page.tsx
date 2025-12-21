@@ -1,3 +1,11 @@
+import HeroSection from '@/components/hero-section'
+import Navbar from '@/components/navbar'
+
 export default function Page() {
-  return <div></div>
+  return (
+    <>
+      <Navbar />
+      <HeroSection />
+    </>
+  )
 }
