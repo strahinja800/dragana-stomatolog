@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { Menu, X, Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -10,7 +11,7 @@ import Image from 'next/image'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
-  // const location = useLocation()
+  const pathname = usePathname()
   const navLinks = [
     { href: '/', label: 'Početna' },
     { href: '/usluge', label: 'Usluge' },
@@ -49,7 +50,7 @@ export default function Navbar() {
                 href={link.href}
                 className={cn(
                   'text-sm font-medium transition-colors hover:text-primary',
-                  window.location.pathname === link.href
+                  pathname === link.href
                     ? 'text-primary'
                     : 'text-muted-foreground'
                 )}
@@ -97,7 +98,7 @@ export default function Navbar() {
                   onClick={() => setIsOpen(false)}
                   className={cn(
                     'text-base font-medium transition-colors py-2',
-                    location.pathname === link.href
+                    pathname === link.href
                       ? 'text-primary'
                       : 'text-muted-foreground'
                   )}
@@ -111,12 +112,7 @@ export default function Navbar() {
                 className='mt-2'
                 asChild
               >
-                <Link
-                  href='/kontakt'
-                  onClick={() => setIsOpen(false)}
-                >
-                  Zakaži pregled
-                </Link>
+                <Link href='/kontakt'>Zakaži pregled</Link>
               </Button>
             </div>
           </div>
