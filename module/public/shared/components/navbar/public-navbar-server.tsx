@@ -8,16 +8,11 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import logo from '@/assets/logo.png'
 import Image from 'next/image'
+import { NAV_LINKS } from '@/constants/navigations'
 
-export default function Navbar() {
+export default function PublicNavbarServer() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
-  const navLinks = [
-    { href: '/', label: 'Početna' },
-    { href: '/usluge', label: 'Usluge' },
-    { href: '/o-nama', label: 'O nama' },
-    { href: '/kontakt', label: 'Kontakt' },
-  ]
 
   return (
     <header className='fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50'>
@@ -44,7 +39,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className='hidden md:flex items-center gap-8'>
-            {navLinks.map(link => (
+            {NAV_LINKS.map(link => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -91,7 +86,7 @@ export default function Navbar() {
         {isOpen && (
           <div className='md:hidden py-4 border-t border-border/50 animate-fade-in'>
             <div className='flex flex-col gap-4'>
-              {navLinks.map(link => (
+              {NAV_LINKS.map(link => (
                 <Link
                   key={link.href}
                   href={link.href}
