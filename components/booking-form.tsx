@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ArrowRight, CheckCircle, Calendar, User, Phone } from 'lucide-react'
+import { useForm } from 'react-hook-form'
 
 export interface BookingFormData {
   name: string
@@ -12,17 +13,21 @@ export interface BookingFormData {
 }
 
 export default function BookingForm() {
-  const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState<BookingFormData>({
-    name: '',
-    phone: '',
-    date: '',
+  const [loading] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<BookingFormData>({
+    defaultValues: {
+      name: '',
+      phone: '',
+      date: '',
+    },
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Form submitted:', formData)
-  }
+  const onSubmit = (data: BookingFormData) => console.log(data)
 
   const submitButtonText = loading ? 'Slanje...' : 'Zakažite sada'
 
@@ -38,7 +43,7 @@ export default function BookingForm() {
       </div>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         className='space-y-4'
       >
         <div className='relative'>
@@ -46,8 +51,7 @@ export default function BookingForm() {
           <Input
             type='text'
             placeholder='Vaše ime i prezime'
-            value={formData.name}
-            onChange={e => setFormData({ ...formData, name: e.target.value })}
+            {...register('name', { required: 'Ime je obavezno' })}
             className='pl-12 h-14 rounded-xl border-border bg-background/50'
             disabled={loading}
           />
@@ -58,8 +62,7 @@ export default function BookingForm() {
           <Input
             type='tel'
             placeholder='Broj telefona'
-            value={formData.phone}
-            onChange={e => setFormData({ ...formData, phone: e.target.value })}
+            {...register('phone', { required: 'Broj telefona je obavezan' })}
             className='pl-12 h-14 rounded-xl border-border bg-background/50'
             disabled={loading}
           />
@@ -69,8 +72,7 @@ export default function BookingForm() {
           <Calendar className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground' />
           <Input
             type='date'
-            value={formData.date}
-            onChange={e => setFormData({ ...formData, date: e.target.value })}
+            {...register('date', { required: 'Datum je obavezan' })}
             className='pl-12 h-14 rounded-xl border-border bg-background/50'
             disabled={loading}
           />
@@ -80,7 +82,7 @@ export default function BookingForm() {
           type='submit'
           size='lg'
           disabled={loading}
-          className='w-full text-xl py-8 bg-linear-to-r from-cyan-600 to-cyan-400 hover:shadow-hover hover:scale-[1.02] active:scale-[0.98] rounded-4xl'
+          className='w-full text-xl py-8 bg-linear-to-r from-cyan-600 to-cyan-400 hover:shadow-hover hover:scale-[1.02] active:scale-[0.98] rounded-4xl cursor-pointer'
         >
           {submitButtonText}
           <ArrowRight className='w-5 h-5 ml-2' />
