@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { usePathname } from "next/navigation";
-import { Menu, X, Phone } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import logo from "@/assets/logo.png";
-import Image from "next/image";
-import { NAV_LINKS } from "@/constants/navigations";
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { Menu, X, Phone } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import logo from '@/assets/logo.png';
+import Image from 'next/image';
+import { NAV_LINKS } from '@/constants/navigations';
 
 export default function PublicNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,10 +37,10 @@ export default function PublicNavbar() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
+                  'text-sm font-medium transition-colors hover:text-primary',
                   pathname === link.href
-                    ? "text-primary"
-                    : "text-muted-foreground"
+                    ? 'text-primary'
+                    : 'text-muted-foreground'
                 )}
               >
                 {link.label}
@@ -85,10 +85,10 @@ export default function PublicNavbar() {
                   href={link.href}
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    "text-base font-medium transition-colors py-2",
+                    'text-base font-medium transition-colors py-2',
                     pathname === link.href
-                      ? "text-primary"
-                      : "text-muted-foreground"
+                      ? 'text-primary'
+                      : 'text-muted-foreground'
                   )}
                 >
                   {link.label}

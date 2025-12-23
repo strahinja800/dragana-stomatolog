@@ -1,0 +1,33 @@
+{
+  "recommendations": [
+    // Essential for development
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next",
+
+    // Tailwind CSS support
+    "bradlc.vscode-tailwindcss",
+
+    // Git integration
+    "eamodio.gitlens",
+
+    // Auto rename paired tags
+    "formulahendry.auto-rename-tag",
+
+    // Path intellisense
+    "christian-kohler.path-intellisense",
+
+    // Better comments
+    "aaron-bond.better-comments",
+
+    // Error lens
+    "usernamehw.errorlens",
+
+    // Prisma support
+    "prisma.prisma",
+
+    // GitHub Copilot
+    "github.copilot",
+    "github.copilot-chat"
+  ]
+}

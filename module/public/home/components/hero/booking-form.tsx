@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ArrowRight, CheckCircle, Calendar, User, Phone } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ArrowRight, CheckCircle, Calendar, User, Phone } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 
 export interface BookingFormData {
   name: string;
@@ -21,15 +21,15 @@ export default function BookingForm() {
     formState: { errors },
   } = useForm<BookingFormData>({
     defaultValues: {
-      name: "",
-      phone: "",
-      date: "",
+      name: '',
+      phone: '',
+      date: '',
     },
   });
 
   const onSubmit = (data: BookingFormData) => console.log(data);
 
-  const submitButtonText = loading ? "Slanje..." : "Zakažite sada";
+  const submitButtonText = loading ? 'Slanje...' : 'Zakažite sada';
 
   return (
     <div className="bg-card/95 backdrop-blur-md rounded-4xl p-8 shadow-hover border border-border/50">
@@ -48,7 +48,7 @@ export default function BookingForm() {
           <Input
             type="text"
             placeholder="Vaše ime i prezime"
-            {...register("name", { required: "Ime je obavezno" })}
+            {...register('name', { required: 'Ime je obavezno' })}
             className="pl-12 h-14 rounded-xl border-border bg-background/50"
             disabled={loading}
           />
@@ -59,7 +59,7 @@ export default function BookingForm() {
           <Input
             type="tel"
             placeholder="Broj telefona"
-            {...register("phone", { required: "Broj telefona je obavezan" })}
+            {...register('phone', { required: 'Broj telefona je obavezan' })}
             className="pl-12 h-14 rounded-xl border-border bg-background/50"
             disabled={loading}
           />
@@ -69,7 +69,7 @@ export default function BookingForm() {
           <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="date"
-            {...register("date", { required: "Datum je obavezan" })}
+            {...register('date', { required: 'Datum je obavezan' })}
             className="pl-12 h-14 rounded-xl border-border bg-background/50"
             disabled={loading}
           />

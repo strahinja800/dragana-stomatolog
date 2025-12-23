@@ -1,7 +1,7 @@
-import { Sparkles, Star } from "lucide-react";
-import Image from "next/image";
-import { heroImage, dentist1, dentist2 } from "@/data/data";
-import BookingForm from "@/module/public/home/components/hero/booking-form";
+import { Sparkles, Star } from 'lucide-react';
+import Image from 'next/image';
+import { heroImage, dentist1, dentist2 } from '@/data/data';
+import BookingForm from '@/module/public/home/components/hero/booking-form';
 
 export default function HeroSection() {
   return (
@@ -67,7 +67,7 @@ export default function HeroSection() {
           </div>
 
           {/* Booking Form */}
-          <div className="animate-fade-up " style={{ animationDelay: "0.2s" }}>
+          <div className="animate-fade-up " style={{ animationDelay: '0.2s' }}>
             <BookingForm />
           </div>
         </div>
