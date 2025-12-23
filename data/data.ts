@@ -1,7 +1,8 @@
-import { Sparkles, Shield, Heart, Clock } from 'lucide-react';
-import heroImage from '@/assets/hero-dental.jpg';
+import { Clock, Heart, Shield, Sparkles } from 'lucide-react';
+
 import dentist1 from '@/assets/dentist-1.jpg';
 import dentist2 from '@/assets/dentist-2.jpg';
+import heroImage from '@/assets/hero-dental.jpg';
 import portfolio1 from '@/assets/portfolio-1.png';
 import portfolio2 from '@/assets/portfolio-2.png';
 import portfolio3 from '@/assets/portfolio-3.png';
@@ -149,4 +150,4 @@ export const features = [
   'Porodična stomatologija',
 ];
 
-export { heroImage, dentist1, dentist2 };
+export { dentist1, dentist2, heroImage };

@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { Menu, X, Phone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import logo from '@/assets/logo.png';
 import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import { Menu, Phone,X } from 'lucide-react';
+
+import logo from '@/assets/logo.png';
+import { Button } from '@/components/ui/button';
 import { NAV_LINKS } from '@/constants/navigations';
+import { cn } from '@/lib/utils';
 
 export default function PublicNavbar() {
   const [isOpen, setIsOpen] = useState(false);

@@ -22,7 +22,21 @@ const eslintConfig = defineConfig([
     },
     rules: {
       // Simple Import Sort Plugin rules
-      'simple-import-sort/imports': 'warn',
+      'simple-import-sort/imports': [
+        'warn',
+        {
+          groups: [
+            // React and Next.js first
+            ['^react', '^next'],
+            // External packages
+            ['^@?\\w'],
+            // Internal alias imports (@/)
+            ['^@/'],
+            // Relative imports
+            ['^\\.'],
+          ],
+        },
+      ],
       'simple-import-sort/exports': 'warn',
 
       // Unused Imports Plugin rules
@@ -57,29 +71,8 @@ const eslintConfig = defineConfig([
         'warn',
         {
           allowSameFolder: true,
-          rootDir: 'src',
+          rootDir: '.',
           prefix: '@',
-        },
-      ],
-    },
-  },
-
-  // Override for shared-fe submodule - disable no-relative-import-paths rule
-  {
-    files: ['src/shared-fe/**/*.ts', 'src/shared-fe/**/*.tsx'],
-    rules: {
-      'no-relative-import-paths/no-relative-import-paths': 'off',
-      // Enforce relative imports in shared-fe
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@/*', '~/*', '~/shared-fe/*'],
-              message:
-                'Use relative imports (./path or ../path) instead of path aliases in shared-fe submodule.',
-            },
-          ],
         },
       ],
     },
@@ -98,8 +91,6 @@ const eslintConfig = defineConfig([
     // Project-specific ignores
     'node_modules/**',
     '**/*.d.ts',
-    'src/lib/mongo-db-client/**',
-    'helm-values/**',
     '**/*.yaml',
     '**/*.yml',
     '**/*.json',

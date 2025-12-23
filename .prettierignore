@@ -1,39 +1,11 @@
-# Dependencies
-node_modules/
-.next/
-dist/
-build/
-
-# Generated files
-src/generated/
-*.d.ts
-
-# Prisma migrations (prevent checksum changes)
-prisma/migrations/
-
-# Problematic HTML templates (malformed HTML)
-public/mailTemplates/*.html
-
-# Lock files
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# Logs
-*.log
-
-# Environment files
-.env*
-
-# IDE files
-.vscode/
-.idea/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Helm values and YAML files
-helm-values/
+node_modules
+.next
+out
+build
+dist
+public
+*.md
+*.json
 *.yaml
 *.yml
+package-lock.json

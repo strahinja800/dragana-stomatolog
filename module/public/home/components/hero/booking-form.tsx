@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+
+import { ArrowRight, Calendar, CheckCircle, Phone, User } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowRight, CheckCircle, Calendar, User, Phone } from 'lucide-react';
-import { useForm } from 'react-hook-form';
 
 export interface BookingFormData {
   name: string;
@@ -25,6 +27,16 @@ export default function BookingForm() {
       phone: '',
       date: '',
     },
+
+
+
+
+
+
+
+
+
+
   });
 
   const onSubmit = (data: BookingFormData) => console.log(data);
@@ -63,6 +75,12 @@ export default function BookingForm() {
             className="pl-12 h-14 rounded-xl border-border bg-background/50"
             disabled={loading}
           />
+
+
+
+
+
+
         </div>
 
         <div className="relative">
