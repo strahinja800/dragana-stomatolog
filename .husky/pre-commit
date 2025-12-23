@@ -1,0 +1,11 @@
+echo "🔍 Running pre-commit checks..."
+
+# Format, lint, and type-check
+npm run validate
+
+if [ $? -ne 0 ]; then
+  echo "❌ Validation failed. Commit aborted."
+  exit 1
+fi
+
+echo "✅ Pre-commit validation passed!"
