@@ -10,7 +10,12 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/80',
+        // default: 'bg-primary text-primary-foreground hover:bg-primary/80',
+        default:
+          'w-full text-white text-xl py-8 bg-linear-to-r gradient-primary hover:shadow-hover hover:scale-[1.02] active:scale-[0.98] rounded-4xl cursor-pointer',
+        hero: 'bg-linear-to-r gradient-primary text-primary-foreground font-semibold shadow-soft hover:shadow-hover hover:scale-[1.02] active:scale-[0.98]',
+        'hero-outline':
+          'border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground font-semibold',
         outline:
           'border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs',
         secondary:

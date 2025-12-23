@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
-import { Menu, Phone,X } from 'lucide-react';
+import { Menu, Phone, X } from 'lucide-react';
 
 import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,7 @@ export default function PublicNavbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="flex items-center justify-center">
-              <div className="rounded-xl gradient-primary flex items-center justify-center">
+              <div className="rounded-xl flex items-center justify-center">
                 <Image src={logo} alt="DentalCare" height={100} />
               </div>
               <span className="font-heading text-2xl font-semibold text-foreground">
@@ -61,7 +61,7 @@ export default function PublicNavbar() {
             </a>
             <Button
               variant="default"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-linear-to-r from-cyan-600 to-cyan-400 text-primary-foreground font-semibold shadow-soft hover:shadow-hover hover:scale-[1.02] active:scale-[0.98] rounded-4xl px-10 py-6.5 text-base"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 gradient-primary text-primary-foreground font-semibold shadow-soft hover:shadow-hover hover:scale-[1.02] active:scale-[0.98] rounded-4xl px-10 py-6.5 text-base"
               asChild
             >
               <Link href="/kontakt">Zakaži pregled</Link>
