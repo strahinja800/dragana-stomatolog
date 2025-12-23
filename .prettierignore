@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+build
+dist
+public
+*.md
+*.json
+*.yaml
+*.yml
+package-lock.json

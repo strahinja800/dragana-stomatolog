@@ -3,4 +3,4 @@ export const NAV_LINKS = [
   { href: '/usluge', label: 'Usluge' },
   { href: '/o-nama', label: 'O nama' },
   { href: '/kontakt', label: 'Kontakt' },
-]
+];

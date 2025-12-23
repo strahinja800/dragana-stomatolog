@@ -6,7 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "ts:check": "tsc --noEmit",
+    "lint": "eslint \"{app,module,components,lib,hooks,constants,data}/**/*.{js,jsx,ts,tsx}\" \"*.{js,jsx,ts,tsx,mjs,cjs}\"",
+    "lint:fix": "eslint \"{app,module,components,lib,hooks,constants,data}/**/*.{js,jsx,ts,tsx}\" \"*.{js,jsx,ts,tsx,mjs,cjs}\" --fix",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "lint:format": "npm run format:write && npm run lint:fix",
+    "validate": "npm run format:check && npm run lint && npm run ts:check",
+    "prepare": "husky"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
@@ -39,6 +46,12 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-no-relative-import-paths": "^1.6.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.3.0",
+    "husky": "^9.1.7",
+    "prettier": "^3.7.4",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

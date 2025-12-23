@@ -1,12 +1,13 @@
-import { Sparkles, Shield, Heart, Clock } from 'lucide-react'
-import heroImage from '@/assets/hero-dental.jpg'
-import dentist1 from '@/assets/dentist-1.jpg'
-import dentist2 from '@/assets/dentist-2.jpg'
-import portfolio1 from '@/assets/portfolio-1.png'
-import portfolio2 from '@/assets/portfolio-2.png'
-import portfolio3 from '@/assets/portfolio-3.png'
-import portfolio4 from '@/assets/portfolio-4.png'
-import portfolio5 from '@/assets/portfolio-5.png'
+import { Clock, Heart, Shield, Sparkles } from 'lucide-react';
+
+import dentist1 from '@/assets/dentist-1.jpg';
+import dentist2 from '@/assets/dentist-2.jpg';
+import heroImage from '@/assets/hero-dental.jpg';
+import portfolio1 from '@/assets/portfolio-1.png';
+import portfolio2 from '@/assets/portfolio-2.png';
+import portfolio3 from '@/assets/portfolio-3.png';
+import portfolio4 from '@/assets/portfolio-4.png';
+import portfolio5 from '@/assets/portfolio-5.png';
 
 export const portfolioItems = [
   {
@@ -39,7 +40,7 @@ export const portfolioItems = [
     description: 'Kvalitetne krunice i mostovi',
     image: portfolio5,
   },
-]
+];
 
 export const services = [
   {
@@ -62,7 +63,7 @@ export const services = [
     title: 'Hitna pomoć',
     description: 'Brza pomoć za bol u zubima i hitne stomatološke situacije.',
   },
-]
+];
 
 export const testimonials = [
   {
@@ -86,7 +87,7 @@ export const testimonials = [
       'Konačno zubar od koga se ne plašim! Atmosfera je opuštajuća, a rezultati fantastični. Hvala vam!',
     rating: 5,
   },
-]
+];
 
 export const team = [
   {
@@ -113,7 +114,7 @@ export const team = [
     specialty: 'Lečenje kanala',
     image: dentist2,
   },
-]
+];
 
 export const blogPosts = [
   {
@@ -140,13 +141,13 @@ export const blogPosts = [
     category: 'Tretmani',
     image: dentist2,
   },
-]
+];
 
 export const features = [
   'Najsavremenija oprema',
   'Bezbolni tretmani',
   'Fleksibilno zakazivanje',
   'Porodična stomatologija',
-]
+];
 
-export { heroImage, dentist1, dentist2 }
+export { dentist1, dentist2, heroImage };
