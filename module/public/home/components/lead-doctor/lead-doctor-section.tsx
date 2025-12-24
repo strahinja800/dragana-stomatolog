@@ -1,8 +1,10 @@
-import dentist1 from "@/assets/dentist-1.jpg";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Award, GraduationCap, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+
+import { ArrowRight, Award, GraduationCap, Star } from "lucide-react";
+
+import dentist1 from "@/assets/dentist-1.jpg";
+import { Button } from "@/components/ui/button";
 
 export default function LeadDoctorSection() {
   return (
@@ -45,13 +47,13 @@ export default function LeadDoctorSection() {
           {/* Content Side */}
           <div className="space-y-6">
             <div>
-              <span className="inline-block px-4 py-2 rounded-full bg-primary-light text-primary text-sm font-medium mb-4">
+              <span className="inline-block px-4 py-2 rounded-full bg-[rgb(217,241,252)] text-[rgb(13,162,231)] text-sm font-medium mb-4">
                 Upoznajte našu glavnu lekarku
               </span>
               <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-2">
                 Dr. Ana Jovanović
               </h2>
-              <p className="text-primary font-medium">
+              <p className="text-[rgb(13,162,231)] font-medium">
                 Specijalista estetske stomatologije
               </p>
             </div>

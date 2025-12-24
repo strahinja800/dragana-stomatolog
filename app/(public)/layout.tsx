@@ -1,3 +1,4 @@
+import Footer from '@/module/public/shared/components/footer/public-footer';
 import Navbar from '@/module/public/shared/components/navbar/public-navbar';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -5,6 +6,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="flex h-dvh flex-col">
       <Navbar />
       <div className="flex-1">{children}</div>
+      <Footer />
     </div>
   );
 }
