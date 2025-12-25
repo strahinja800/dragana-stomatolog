@@ -34,6 +34,7 @@ export default function PortfolioSection() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
           <Services props={portfolioItems} />
         </div>
+        <Services props={portfolioItems} />
 
         <div className="text-center mt-12">
           <Button

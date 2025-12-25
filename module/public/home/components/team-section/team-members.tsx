@@ -13,7 +13,7 @@ interface Props {
 
 export default function TeamMembers({ team }: Props) {
   return (
-    <>
+    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
       {team.map((member, index) => (
         <div
           key={index}
@@ -37,6 +37,6 @@ export default function TeamMembers({ team }: Props) {
           </div>
         </div>
       ))}
-    </>
+    </div>
   );
 }

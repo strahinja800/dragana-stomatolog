@@ -13,7 +13,7 @@ interface Props {
 
 export default function Services({ props }: Props) {
   return (
-    <>
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
       {props.map((item, index) => (
         <div
           key={index}
@@ -40,6 +40,6 @@ export default function Services({ props }: Props) {
           </div>
         </div>
       ))}
-    </>
+    </div>
   );
 }

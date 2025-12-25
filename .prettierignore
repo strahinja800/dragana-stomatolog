@@ -1,11 +1,37 @@
-node_modules
-.next
-out
-build
-dist
-# public
-*.md
-*.json
+# Dependencies
+node_modules/
+.next/
+dist/
+build/
+
+# Generated files
+src/generated/
+*.d.ts
+
+
+
+
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Logs
+*.log
+
+# Environment files
+.env*
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Helm values and YAML files
+helm-values/
 *.yaml
 *.yml
-package-lock.json

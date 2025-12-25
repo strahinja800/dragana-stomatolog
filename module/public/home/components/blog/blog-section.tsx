@@ -32,10 +32,7 @@ export default function BlogSection() {
             </Link>
           </Button>
         </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          <BlogArticle post={blogPosts} />
-        </div>
+        <BlogArticle post={blogPosts} />
       </div>
     </section>
   );

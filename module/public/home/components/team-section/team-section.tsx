@@ -24,9 +24,7 @@ export default function TeamSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <TeamMembers team={team} />
-        </div>
+        <TeamMembers team={team} />
 
         <div className="text-center mt-12">
           <Button
