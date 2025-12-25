@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 
+import { SERVICES } from "@/constants/footer";
 import { FacebookIcon, InstagramIcon, LinkedinIcon } from "@/constants/icons";
 
 export default function Footer() {
@@ -59,13 +60,7 @@ export default function Footer() {
           <div>
             <h3 className="font-heading text-lg font-semibold mb-6">Usluge</h3>
             <ul className="space-y-3">
-              {[
-                "Opšta stomatologija",
-                "Estetska stomatologija",
-                "Implantologija",
-                "Ortodoncija",
-                "Parodontologija",
-              ].map((service) => (
+              {SERVICES.map((service) => (
                 <li key={service}>
                   <span className="text-background/70 text-sm">{service}</span>
                 </li>

@@ -1,10 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { team } from "@/data/data";
+
+import TeamMembers from "./team-members";
 
 export default function TeamSection() {
   return (
@@ -23,27 +24,7 @@ export default function TeamSection() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {team.map((member, index) => (
-            <div
-              key={index}
-              className="group relative overflow-hidden rounded-2xl bg-card border border-border shadow-card hover:shadow-hover transition-all duration-300"
-            >
-              <div className="aspect-3/4 overflow-hidden">
-                <Image
-                  src={member.image}
-                  alt={member.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-foreground/90 via-foreground/60 to-transparent p-6">
-                <h3 className="text-lg font-heading font-semibold text-primary-foreground">
-                  {member.name}
-                </h3>
-                <p className="text-primary text-sm font-medium">{member.role}</p>
-                <p className="text-primary-foreground/70 text-sm">{member.specialty}</p>
-              </div>
-            </div>
-          ))}
+          <TeamMembers team={team} />
         </div>
 
         <div className="text-center mt-12">

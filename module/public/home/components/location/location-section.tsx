@@ -19,7 +19,7 @@ export default function LocationSection() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 rounded-2xl overflow-hidden shadow-card border border-border h-[400px]">
+          <div className="lg:col-span-2 rounded-2xl overflow-hidden shadow-card border border-border h-100">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2830.3890988073946!2d20.4565!3d44.8125!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475a7ab4a0e4f4c9%3A0x5c4a4e4f4e4f4e4f!2sBelgrade%2C%20Serbia!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus"
               width="100%"
