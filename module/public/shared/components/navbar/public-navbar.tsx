@@ -62,7 +62,7 @@ export default function PublicNavbar() {
             </a>
             <Button
               variant="hero"
-              className='px-9 py-6 rounded-3xl text-base'
+              className="px-9 py-6 rounded-3xl text-base"
               asChild
             >
               <Link href="/kontakt">Zakaži pregled</Link>

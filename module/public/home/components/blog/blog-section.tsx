@@ -1,11 +1,11 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { BookOpen } from "lucide-react";
+import { BookOpen } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { blogPosts } from "@/data/data";
+import { Button } from '@/components/ui/button';
+import { blogPosts } from '@/data/data';
 
-import { BlogArticle } from "./blog-article";
+import { BlogArticle } from './blog-article';
 
 export default function BlogSection() {
   return (
@@ -20,7 +20,12 @@ export default function BlogSection() {
               Najnoviji članci
             </h2>
           </div>
-          <Button variant="hero-outline" size="lg" asChild className="text-lg px-8 py-6 border-[rgb(13,162,231)] hover:bg-[rgb(13,162,231)] text-[rgb(13,162,231)] rounded-3xl">
+          <Button
+            variant="hero-outline"
+            size="lg"
+            asChild
+            className="text-lg px-8 py-6 border-[rgb(13,162,231)] hover:bg-[rgb(13,162,231)] text-[rgb(13,162,231)] rounded-3xl"
+          >
             <Link href="/blog">
               Svi članci
               <BookOpen className="w-4 h-4 ml-2" />
