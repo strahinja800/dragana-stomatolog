@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import { Sparkles, Star } from 'lucide-react';
 
-import { dentist1, dentist2,heroImage } from '@/data/data';
+import { dentist1, dentist2, heroImage } from '@/data/data';
 import BookingForm from '@/module/public/home/components/hero/booking-form';
 
 export default function HeroSection() {

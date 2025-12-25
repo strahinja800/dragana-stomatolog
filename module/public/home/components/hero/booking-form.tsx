@@ -27,16 +27,6 @@ export default function BookingForm() {
       phone: '',
       date: '',
     },
-
-
-
-
-
-
-
-
-
-
   });
 
   const onSubmit = (data: BookingFormData) => console.log(data);
@@ -75,12 +65,6 @@ export default function BookingForm() {
             className="pl-12 h-14 rounded-xl border-border bg-background/50"
             disabled={loading}
           />
-
-
-
-
-
-
         </div>
 
         <div className="relative">
@@ -97,7 +81,7 @@ export default function BookingForm() {
           type="submit"
           size="lg"
           disabled={loading}
-          className="w-full text-xl py-8 bg-linear-to-r from-cyan-600 to-cyan-400 hover:shadow-hover hover:scale-[1.02] active:scale-[0.98] rounded-4xl cursor-pointer"
+          className="w-full text-xl py-8 gradient-primary hover:shadow-hover hover:scale-[1.02] active:scale-[0.98] rounded-4xl cursor-pointer"
         >
           {submitButtonText}
           <ArrowRight className="w-5 h-5 ml-2" />

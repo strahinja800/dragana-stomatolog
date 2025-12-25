@@ -3,7 +3,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.removeUnusedImports": "always",
-    "source.organizeImports": "always"
   },
 
   "editor.formatOnSave": true,
@@ -21,6 +20,8 @@
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
+
+
 
   // File associations
   "files.associations": {
