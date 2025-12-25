@@ -1,11 +1,11 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { portfolioItems } from "@/data/data";
+import { Button } from '@/components/ui/button';
+import { portfolioItems } from '@/data/data';
 
-import Services from "./services";
+import Services from './services';
 
 export default function PortfolioSection() {
   return (
@@ -20,20 +20,26 @@ export default function PortfolioSection() {
               </span>
             </div>
             <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground">
-              Vrhunska stomatološka<br />oprema i usluge
+              Vrhunska stomatološka
+              <br />
+              oprema i usluge
             </h2>
           </div>
           <p className="text-muted-foreground max-w-md lg:text-right text-base">
-            Koristimo najsavremeniju opremu i tehnologije za postizanje najboljih rezultata u lečenju i nezi vaših zuba.
+            Koristimo najsavremeniju opremu i tehnologije za postizanje
+            najboljih rezultata u lečenju i nezi vaših zuba.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
-          <Services props={portfolioItems}/>
-        </div>
+        <Services props={portfolioItems} />
 
         <div className="text-center mt-12">
-          <Button variant="hero-outline" size="lg" className="text-lg px-8 py-6 border-[rgb(13,162,231)] hover:bg-[rgb(13,162,231)] text-[rgb(13,162,231)] rounded-3xl" asChild>
+          <Button
+            variant="hero-outline"
+            size="lg"
+            className="text-lg px-8 py-6 border-[rgb(13,162,231)] hover:bg-[rgb(13,162,231)] text-[rgb(13,162,231)] rounded-3xl"
+            asChild
+          >
             <Link href="/usluge">
               Pogledaj sve usluge
               <ArrowRight className="w-4 h-4 ml-2" />

@@ -27,16 +27,6 @@ export default function BookingForm() {
       phone: '',
       date: '',
     },
-
-
-
-
-
-
-
-
-
-
   });
 
   const onSubmit = (data: BookingFormData) => console.log(data);
@@ -75,12 +65,6 @@ export default function BookingForm() {
             className="pl-12 h-14 rounded-xl border-border bg-background/50"
             disabled={loading}
           />
-
-
-
-
-
-
         </div>
 
         <div className="relative">

@@ -1,5 +1,6 @@
-import { AlertCircle, Phone } from "lucide-react";
-import Link from "next/link";
+import Link from 'next/link';
+
+import { AlertCircle, Phone } from 'lucide-react';
 
 export default function EmergencySection() {
   return (

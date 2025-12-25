@@ -1,11 +1,11 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { team } from "@/data/data";
+import { Button } from '@/components/ui/button';
+import { team } from '@/data/data';
 
-import TeamMembers from "./team-members";
+import TeamMembers from './team-members';
 
 export default function TeamSection() {
   return (
@@ -19,16 +19,20 @@ export default function TeamSection() {
             Upoznajte naše stručnjake
           </h2>
           <p className="text-muted-foreground">
-            Tim posvećenih profesionalaca sa dugogodišnjim iskustvom u stomatologiji.
+            Tim posvećenih profesionalaca sa dugogodišnjim iskustvom u
+            stomatologiji.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <TeamMembers team={team} />
-        </div>
+        <TeamMembers team={team} />
 
         <div className="text-center mt-12">
-          <Button variant="hero-outline" size="lg" className="text-lg px-8 py-6 border-[rgb(13,162,231)] hover:bg-[rgb(13,162,231)] text-[rgb(13,162,231)] rounded-3xl" asChild>
+          <Button
+            variant="hero-outline"
+            size="lg"
+            className="text-lg px-8 py-6 border-[rgb(13,162,231)] hover:bg-[rgb(13,162,231)] text-[rgb(13,162,231)] rounded-3xl"
+            asChild
+          >
             <Link href="/o-nama">
               Više o timu
               <ArrowRight className="w-4 h-4 ml-2" />

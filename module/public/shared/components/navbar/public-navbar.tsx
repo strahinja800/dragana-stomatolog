@@ -1,9 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 
 import { Menu, Phone, X } from 'lucide-react';
 
@@ -61,7 +61,7 @@ export default function PublicNavbar() {
             </a>
             <Button
               variant="hero"
-              className='px-9 py-6 rounded-3xl text-base'
+              className="px-9 py-6 rounded-3xl text-base"
               asChild
             >
               <Link href="/kontakt">Zakaži pregled</Link>
