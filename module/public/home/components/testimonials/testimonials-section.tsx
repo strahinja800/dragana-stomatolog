@@ -1,5 +1,6 @@
-import { testimonials } from "@/data/data";
-import { Star } from "lucide-react";
+import { Star } from 'lucide-react';
+
+import { testimonials } from '@/data/data';
 export default function TestimonialsSection() {
   return (
     <section className="py-24 gradient-hero">
@@ -21,7 +22,10 @@ export default function TestimonialsSection() {
             >
               <div className="flex items-center gap-1 mb-6">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-[rgb(13,162,231)] text-[rgb(13,162,231)]" />
+                  <Star
+                    key={i}
+                    className="w-5 h-5 fill-[rgb(13,162,231)] text-[rgb(13,162,231)]"
+                  />
                 ))}
               </div>
               <p className="text-foreground leading-relaxed mb-6">
@@ -34,8 +38,12 @@ export default function TestimonialsSection() {
                   </span>
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">{testimonial.name}</p>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                  <p className="font-medium text-foreground">
+                    {testimonial.name}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {testimonial.role}
+                  </p>
                 </div>
               </div>
             </div>

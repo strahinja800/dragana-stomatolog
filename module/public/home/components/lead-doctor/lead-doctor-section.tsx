@@ -1,10 +1,10 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { ArrowRight, Award, GraduationCap, Star } from "lucide-react";
+import { ArrowRight, Award, GraduationCap, Star } from 'lucide-react';
 
-import dentist1 from "@/assets/dentist-1.jpg";
-import { Button } from "@/components/ui/button";
+import dentist1 from '@/assets/dentist-1.jpg';
+import { Button } from '@/components/ui/button';
 
 export default function LeadDoctorSection() {
   return (
@@ -28,15 +28,22 @@ export default function LeadDoctorSection() {
                     <Award className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <div>
-                    <p className="font-heading font-bold text-foreground">15+ godina</p>
+                    <p className="font-heading font-bold text-foreground">
+                      15+ godina
+                    </p>
                     <p className="text-sm text-muted-foreground">iskustva</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                    <Star
+                      key={i}
+                      className="w-4 h-4 fill-primary text-primary"
+                    />
                   ))}
-                  <span className="text-sm text-muted-foreground ml-2">5.0 ocena</span>
+                  <span className="text-sm text-muted-foreground ml-2">
+                    5.0 ocena
+                  </span>
                 </div>
               </div>
             </div>
@@ -59,36 +66,51 @@ export default function LeadDoctorSection() {
             </div>
 
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Sa više od 15 godina iskustva u stomatologiji, dr. Ana Jovanović je posvećena
-              pružanju vrhunske nege svakom pacijentu. Njena strast za estetskom stomatologijom
-              i kontinuirano usavršavanje omogućavaju joj da primenjuje najnovije tehnike i
-              tehnologije u svakodnevnoj praksi.
+              Sa više od 15 godina iskustva u stomatologiji, dr. Ana Jovanović
+              je posvećena pružanju vrhunske nege svakom pacijentu. Njena strast
+              za estetskom stomatologijom i kontinuirano usavršavanje
+              omogućavaju joj da primenjuje najnovije tehnike i tehnologije u
+              svakodnevnoj praksi.
             </p>
 
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Diplomirala je na Stomatološkom fakultetu Univerziteta u Beogradu, a specijalizaciju
-              je završila u Švajcarskoj. Redovno učestvuje na međunarodnim kongresima i radionicama
-              kako bi svojim pacijentima pružila najbolju moguću negu.
+              Diplomirala je na Stomatološkom fakultetu Univerziteta u Beogradu,
+              a specijalizaciju je završila u Švajcarskoj. Redovno učestvuje na
+              međunarodnim kongresima i radionicama kako bi svojim pacijentima
+              pružila najbolju moguću negu.
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4 pt-4">
               <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 border border-border">
                 <GraduationCap className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="font-medium text-foreground text-sm">Stomatološki fakultet</p>
-                  <p className="text-xs text-muted-foreground">Univerzitet u Beogradu</p>
+                  <p className="font-medium text-foreground text-sm">
+                    Stomatološki fakultet
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Univerzitet u Beogradu
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 border border-border">
                 <Award className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="font-medium text-foreground text-sm">Specijalizacija</p>
-                  <p className="text-xs text-muted-foreground">Estetska stomatologija</p>
+                  <p className="font-medium text-foreground text-sm">
+                    Specijalizacija
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Estetska stomatologija
+                  </p>
                 </div>
               </div>
             </div>
 
-            <Button variant='hero' size="lg" className="rounded-3xl text-lg px-8 py-6" asChild>
+            <Button
+              variant="hero"
+              size="lg"
+              className="rounded-3xl text-lg px-8 py-6"
+              asChild
+            >
               <Link href="/o-nama">
                 Više o timu
                 <ArrowRight className="w-4 h-4 ml-2" />

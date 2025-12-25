@@ -1,5 +1,6 @@
 'use client';
 
+// eslint-disable-next-line simple-import-sort/imports
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -39,9 +40,9 @@ export default function PublicNavbar() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'text-sm font-medium transition-colors hover:text-primary',
+                  'text-sm font-medium transition-colors text-[rgb(13,162,231)]',
                   pathname === link.href
-                    ? 'text-primary'
+                    ? 'text-[rgb(13,162,231)]'
                     : 'text-muted-foreground'
                 )}
               >

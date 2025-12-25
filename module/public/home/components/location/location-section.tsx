@@ -1,6 +1,6 @@
-import { ArrowRight, Clock, MapPin, Phone } from "lucide-react";
+import { ArrowRight, Clock, MapPin, Phone } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
 export default function LocationSection() {
   return (
@@ -39,9 +39,12 @@ export default function LocationSection() {
                   <MapPin className="w-6 h-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-heading font-semibold text-foreground mb-1">Adresa</h3>
+                  <h3 className="font-heading font-semibold text-foreground mb-1">
+                    Adresa
+                  </h3>
                   <p className="text-muted-foreground text-sm">
-                    Knez Mihailova 25<br />
+                    Knez Mihailova 25
+                    <br />
                     11000 Beograd, Srbija
                   </p>
                 </div>
@@ -54,9 +57,12 @@ export default function LocationSection() {
                   <Phone className="w-6 h-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-heading font-semibold text-foreground mb-1">Telefon</h3>
+                  <h3 className="font-heading font-semibold text-foreground mb-1">
+                    Telefon
+                  </h3>
                   <p className="text-muted-foreground text-sm">
-                    +381 11 123 4567<br />
+                    +381 11 123 4567
+                    <br />
                     +381 63 123 4567
                   </p>
                 </div>
@@ -69,16 +75,24 @@ export default function LocationSection() {
                   <Clock className="w-6 h-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-heading font-semibold text-foreground mb-1">Radno vreme</h3>
+                  <h3 className="font-heading font-semibold text-foreground mb-1">
+                    Radno vreme
+                  </h3>
                   <p className="text-muted-foreground text-sm">
-                    Pon - Pet: 08:00 - 20:00<br />
+                    Pon - Pet: 08:00 - 20:00
+                    <br />
                     Sub: 09:00 - 15:00
                   </p>
                 </div>
               </div>
             </div>
 
-            <Button variant="hero" size="lg" className="w-full rounded-3xl text-lg py-6" asChild>
+            <Button
+              variant="hero"
+              size="lg"
+              className="w-full rounded-3xl text-lg py-6"
+              asChild
+            >
               <a
                 href="https://www.google.com/maps/dir//Belgrade,+Serbia"
                 target="_blank"

@@ -1,8 +1,8 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
 export default function CtaSection() {
   return (
@@ -13,13 +13,14 @@ export default function CtaSection() {
             Spremni za savršen osmeh?
           </h2>
           <p className="text-primary-foreground/90 text-lg mb-8 max-w-xl mx-auto">
-            Zakažite besplatnu konsultaciju danas i napravite prvi korak ka osmehu iz snova.
+            Zakažite besplatnu konsultaciju danas i napravite prvi korak ka
+            osmehu iz snova.
           </p>
           <div className="flex flex-col mx-60 sm:flex-row gap-4 justify-center">
             <Button
-              variant='outline'
+              variant="outline"
               size="lg"
-              className= "px-12 py-7 rounded-3xl text-lg bg-white text-[rgb(13,162,231)]! hover:bg-card/90 font-semibold shadow-soft "
+              className="px-12 py-7 rounded-3xl text-lg bg-white text-[rgb(13,162,231)]! hover:bg-card/90 font-semibold shadow-soft "
               asChild
             >
               <Link href="/kontakt">

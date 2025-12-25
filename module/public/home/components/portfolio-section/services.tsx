@@ -1,18 +1,17 @@
-import Image, { type StaticImageData } from "next/image";
-
+import Image, { type StaticImageData } from 'next/image';
 
 interface Service {
   title: string;
   description: string;
   number: string;
-  image: StaticImageData
+  image: StaticImageData;
 }
 
 interface Props {
-  props: Service[]
+  props: Service[];
 }
 
-export default function Services({props}: Props) {
+export default function Services({ props }: Props) {
   return (
     <>
       {props.map((item, index) => (
@@ -29,9 +28,7 @@ export default function Services({props}: Props) {
             <h3 className="text-2xl font-heading font-semibold text-foreground mb-2">
               {item.title}
             </h3>
-            <p className="text-muted-foreground text-sm">
-              {item.description}
-            </p>
+            <p className="text-muted-foreground text-sm">{item.description}</p>
           </div>
           {/* 3D Image */}
           <div className="absolute -right-8 -bottom-8 w-40 h-40 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
@@ -44,5 +41,5 @@ export default function Services({props}: Props) {
         </div>
       ))}
     </>
-  )
+  );
 }
