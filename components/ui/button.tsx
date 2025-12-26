@@ -16,7 +16,7 @@ const buttonVariants = cva(
         'hero-outline':
           'border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground font-semibold',
         outline:
-          'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+          'border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground',
         ghost:

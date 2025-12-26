@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 export default function CtaServices() {
   return (
-    <section className="py-24 gradient-primary">
+    <section className="py-40 gradient-primary">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary-foreground mb-6">
@@ -17,8 +17,9 @@ export default function CtaServices() {
             odaberete pravi tretman za vas.
           </p>
           <Button
-            size="xl"
-            className="bg-card text-primary hover:bg-card/90 font-semibold shadow-soft"
+            variant="outline"
+            size="lg"
+            className="px-12 py-7 rounded-3xl text-lg bg-white text-[rgb(13,162,231)]! hover:bg-card/90 font-semibold shadow-soft "
             asChild
           >
             <Link href="/kontakt">
