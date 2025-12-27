@@ -1,4 +1,5 @@
-import CtaServices from './cta-services';
+import CtaServices from '@/module/public/services/views/services-view/cta-services';
+
 import ServicesGrid from './services-grid';
 
 export default function ServicesHero() {

@@ -1,4 +1,4 @@
-import ServicesHero from '@/module/public/services-page/components/hero/hero';
+import ServicesHero from '@/module/public/services/views/services-view/hero';
 
 export default function ServicesPage() {
   return (
