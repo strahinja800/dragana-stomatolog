@@ -7,7 +7,7 @@ import BookingForm from '@/module/public/home/components/hero/booking-form';
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden mt-20">
+    <section className="relative min-h-screen flex items-center overflow-hidden mt-20 max-md:mt-10">
       {/* Full background image */}
       <div className="absolute inset-0">
         <Image
@@ -18,7 +18,7 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-linear-to-r from-foreground/80 via-foreground/50 to-transparent" />
       </div>
 
-      <div className="container mx-auto px-4 py-20 relative z-10">
+      <div className="container mx-auto px-4 py-20 relative z-10 max-lg:m-20 max-lg:mt-0 max-lg:max-w-full">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8 animate-fade-up">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 backdrop-blur-sm text-primary-foreground text-sm font-medium border border-primary/30">
@@ -26,7 +26,7 @@ export default function HeroSection() {
               <span>Vaš savršen osmeh počinje ovde</span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl lg:text-8xl font-heading font-bold text-primary-foreground leading-tighter">
+            <h1 className="text-3xl md:text-6xl xl:text-8xl font-heading font-bold text-primary-foreground leading-tighter max-[1280px]:text-2xl">
               Stomatologija koja
               <span className="block text-primary"> inspiriše osmeh</span>
             </h1>

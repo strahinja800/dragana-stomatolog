@@ -1,18 +1,11 @@
-import { CheckCircle, Clock, Heart, Star } from 'lucide-react';
-
-const stats = [
-  { icon: CheckCircle, value: '15+', label: 'Godina iskustva' },
-  { icon: Heart, value: '10,000+', label: 'Zadovoljnih pacijenata' },
-  { icon: Star, value: '5.0', label: 'Prosečna ocena' },
-  { icon: Clock, value: '24/7', label: 'Podrška pacijentima' },
-];
+import { STATISTICS } from '@/constants/stats';
 
 export default function StatisticsSection() {
   return (
-    <section className="py-20 bg-background">
+    <section className="py-6 md:py-16 lg:py-20 bg-background">
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-4 gap-8">
-          {stats.map((item, index) => (
+        <div className="grid lg:grid-cols-4 gap-4 md:gap-8">
+          {STATISTICS.map((item, index) => (
             <div
               key={index}
               className="flex items-center gap-4 p-6 rounded-2xl bg-card border border-border shadow-card"
