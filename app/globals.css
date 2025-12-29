@@ -106,6 +106,7 @@
   --shadow-soft: 0 4px 20px -4px hsl(199 89% 48% / 0.15);
   --shadow-card: 0 8px 30px -8px hsl(210 25% 15% / 0.08);
   --shadow-hover: 0 12px 40px -8px hsl(199 89% 48% / 0.25);
+  --shadow-hover-blue: 0 12px 40px -8px rgb(13, 162, 231);
   --shadow-glow: 0 0 40px hsl(199 85% 70% / 0.3);
 
   --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
