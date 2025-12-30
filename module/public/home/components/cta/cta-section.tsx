@@ -16,25 +16,17 @@ export default function CtaSection() {
             Zakažite besplatnu konsultaciju danas i napravite prvi korak ka
             osmehu iz snova.
           </p>
-          <div className="flex flex-col mx-60 sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row justify-center">
             <Button
               variant="outline"
               size="lg"
-              className="px-12 py-7 rounded-3xl text-lg bg-white text-[rgb(13,162,231)]! hover:bg-card/90 font-semibold shadow-soft "
+              className="px-18 py-7 rounded-3xl text-lg bg-white text-[rgb(13,162,231)]! hover:bg-card/90 font-semibold shadow-soft "
               asChild
             >
               <Link href="/kontakt">
                 Zakaži pregled
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
-            </Button>
-            <Button
-              size="xl"
-              variant="outline"
-              className="border-2 rounded-3xl border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary font-semibold"
-              asChild
-            >
-              <a href="tel:+381111234567">Pozovi nas</a>
             </Button>
           </div>
         </div>

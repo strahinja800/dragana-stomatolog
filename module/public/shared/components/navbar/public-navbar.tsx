@@ -18,7 +18,7 @@ export default function PublicNavbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 max-lg:m-0 max-lg:max-w-full">
         <nav className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
@@ -26,7 +26,7 @@ export default function PublicNavbar() {
               <div className="rounded-xl flex items-center justify-center">
                 <Image src={logo} alt="DentalCare" height={100} />
               </div>
-              <span className="font-heading text-2xl font-semibold text-foreground">
+              <span className="font-heading text-2xl font-semibold text-foreground max-[900px]:hidden">
                 DentalCare
               </span>
             </div>

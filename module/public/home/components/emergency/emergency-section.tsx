@@ -6,9 +6,9 @@ export default function EmergencySection() {
   return (
     <section className="py-8 gradient-primary from-primary to-accent">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-3xl bg-card/20 backdrop-blur-sm flex items-center justify-center">
+            <div className="w-14 h-14 rounded-3xl bg-card/20 backdrop-blur-sm flex items-center justify-center shrink-0">
               <AlertCircle className="w-7 h-7 text-primary-foreground" />
             </div>
             <div>
@@ -20,10 +20,11 @@ export default function EmergencySection() {
               </p>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3">
+
+          <div className="flex flex-col md:flex-row gap-3 w-full lg:w-auto">
             <Link
               href="tel:+381111234567"
-              className="flex items-center gap-3 px-5 py-3 rounded-3xl bg-card text-foreground hover:bg-card/90 transition-colors shadow-soft"
+              className="flex items-center justify-center md:justify-start gap-3 px-5 py-3 rounded-3xl bg-card text-foreground hover:bg-card/90 transition-colors shadow-soft w-full md:w-auto"
             >
               <Phone className="w-5 h-5 text-primary" />
               <div>
@@ -31,9 +32,10 @@ export default function EmergencySection() {
                 <p className="font-semibold">+381 11 123 4567</p>
               </div>
             </Link>
+
             <Link
               href="tel:+381631234567"
-              className="flex items-center gap-3 px-5 py-3 rounded-3xl bg-card/20 backdrop-blur-sm text-primary-foreground border border-primary-foreground/20 hover:bg-card/30 transition-colors"
+              className="flex items-center justify-center md:justify-start gap-3 px-5 py-3 rounded-3xl bg-card/20 backdrop-blur-sm text-primary-foreground border border-primary-foreground/20 hover:bg-card/30 transition-colors w-full md:w-auto"
             >
               <Phone className="w-5 h-5" />
               <div>
