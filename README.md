@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DentalCare - Stomatološka ordinacija
 
-## Getting Started
+Moderni website za stomatološku ordinaciju izrađen u Next.js 16 sa React 19 i Tailwind CSS 4.
 
-First, run the development server:
+## Tech Stack
+
+- **Next.js 16** - App Router, React Server Components
+- **React 19** - Najnovija verzija React-a
+- **TypeScript 5** - Striktna tipizacija
+- **Tailwind CSS 4** - Utility-first CSS
+- **shadcn/ui** - Radix-based komponente
+- **react-hook-form** - Upravljanje formama
+
+## Pokretanje
 
 ```bash
+# Instalacija
+npm install
+
+# Development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Production build
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Struktura projekta
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/                    # Next.js App Router
+  (public)/             # Javne stranice
+module/                 # Feature moduli
+  public/
+    home/components/    # Home sekcije
+    services/views/     # Usluge stranica
+    shared/components/  # Navbar, Footer
+components/ui/          # shadcn komponente
+constants/              # Navigacija, usluge, statistika
+assets/                 # Slike
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Dostupne komande
 
-## Learn More
+| Komanda            | Opis                       |
+| ------------------ | -------------------------- |
+| `npm run dev`      | Development server         |
+| `npm run build`    | Production build           |
+| `npm run lint`     | ESLint provera             |
+| `npm run validate` | Format + Lint + TypeScript |
 
-To learn more about Next.js, take a look at the following resources:
+## Stranice
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `/` - Početna stranica
+- `/usluge` - Pregled usluga
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Planirane funkcionalnosti
 
-## Deploy on Vercel
+### User Dashboard
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Online zakazivanje termina sa prikazom slobodnih termina
+- Opcija za dodatnu poruku pri zakazivanju
+- Email podsetnici za termine
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Admin Dashboard
+
+- Upravljanje blog postovima
+- Pregled i upravljanje kartonima pacijenata
+- Automatski email sistem na osnovu kartona pacijenta
+
+## Konvencije
+
+- Srpski jezik za UI tekst
+- Module-based arhitektura
+- `@/` path alias za importe
+- `cn()` utility za Tailwind klase
