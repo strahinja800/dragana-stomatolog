@@ -59,7 +59,7 @@ assets/                 # Slike
 
 - Online zakazivanje termina sa prikazom slobodnih termina
 - Opcija za dodatnu poruku pri zakazivanju
-- Email podsjetnici za termine
+- Email podsetnici za termine
 
 ### Admin Dashboard
 
