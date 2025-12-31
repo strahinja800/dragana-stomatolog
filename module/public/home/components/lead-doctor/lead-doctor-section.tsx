@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 
 export default function LeadDoctorSection() {
   return (
-    <section className="py-24 bg-background overflow-hidden">
+    <section className="py-16 md:py-24 bg-background overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Image Side */}
@@ -22,7 +22,7 @@ export default function LeadDoctorSection() {
                 />
               </div>
               {/* Floating Card */}
-              <div className="absolute -bottom-6 -right-6 lg:right-8 bg-card rounded-2xl p-6 shadow-hover border border-border max-w-70">
+              <div className="absolute -bottom-6 -right-3 md:-right-6 lg:right-8 bg-card rounded-2xl p-6 shadow-hover border border-border max-w-70">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-3xl gradient-primary flex items-center justify-center">
                     <Award className="w-6 h-6 text-primary-foreground" />
@@ -84,7 +84,7 @@ export default function LeadDoctorSection() {
               <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 border border-border">
                 <GraduationCap className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="font-medium text-foreground text-sm">
+                  <p className="font-medium text-foreground text-base">
                     Stomatološki fakultet
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -95,7 +95,7 @@ export default function LeadDoctorSection() {
               <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 border border-border">
                 <Award className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="font-medium text-foreground text-sm">
+                  <p className="font-medium text-foreground text-base">
                     Specijalizacija
                   </p>
                   <p className="text-xs text-muted-foreground">

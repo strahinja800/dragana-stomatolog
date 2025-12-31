@@ -11,8 +11,8 @@ import {
 export default function Footer() {
   return (
     <footer className="bg-foreground text-background">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div className="container mx-auto px-4 py-12 md:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
@@ -28,14 +28,14 @@ export default function Footer() {
             <p className="text-background/70 text-sm leading-relaxed">
               {FOOTER_BRAND.description}
             </p>
-            <div className="flex items-center gap-4 pt-2">
+            <div className="flex items-center gap-2 pt-2">
               {FOOTER_SOCIAL_LINKS.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
                   className="p-2 rounded-lg bg-background/10 hover:bg-primary transition-colors"
                 >
-                  <link.icon />
+                  <link.icon className="w-5 h-5 md:w-6 md:h-6" />
                 </a>
               ))}
             </div>
@@ -43,10 +43,10 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-heading text-lg font-semibold mb-6">
+            <h3 className="font-heading text-lg font-semibold mb-3 md:mb-6">
               Brzi linkovi
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-1.5 md:space-y-3">
               {FOOTER_QUICK_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -62,8 +62,10 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h3 className="font-heading text-lg font-semibold mb-6">Usluge</h3>
-            <ul className="space-y-3">
+            <h3 className="font-heading text-lg font-semibold mb-3 md:mb-6">
+              Usluge
+            </h3>
+            <ul className="space-y-1.5 md:space-y-3">
               {FOOTER_SERVICES.map((service) => (
                 <li key={service}>
                   <span className="text-background/70 text-sm">{service}</span>
@@ -74,8 +76,10 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-heading text-lg font-semibold mb-6">Kontakt</h3>
-            <ul className="space-y-4">
+            <h3 className="font-heading text-lg font-semibold mb-3 md:mb-6">
+              Kontakt
+            </h3>
+            <ul className="space-y-3 md:space-y-4">
               {FOOTER_CONTACT.map((item) => (
                 <li key={item.type} className="flex items-start gap-3">
                   <item.icon className="w-5 h-5 text-primary shrink-0 mt-0.5" />

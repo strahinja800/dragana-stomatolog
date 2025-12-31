@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 
 export default function LocationSection() {
   return (
-    <section className="py-24 bg-background">
+    <section className="py-16 md:py-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="inline-block px-4 py-2 rounded-full bg-[rgb(217,241,252)] text-[rgb(13,162,231)] text-sm font-medium mb-4">
@@ -35,8 +35,8 @@ export default function LocationSection() {
           <div className="space-y-6">
             <div className="p-6 rounded-2xl bg-card border border-border shadow-card">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shrink-0">
-                  <MapPin className="w-6 h-6 text-primary-foreground" />
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl gradient-primary flex items-center justify-center shrink-0">
+                  <MapPin className="w-4 h-4 md:w-6 md:h-6 text-primary-foreground" />
                 </div>
                 <div>
                   <h3 className="font-heading font-semibold text-foreground mb-1">

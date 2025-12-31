@@ -9,7 +9,7 @@ import Services from './services';
 
 export default function PortfolioSection() {
   return (
-    <section className="py-24 bg-muted/30">
+    <section className="py-16 md:py-24 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-16">
           <div>
@@ -31,7 +31,7 @@ export default function PortfolioSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-7">
           <Services props={portfolioItems} />
         </div>
 
