@@ -21,7 +21,7 @@ export default function EmergencySection() {
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-3 w-full lg:w-auto">
+          <div className="flex flex-col items-center justify-center md:flex-row gap-3 w-full lg:w-auto">
             <Link
               href="tel:+381111234567"
               className="flex items-center justify-center md:justify-start gap-3 px-5 py-3 rounded-3xl bg-card text-foreground hover:bg-card/90 transition-colors shadow-soft w-full md:w-auto"

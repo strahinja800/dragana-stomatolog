@@ -17,9 +17,9 @@ export default function PublicNavbar() {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-lg border-b border-border/50">
       <div className="container mx-auto px-4 max-lg:m-0 max-lg:max-w-full">
-        <nav className="flex items-center justify-between h-20">
+        <nav className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="flex items-center justify-center">
@@ -39,10 +39,10 @@ export default function PublicNavbar() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'text-sm font-medium transition-colors text-[rgb(13,162,231)]',
+                  'text-sm font-medium transition-colors',
                   pathname === link.href
                     ? 'text-[rgb(13,162,231)]'
-                    : 'text-muted-foreground'
+                    : 'text-black'
                 )}
               >
                 {link.label}
@@ -54,7 +54,7 @@ export default function PublicNavbar() {
           <div className="hidden md:flex items-center gap-4">
             <a
               href="tel:+381111234567"
-              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+              className="flex items-center gap-2 text-black hover:text-primary transition-colors"
             >
               <Phone className="w-4 h-4" />
               <span className="text-sm font-medium">+381 11 123 4567</span>
@@ -80,17 +80,15 @@ export default function PublicNavbar() {
         {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden py-4 border-t border-border/50 animate-fade-in">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    'text-base font-medium transition-colors py-2',
-                    pathname === link.href
-                      ? 'text-primary'
-                      : 'text-muted-foreground'
+                    'text-base font-medium transition-colors',
+                    pathname === link.href ? 'text-primary' : 'text-black'
                   )}
                 >
                   {link.label}

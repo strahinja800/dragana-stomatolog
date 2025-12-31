@@ -9,7 +9,7 @@ import { BlogArticle } from './blog-article';
 
 export default function BlogSection() {
   return (
-    <section className="py-24 bg-background">
+    <section className="py-16 md:py-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-16">
           <div>

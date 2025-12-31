@@ -31,7 +31,7 @@ export default function Services({ props }: Props) {
             <p className="text-muted-foreground text-sm">{item.description}</p>
           </div>
           {/* 3D Image */}
-          <div className="absolute -right-8 -bottom-8 w-40 h-40 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
+          <div className="absolute -right-8 -bottom-8  w-36 h-36 md:w-40 md:h-40 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
             <Image
               src={item.image}
               alt={item.title}

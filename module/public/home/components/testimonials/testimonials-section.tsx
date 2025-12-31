@@ -3,7 +3,7 @@ import { Star } from 'lucide-react';
 import { testimonials } from '@/data/data';
 export default function TestimonialsSection() {
   return (
-    <section className="py-24 gradient-hero">
+    <section className="py-16 md:py-24 gradient-hero">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="inline-block px-4 py-2 rounded-full bg-[rgb(217,241,252)] text-[rgb(13,162,231)] text-sm font-medium mb-4">

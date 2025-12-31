@@ -34,9 +34,9 @@ export default function BookingForm() {
   const submitButtonText = loading ? 'Slanje...' : 'Zakažite sada';
 
   return (
-    <div className="bg-card/95 backdrop-blur-md rounded-4xl p-8 shadow-hover border border-border/50">
+    <div className="bg-card/95 backdrop-blur-md rounded-4xl p-3 md:p-8 shadow-hover border border-border/50">
       <div className="text-center mb-6">
-        <h3 className="text-2xl font-heading font-bold text-foreground mb-2">
+        <h3 className="text-2xl font-heading font-bold text-foreground mb-2 max-sm:mb-0">
           Brzo zakazivanje
         </h3>
         <p className="text-muted-foreground text-sm">
@@ -46,7 +46,7 @@ export default function BookingForm() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="relative">
-          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 md:w-5 md:h-5 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Vaše ime i prezime"
@@ -57,7 +57,7 @@ export default function BookingForm() {
         </div>
 
         <div className="relative">
-          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 md:w-5 md:h-5 text-muted-foreground" />
           <Input
             type="tel"
             placeholder="Broj telefona"
@@ -68,7 +68,7 @@ export default function BookingForm() {
         </div>
 
         <div className="relative">
-          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 md:w-5 md:h-5 text-muted-foreground" />
           <Input
             type="date"
             {...register('date', { required: 'Datum je obavezan' })}

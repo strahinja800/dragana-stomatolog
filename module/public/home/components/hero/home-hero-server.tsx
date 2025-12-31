@@ -7,7 +7,7 @@ import BookingForm from '@/module/public/home/components/hero/booking-form';
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden mt-20 max-md:mt-10">
+    <section className="relative min-h-screen flex items-center overflow-hidden md:mt-16">
       {/* Full background image */}
       <div className="absolute inset-0">
         <Image
