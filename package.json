@@ -15,7 +15,7 @@
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "lint:format": "npm run format:write && npm run lint:fix",
-    "validate": "npm run format:check && npm run lint && npm run ts:check",
+    "validate": "npm run format:check && npm run lint && npm run ts:check && npm run build",
     "prepare": "husky",
     "postinstall": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
