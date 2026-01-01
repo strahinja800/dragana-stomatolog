@@ -35,12 +35,7 @@ export default function NotFound() {
             </p>
 
             {/* CTA Button */}
-            <Button
-              variant="hero"
-              size="xl"
-              className="group gap-2.5 rounded-3xl px-10"
-              asChild
-            >
+            <Button className="group gap-2.5 rounded-3xl px-10" asChild>
               <Link href="/">
                 <Home className="size-5 transition-transform duration-300 group-hover:scale-110" />
                 Nazad na početnu

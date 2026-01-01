@@ -87,12 +87,7 @@ export default function LocationSection() {
               </div>
             </div>
 
-            <Button
-              variant="hero"
-              size="lg"
-              className="w-full rounded-3xl text-lg py-6"
-              asChild
-            >
+            <Button className="w-full " asChild>
               <a
                 href="https://www.google.com/maps/dir//Belgrade,+Serbia"
                 target="_blank"

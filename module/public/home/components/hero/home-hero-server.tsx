@@ -19,8 +19,8 @@ export default function HeroSection() {
       </div>
 
       <div className="container mx-auto px-4 py-20 relative z-10 max-lg:m-20 max-lg:mt-0 max-lg:max-w-full max-sm:mx-0 max-sm:mb-0">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8 animate-fade-up">
+        <div className="grid lg:grid-cols-5 gap-12 items-center">
+          <div className="lg:col-span-3 space-y-8 animate-fade-up">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 backdrop-blur-sm text-primary-foreground text-sm font-medium border border-primary/30">
               <Sparkles className="w-4 h-4" />
               <span>Vaš savršen osmeh počinje ovde</span>
@@ -69,7 +69,10 @@ export default function HeroSection() {
           </div>
 
           {/* Booking Form */}
-          <div className="animate-fade-up " style={{ animationDelay: '0.2s' }}>
+          <div
+            className="lg:col-span-2 animate-fade-up"
+            style={{ animationDelay: '0.2s' }}
+          >
             <BookingForm />
           </div>
         </div>
