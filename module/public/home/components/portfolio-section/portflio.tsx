@@ -36,12 +36,7 @@ export default function PortfolioSection() {
         </div>
 
         <div className="text-center mt-12">
-          <Button
-            variant="hero-outline"
-            size="lg"
-            className="text-lg px-8 py-6 border-[rgb(13,162,231)] hover:bg-[rgb(13,162,231)] text-[rgb(13,162,231)] rounded-3xl"
-            asChild
-          >
+          <Button asChild>
             <Link href="/usluge">
               Pogledaj sve usluge
               <ArrowRight className="w-4 h-4 ml-2" />

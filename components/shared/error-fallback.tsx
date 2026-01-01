@@ -70,8 +70,6 @@ export function ErrorFallback({
 
             {/* CTA Button */}
             <Button
-              variant="hero"
-              size="xl"
               onClick={resetErrorBoundary}
               className="group gap-2.5 rounded-3xl px-10"
             >

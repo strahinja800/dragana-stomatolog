@@ -20,12 +20,7 @@ export default function BlogSection() {
               Najnoviji članci
             </h2>
           </div>
-          <Button
-            variant="hero-outline"
-            size="lg"
-            asChild
-            className="text-lg px-8 py-6 border-[rgb(13,162,231)] hover:bg-[rgb(13,162,231)] text-[rgb(13,162,231)] rounded-3xl"
-          >
+          <Button variant="outline" asChild>
             <Link href="/blog">
               Svi članci
               <BookOpen className="w-4 h-4 ml-2" />

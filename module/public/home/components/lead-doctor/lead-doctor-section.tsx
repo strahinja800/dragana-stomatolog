@@ -105,12 +105,7 @@ export default function LeadDoctorSection() {
               </div>
             </div>
 
-            <Button
-              variant="hero"
-              size="lg"
-              className="rounded-3xl text-lg px-8 py-6"
-              asChild
-            >
+            <Button asChild>
               <Link href="/o-nama">
                 Više o timu
                 <ArrowRight className="w-4 h-4 ml-2" />

@@ -28,8 +28,8 @@ export default function TeamSection() {
 
         <div className="text-center mt-12">
           <Button
-            variant="hero-outline"
-            size="lg"
+            variant="outline"
+            size="default"
             className="text-lg px-8 py-6 border-[rgb(13,162,231)] hover:bg-[rgb(13,162,231)] text-[rgb(13,162,231)] rounded-3xl"
             asChild
           >
