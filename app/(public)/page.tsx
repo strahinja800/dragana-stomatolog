@@ -1,4 +1,3 @@
-import prisma from '@/lib/db';
 import BlogSection from '@/module/public/home/components/blog/blog-section';
 import CtaSection from '@/module/public/home/components/cta/cta-section';
 import EmergencySection from '@/module/public/home/components/emergency/emergency-section';
@@ -11,8 +10,6 @@ import TeamSection from '@/module/public/home/components/team-section/team-secti
 import TestimonialsSection from '@/module/public/home/components/testimonials/testimonials-section';
 
 export default async function HomePage() {
-  const users = await prisma.user.findMany();
-  console.log('USERS:', users);
   return (
     <>
       <HeroSection />
