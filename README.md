@@ -4,12 +4,26 @@ Moderni website za stomatološku ordinaciju izrađen u Next.js 16 sa React 19 i 
 
 ## Tech Stack
 
+### Frontend
+
 - **Next.js 16** - App Router, React Server Components
 - **React 19** - Najnovija verzija React-a
 - **TypeScript 5** - Striktna tipizacija
 - **Tailwind CSS 4** - Utility-first CSS
 - **shadcn/ui** - Radix-based komponente
 - **react-hook-form** - Upravljanje formama
+
+### Backend (planned)
+
+- **Neon DB** - Managed PostgreSQL, serverless
+- **Prisma ORM** - Type-safe database queries with migrations
+- **oRPC** - Type-safe API with OpenAPI specification
+- **Better Auth** - Authentication with shadcn/ui components
+- **Resend** - Email notifications (React Email templates)
+
+### Hosting
+
+- **Coolify** - Self-hosted PaaS on VPS
 
 ## Pokretanje
 
@@ -47,6 +61,15 @@ assets/                 # Slike
 | `npm run build`    | Production build           |
 | `npm run lint`     | ESLint provera             |
 | `npm run validate` | Format + Lint + TypeScript |
+
+### Database (Prisma)
+
+| Komanda                  | Opis                          |
+| ------------------------ | ----------------------------- |
+| `npx prisma generate`    | Generate Prisma Client        |
+| `npx prisma migrate dev` | Run migrations (development)  |
+| `npx prisma db push`     | Push schema without migration |
+| `npx prisma studio`      | Open database GUI             |
 
 ## Stranice
 
