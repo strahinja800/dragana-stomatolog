@@ -32,10 +32,24 @@ tsc --noEmit        # Type-check only (run before suggesting code changes)
 
 ## Tech Stack
 
+### Frontend
+
 - **Next.js 16.1.0** with App Router and React Server Components
 - **React 19.2.3** with hooks (react-hook-form for forms)
 - **Tailwind CSS 4** with shadcn/ui (radix-vega style)
 - **TypeScript 5** with strict mode
+
+### Backend (planned)
+
+- **Neon DB** - Managed PostgreSQL, serverless
+- **Prisma ORM** - Type-safe database queries with migrations
+- **oRPC** - Type-safe API with OpenAPI specification
+- **Better Auth** - Authentication with shadcn/ui components
+- **Resend** - Email notifications (React Email templates)
+
+### Hosting
+
+- **Coolify** - Self-hosted PaaS on VPS
 
 ## Code Conventions
 

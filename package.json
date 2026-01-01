@@ -13,14 +13,21 @@
     "format:write": "prettier --write .",
     "lint:format": "npm run format:write && npm run lint:fix",
     "validate": "npm run format:check && npm run lint && npm run ts:check",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
+    "@neondatabase/serverless": "^1.0.2",
+    "@prisma/adapter-neon": "^7.2.0",
+    "@prisma/client": "^7.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.562.0",
@@ -52,7 +59,9 @@
     "eslint-plugin-unused-imports": "^4.3.0",
     "husky": "^9.1.7",
     "prettier": "^3.7.4",
+    "prisma": "^7.2.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
