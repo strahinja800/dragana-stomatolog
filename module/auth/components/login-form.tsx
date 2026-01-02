@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -28,6 +29,7 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth-client';
+import { parseAuthError } from '@/lib/auth-error-handler';
 
 const loginSchema = z.object({
   email: z.string().email('Unesite validnu email adresu'),
@@ -39,6 +41,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export function LoginForm() {
   const router = useRouter();
   const [redirectUrl] = useQueryState('redirect');
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -51,6 +54,8 @@ export function LoginForm() {
   const isPending = form.formState.isSubmitting;
 
   const onSubmit = async (data: LoginFormValues) => {
+    setServerError(null);
+
     await authClient.signIn.email(
       {
         email: data.email,
@@ -65,9 +70,9 @@ export function LoginForm() {
           router.push(destination);
         },
         onError: (ctx) => {
-          toast.error('Pogrešna email adresa ili lozinka', {
-            description: 'Pokušajte ponovno',
-          });
+          const error = parseAuthError(ctx);
+          setServerError(error.message);
+          toast.error(error.message);
         },
       }
     );
@@ -128,16 +133,22 @@ export function LoginForm() {
               name="email"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field data-invalid={fieldState.invalid || !!serverError}>
                   <FieldLabel htmlFor="login-email">Email adresa</FieldLabel>
                   <Input
                     {...field}
                     id="login-email"
                     type="email"
-                    aria-invalid={fieldState.invalid}
+                    aria-invalid={fieldState.invalid || !!serverError}
                     placeholder="vas@email.com"
                     autoComplete="email"
                     disabled={isPending}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      if (serverError) {
+                        setServerError(null);
+                      }
+                    }}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -150,19 +161,28 @@ export function LoginForm() {
               name="password"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field data-invalid={fieldState.invalid || !!serverError}>
                   <FieldLabel htmlFor="login-password">Lozinka</FieldLabel>
                   <Input
                     {...field}
                     id="login-password"
                     type="password"
-                    aria-invalid={fieldState.invalid}
+                    aria-invalid={fieldState.invalid || !!serverError}
                     placeholder="********"
                     autoComplete="current-password"
                     disabled={isPending}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      if (serverError) {
+                        setServerError(null);
+                      }
+                    }}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
+                  )}
+                  {!fieldState.invalid && serverError && (
+                    <FieldError errors={[{ message: serverError }]} />
                   )}
                 </Field>
               )}

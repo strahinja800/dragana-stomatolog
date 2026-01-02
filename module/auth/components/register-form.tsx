@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -27,6 +28,7 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth-client';
+import { parseAuthError } from '@/lib/auth-error-handler';
 
 const registerSchema = z
   .object({
@@ -44,6 +46,11 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
   const router = useRouter();
+  const [serverError, setServerError] = useState<{
+    message: string;
+    isEmailError: boolean;
+  } | null>(null);
+
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -57,6 +64,8 @@ export function RegisterForm() {
   const isPending = form.formState.isSubmitting;
 
   const onSubmit = async (data: RegisterFormValues) => {
+    setServerError(null);
+
     await authClient.signUp.email(
       {
         email: data.email,
@@ -64,16 +73,22 @@ export function RegisterForm() {
         name: data.name,
       },
       {
-        onSuccess: (data) => {
-          console.log('Register success', data);
+        onSuccess: (response) => {
           toast.success('Uspešna registracija!', {
-            description: `Dobrodošli, ${data.data.user.name}`,
+            description: `Dobrodošli, ${response.data.user.name}`,
           });
           router.push('/');
         },
         onError: (ctx) => {
           console.log('Register error', ctx);
-          toast.error(ctx.response.statusText);
+          const error = parseAuthError(ctx);
+
+          setServerError({
+            message: error.message,
+            isEmailError: error.isEmailError,
+          });
+
+          toast.error(error.message);
         },
       }
     );
@@ -154,23 +169,38 @@ export function RegisterForm() {
             <Controller
               name="email"
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="register-email">Email adresa</FieldLabel>
-                  <Input
-                    {...field}
-                    id="register-email"
-                    type="email"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="vas@email.com"
-                    autoComplete="email"
-                    disabled={isPending}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
+              render={({ field, fieldState }) => {
+                const hasError =
+                  fieldState.invalid || serverError?.isEmailError;
+                return (
+                  <Field data-invalid={hasError}>
+                    <FieldLabel htmlFor="register-email">
+                      Email adresa
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="register-email"
+                      type="email"
+                      aria-invalid={hasError}
+                      placeholder="vas@email.com"
+                      autoComplete="email"
+                      disabled={isPending}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        if (serverError?.isEmailError) {
+                          setServerError(null);
+                        }
+                      }}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                    {!fieldState.invalid && serverError?.isEmailError && (
+                      <FieldError errors={[{ message: serverError.message }]} />
+                    )}
+                  </Field>
+                );
+              }}
             />
 
             <Controller
