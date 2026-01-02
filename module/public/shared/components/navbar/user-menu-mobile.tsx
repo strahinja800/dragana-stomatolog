@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-import { LogOut, User } from 'lucide-react';
+import { LayoutDashboard, LogOut, User } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -19,8 +19,10 @@ import {
 type UserMenuMobileProps = {
   user: {
     name: string;
+    initials: string;
     email: string;
     image?: string | null;
+    role?: string;
   };
   onSignOut: () => void;
 };
@@ -28,12 +30,10 @@ type UserMenuMobileProps = {
 export function UserMenuMobile({ user, onSignOut }: UserMenuMobileProps) {
   const [open, setOpen] = useState(false);
 
-  const initials = user.name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+  const initials = user.initials;
+  const isAdmin = user.role === 'admin';
+  const dashboardHref = isAdmin ? '/admin' : '/profile';
+  const dashboardLabel = isAdmin ? 'Admin panel' : 'Profil';
 
   const handleSignOut = () => {
     setOpen(false);
@@ -67,9 +67,13 @@ export function UserMenuMobile({ user, onSignOut }: UserMenuMobileProps) {
           <div className="flex flex-col gap-2 p-4">
             <DrawerClose asChild>
               <Button variant="ghost" className="justify-start" asChild>
-                <Link href="/profil">
-                  <User className="mr-2 h-4 w-4" />
-                  Profil
+                <Link href={dashboardHref}>
+                  {isAdmin ? (
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                  ) : (
+                    <User className="mr-2 h-4 w-4" />
+                  )}
+                  {dashboardLabel}
                 </Link>
               </Button>
             </DrawerClose>

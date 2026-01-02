@@ -27,11 +27,19 @@ export default function UserMenu() {
       </Button>
     );
   }
+  const initials = session.user.name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   const user = {
     name: session.user.name || 'Korisnik',
+    initials: initials,
     email: session.user.email || '',
     image: session.user.image,
+    role: session.user.role as string | undefined,
   };
 
   return (

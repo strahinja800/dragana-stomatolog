@@ -13,6 +13,17 @@ export const requireAuth = async (currentPath: string) => {
   return session;
 };
 
+export const requireAdmin = async (currentPath: string) => {
+  const session = await requireAuth(currentPath);
+  console.log('session', session);
+
+  if (session.user.role !== 'admin') {
+    redirect('/');
+  }
+
+  return session;
+};
+
 export const requireUnAuth = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),

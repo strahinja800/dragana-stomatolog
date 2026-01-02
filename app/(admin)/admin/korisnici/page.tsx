@@ -1,14 +1,14 @@
 import { requireAdmin } from '@/lib/auth-utils';
-import { AdminView } from '@/module/admin/view/admin-view';
+import { UsersView } from '@/module/admin/view/users-view';
 import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 
-export default async function AdminPage() {
-  await requireAdmin('/admin');
+export default async function UsersPage() {
+  await requireAdmin('/admin/korisnici');
   prefetch(trpc.hello.queryOptions());
 
   return (
     <HydrateClient>
-      <AdminView />
+      <UsersView />
     </HydrateClient>
   );
 }

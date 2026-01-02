@@ -62,11 +62,21 @@ export function LoginForm() {
         password: data.password,
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           toast.success('Uspešna prijava!', {
             description: 'Dobrodošli nazad',
           });
-          const destination = redirectUrl?.startsWith('/') ? redirectUrl : '/';
+
+          // Ako postoji redirect URL, koristi ga
+          if (redirectUrl?.startsWith('/')) {
+            router.push(redirectUrl);
+            return;
+          }
+
+          // Inače, redirektuj na osnovu uloge
+          const session = await authClient.getSession();
+          const role = session.data?.user?.role;
+          const destination = role === 'admin' ? '/admin' : '/profile';
           router.push(destination);
         },
         onError: (ctx) => {

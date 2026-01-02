@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { admin } from 'better-auth/plugins';
 import { localization } from 'better-auth-localization';
 
 import { authMessagesSr } from './auth-messages';
@@ -19,6 +20,10 @@ export const auth = betterAuth({
       translations: {
         sr: authMessagesSr,
       },
+    }),
+    admin({
+      defaultRole: 'user',
+      adminRoles: ['admin'],
     }),
   ],
 });
