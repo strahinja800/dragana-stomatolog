@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { ChevronDown, LogOut, User } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, LogOut, User } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -15,21 +15,23 @@ import { cn } from '@/lib/utils';
 type UserMenuDesktopProps = {
   user: {
     name: string;
+    initials: string;
     email: string;
     image?: string | null;
+    role?: string;
   };
   onSignOut: () => void;
 };
 
 export function UserMenuDesktop({ user, onSignOut }: UserMenuDesktopProps) {
-  const initials = user.name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-
   const firstName = user.name.split(' ')[0];
+  const initials = user.initials;
+  const isAdmin = user.role === 'admin';
+  const dashboardHref = isAdmin ? '/admin' : '/profile';
+  const dashboardLabel = isAdmin ? 'Admin panel' : 'Moj profil';
+  const dashboardDescription = isAdmin
+    ? 'Upravljaj sajtom'
+    : 'Pregledaj i uredi podatke';
 
   return (
     <div className="hidden md:block">
@@ -91,14 +93,18 @@ export function UserMenuDesktop({ user, onSignOut }: UserMenuDesktopProps) {
             asChild
             className="group/item gap-3 px-3 py-2.5 rounded-lg cursor-pointer focus:bg-accent"
           >
-            <Link href="/profil">
+            <Link href={dashboardHref}>
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 group-focus/item:bg-primary/20">
-                <User className="h-4 w-4 text-primary" />
+                {isAdmin ? (
+                  <LayoutDashboard className="h-4 w-4 text-primary" />
+                ) : (
+                  <User className="h-4 w-4 text-primary" />
+                )}
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-medium">Moj profil</span>
+                <span className="text-sm font-medium">{dashboardLabel}</span>
                 <span className="text-xs text-muted-foreground group-focus/item:text-muted-foreground">
-                  Pregledaj i uredi podatke
+                  {dashboardDescription}
                 </span>
               </div>
             </Link>

@@ -1,7 +1,9 @@
-export default function AdminLayout({
+import { AdminLayout } from '@/module/admin/components/admin-layout/admin-layout';
+
+export default function AdminRootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <main className="min-h-screen">{children}</main>;
+  return <AdminLayout>{children}</AdminLayout>;
 }
