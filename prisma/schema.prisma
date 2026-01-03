@@ -29,6 +29,9 @@ model User {
   banReason  String?
   banExpires DateTime?
 
+  dentist    Dentist?
+  patients   Patient[]
+
   @@unique([email])
   @@map("user")
 }
@@ -82,3 +85,164 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+model Dentist {
+  id             String   @id @default(cuid())
+
+  userId         String?  @unique
+  user           User?    @relation(fields: [userId], references: [id])
+
+  firstName      String
+  lastName       String
+  email          String   @unique
+  phone          String?
+  specialization String?
+  bio            String?
+  imageUrl       String?
+  isActive       Boolean  @default(true)
+
+  appointments   Appointment[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("dentist")
+}
+
+model Patient {
+  id          String    @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  dateOfBirth DateTime?
+  gender      Gender?
+
+  allergies   String?
+  medications String?
+  notes       String?
+
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id])
+  isMain      Boolean   @default(false)
+
+  appointments   Appointment[]
+  invoices       Invoice[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("patient")
+}
+
+model MedicalRecord {
+  id            String      @id @default(cuid())
+
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  tooth         String?
+  diagnosis     String?
+  treatment     String
+  notes         String?
+
+  invoiceId     String?
+  invoice       Invoice?    @relation(fields: [invoiceId], references: [id])
+
+  attachments   Attachment[]
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([appointmentId])
+  @@map("medical_record")
+}
+
+model Attachment {
+  id              String        @id @default(cuid())
+  medicalRecordId String
+  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
+
+  fileName        String
+  fileUrl         String
+  fileType        String
+  description     String?
+
+  createdAt       DateTime      @default(now())
+
+  @@index([medicalRecordId])
+  @@map("attachment")
+}
+
+model Invoice {
+  id          String        @id @default(cuid())
+
+  patientId   String
+  patient     Patient       @relation(fields: [patientId], references: [id])
+
+  items       MedicalRecord[]
+
+  totalAmount Decimal       @db.Decimal(10, 2)
+  status      InvoiceStatus @default(PENDING)
+
+  paidAt      DateTime?
+  notes       String?
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([patientId])
+  @@index([status])
+  @@map("invoice")
+}
+
+model Appointment {
+  id             String            @id @default(cuid())
+
+  patientId      String
+  patient        Patient           @relation(fields: [patientId], references: [id])
+
+  dentistId      String?
+  dentist        Dentist?          @relation(fields: [dentistId], references: [id])
+
+  isExternal     Boolean           @default(false)
+  serviceType    String?
+  status         AppointmentStatus @default(PENDING)
+  startTime      DateTime
+  endTime        DateTime
+  notes          String?
+  phone          String?
+
+  medicalRecords MedicalRecord[]
+
+  reminderSent   Boolean           @default(false)
+  reminderSentAt DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@index([patientId])
+  @@index([dentistId])
+  @@index([status])
+  @@index([startTime])
+  @@map("appointment")
+}
+
