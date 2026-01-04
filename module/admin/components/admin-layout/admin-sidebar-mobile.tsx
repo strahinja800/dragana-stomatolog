@@ -20,8 +20,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
+import { authClient } from '@/module/auth/lib/auth-client';
 
 const navItems = [
   {

@@ -1,10 +1,9 @@
-import { requireAdmin } from '@/lib/auth-utils';
 import { AdminView } from '@/module/admin/view/admin-view';
-import { HydrateClient, prefetch, trpc } from '@/trpc/server';
+import { requireAdmin } from '@/module/auth/lib/auth-utils';
+import { HydrateClient } from '@/trpc/server';
 
 export default async function AdminPage() {
   await requireAdmin('/admin');
-  prefetch(trpc.hello.queryOptions());
 
   return (
     <HydrateClient>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { authClient } from '@/lib/auth-client';
+import { authClient } from '@/module/auth/lib/auth-client';
 
 import { UserMenuDesktop } from './user-menu-desktop';
 import { UserMenuMobile } from './user-menu-mobile';

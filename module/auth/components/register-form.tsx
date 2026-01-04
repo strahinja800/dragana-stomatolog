@@ -7,8 +7,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import * as z from 'zod';
 
 import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
@@ -27,22 +27,14 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { authClient } from '@/lib/auth-client';
-import { parseAuthError } from '@/lib/auth-error-handler';
-
-const registerSchema = z
-  .object({
-    name: z.string().min(2, 'Ime mora imati najmanje 2 karaktera'),
-    email: z.string().email('Unesite validnu email adresu'),
-    password: z.string().min(8, 'Lozinka mora imati najmanje 8 karaktera'),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Lozinke se ne poklapaju',
-    path: ['confirmPassword'],
-  });
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
+import { authClient } from '@/module/auth/lib/auth-client';
+import { parseAuthError } from '@/module/auth/lib/auth-error-handler';
+import {
+  type RegisterFormSchemaInputs,
+  registerSchema,
+} from '@/module/auth/types/auth-schema';
+import { type AuthUser } from '@/module/auth/types/auth-types';
+import { useTRPC } from '@/trpc/client';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -51,10 +43,11 @@ export function RegisterForm() {
     isEmailError: boolean;
   } | null>(null);
 
-  const form = useForm<RegisterFormValues>({
+  const form = useForm<RegisterFormSchemaInputs>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: '',
+      firstName: '',
+      lastName: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -63,21 +56,43 @@ export function RegisterForm() {
 
   const isPending = form.formState.isSubmitting;
 
-  const onSubmit = async (data: RegisterFormValues) => {
+  const trpc = useTRPC();
+
+  const { mutateAsync } = useMutation(
+    trpc.patient.createPatient.mutationOptions({
+      onSuccess: (data) => {
+        console.log('Patient created:', data);
+        router.push('/');
+      },
+      onError: (error) => {
+        console.error('Error creating patient:', error);
+      },
+    })
+  );
+
+  const onSubmit = async (data: RegisterFormSchemaInputs) => {
     setServerError(null);
 
     await authClient.signUp.email(
       {
         email: data.email,
         password: data.password,
-        name: data.name,
+        name: `${data.firstName} ${data.lastName}`,
       },
       {
         onSuccess: (response) => {
           toast.success('Uspešna registracija!', {
             description: `Dobrodošli, ${response.data.user.name}`,
           });
-          router.push('/');
+
+          console.log('RESPONSE', response.data.user);
+          const userFromResponse = response.data.user as AuthUser;
+          mutateAsync({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            userId: userFromResponse.id,
+          });
         },
         onError: (ctx) => {
           console.log('Register error', ctx);
@@ -145,18 +160,39 @@ export function RegisterForm() {
         <form id="register-form" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
-              name="name"
+              name="firstName"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="register-name">Ime i prezime</FieldLabel>
+                  <FieldLabel htmlFor="register-firstName">Ime</FieldLabel>
                   <Input
                     {...field}
-                    id="register-name"
+                    id="register-firstName"
                     type="text"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Marko Marković"
-                    autoComplete="name"
+                    placeholder="Marko"
+                    autoComplete="given-name"
+                    disabled={isPending}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="lastName"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="register-lastName">Prezime</FieldLabel>
+                  <Input
+                    {...field}
+                    id="register-lastName"
+                    type="text"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Marković"
+                    autoComplete="family-name"
                     disabled={isPending}
                   />
                   {fieldState.invalid && (

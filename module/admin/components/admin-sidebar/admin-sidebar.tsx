@@ -13,8 +13,8 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
+import { authClient } from '@/module/auth/lib/auth-client';
 
 const navItems = [
   {

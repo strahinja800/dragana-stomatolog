@@ -1,14 +1,9 @@
 'use client';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
-
-import { UsersTable } from '@/module/admin/components/users-table/users-table';
 import { useTRPC } from '@/trpc/client';
 
 export function UsersView() {
   const trpc = useTRPC();
-
-  const { data: users } = useSuspenseQuery(trpc.hello.queryOptions());
 
   return (
     <div className="space-y-8">
@@ -21,7 +16,7 @@ export function UsersView() {
       </div>
 
       {/* Users Table */}
-      <UsersTable users={users} />
+      {/* <UsersTable users={users} /> */}
     </div>
   );
 }
