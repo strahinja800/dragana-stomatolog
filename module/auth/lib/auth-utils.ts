@@ -1,6 +1,8 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+import { USER_ROLES } from '@/module/auth/types/auth-types';
+
 import { auth } from './auth';
 
 export const requireAuth = async (currentPath: string) => {
@@ -17,7 +19,7 @@ export const requireAdmin = async (currentPath: string) => {
   const session = await requireAuth(currentPath);
   console.log('session', session);
 
-  if (session.user.role !== 'admin') {
+  if (session.user.role !== USER_ROLES.ADMIN) {
     redirect('/');
   }
 

@@ -9,7 +9,6 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryState } from 'nuqs';
 import { toast } from 'sonner';
-import * as z from 'zod';
 
 import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
@@ -28,22 +27,19 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { authClient } from '@/lib/auth-client';
-import { parseAuthError } from '@/lib/auth-error-handler';
-
-const loginSchema = z.object({
-  email: z.string().email('Unesite validnu email adresu'),
-  password: z.string().min(1, 'Lozinka je obavezna'),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { authClient } from '@/module/auth/lib/auth-client';
+import { parseAuthError } from '@/module/auth/lib/auth-error-handler';
+import {
+  type LoginFormSchemaInputs,
+  loginSchema,
+} from '@/module/auth/types/auth-schema';
 
 export function LoginForm() {
   const router = useRouter();
   const [redirectUrl] = useQueryState('redirect');
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const form = useForm<LoginFormValues>({
+  const form = useForm<LoginFormSchemaInputs>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
@@ -53,7 +49,7 @@ export function LoginForm() {
 
   const isPending = form.formState.isSubmitting;
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async (data: LoginFormSchemaInputs) => {
     setServerError(null);
 
     await authClient.signIn.email(
