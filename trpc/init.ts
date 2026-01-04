@@ -5,6 +5,7 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 
 import { auth } from '@/module/auth/lib/auth';
+import { USER_ROLES } from '@/module/auth/types/auth-types';
 
 export const createTRPCContext = cache(async () => {
   /**
@@ -37,4 +38,15 @@ export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
   }
 
   return next({ ctx: { ...ctx, auth: session } });
+});
+
+export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  if (ctx.auth.user.role !== USER_ROLES.ADMIN) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Admin access required',
+    });
+  }
+
+  return next({ ctx });
 });

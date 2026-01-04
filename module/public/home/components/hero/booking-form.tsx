@@ -1,171 +1,174 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  ArrowRight,
-  Calendar,
-  CheckCircle,
-  Loader2,
-  Phone,
-  User,
-} from 'lucide-react';
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { ArrowRight, CheckCircle, Loader2, Phone, User } from 'lucide-react';
+import { toast } from 'sonner';
 import * as z from 'zod';
 
+import { AppointmentCalendar } from '@/components/ui/appointment-calendar';
+import { FloatingInput } from '@/components/ui/floating-input';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-
-export interface BookingFormData {
-  name: string;
-  phone: string;
-  date: string;
-}
+import { useTRPC } from '@/trpc/client';
 
 const bookingFormSchema = z.object({
   name: z.string().min(1, 'Ime je obavezno'),
   phone: z.string().min(1, 'Broj telefona je obavezan'),
-  date: z.string().min(1, 'Datum je obavezan'),
+  date: z.date({ error: 'Datum je obavezan' }),
+  time: z.string().min(1, 'Vreme je obavezno'),
+  symptoms: z.string().optional(),
 });
 
-interface FloatingInputProps {
-  id: string;
-  label: string;
-  type: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onBlur: () => void;
-  icon: React.ReactNode;
-  step: number;
-  isInvalid?: boolean;
-  errorMessage?: string;
-  disabled?: boolean;
-  placeholder?: string;
-}
+export type BookingFormData = z.infer<typeof bookingFormSchema>;
 
-function FloatingInput({
-  id,
-  label,
-  type,
-  value,
-  onChange,
-  onBlur,
-  icon,
-  step,
-  isInvalid,
-  errorMessage,
-  disabled,
-  placeholder,
-}: FloatingInputProps) {
-  const isFilled = value.length > 0;
-
-  return (
-    <div
-      className="group animate-fade-up"
-      style={{ animationDelay: `${step * 100}ms`, animationFillMode: 'both' }}
-    >
-      <div className="flex items-center gap-3 mb-2">
-        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-          {step}
-        </span>
-        <label
-          htmlFor={id}
-          className="text-sm font-medium text-foreground/80 transition-colors group-focus-within:text-primary"
-        >
-          {label}
-        </label>
-      </div>
-
-      <div className="relative">
-        {/* Icon */}
-        <div
-          className={cn(
-            'absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-300 z-10',
-            'text-muted-foreground group-focus-within:text-primary',
-            isInvalid && 'text-destructive'
-          )}
-        >
-          {icon}
-        </div>
-
-        {/* Input */}
-        <input
-          id={id}
-          type={type}
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur}
-          disabled={disabled}
-          placeholder={placeholder}
-          aria-invalid={isInvalid}
-          className={cn(
-            // Base styles
-            'peer w-full h-12 pl-12 pr-4 rounded-2xl',
-            'bg-background/50 backdrop-blur-sm',
-            'border-2 border-border/50',
-            'text-foreground placeholder:text-muted-foreground/60',
-            'text-base transition-all duration-300',
-            // Focus styles
-            'focus:outline-none focus:border-primary/50',
-            'focus:shadow-[0_0_0_4px_hsl(199_89%_48%/0.1)]',
-            'focus:bg-background/80',
-            // Hover styles
-            'hover:border-border hover:bg-background/60',
-            // Disabled styles
-            'disabled:opacity-50 disabled:cursor-not-allowed',
-            // Invalid styles
-            isInvalid && [
-              'border-destructive/50 focus:border-destructive/70',
-              'focus:shadow-[0_0_0_4px_hsl(0_84%_60%/0.1)]',
-            ]
-          )}
-        />
-
-        {/* Valid indicator */}
-        {isFilled && !isInvalid && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 animate-fade-in">
-            <CheckCircle className="w-5 h-5 text-primary" />
-          </div>
-        )}
-      </div>
-
-      {/* Error message */}
-      {isInvalid && errorMessage && (
-        <p className="mt-2 text-sm text-destructive flex items-center gap-1.5 animate-fade-in">
-          <span className="inline-block w-1 h-1 rounded-full bg-destructive" />
-          {errorMessage}
-        </p>
-      )}
-    </div>
-  );
-}
+type BookingFormInput = {
+  name: string;
+  phone: string;
+  date?: Date;
+  time: string;
+  symptoms: string;
+};
 
 export default function BookingForm() {
-  const form = useForm<BookingFormData>({
-    resolver: zodResolver(bookingFormSchema),
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const trpc = useTRPC();
+
+  // Prefetched data from server
+  const { data: workingHours } = useSuspenseQuery(
+    trpc.settings.getWorkingHours.queryOptions()
+  );
+  const { data: nonWorkingDays } = useSuspenseQuery(
+    trpc.settings.getNonWorkingDays.queryOptions({})
+  );
+
+  // Fetch available slots when date is selected
+  const { data: availableSlots, isLoading: isSlotsLoading } = useQuery({
+    ...trpc.appointment.getAvailableSlots.queryOptions({
+      date: selectedDate ?? new Date(),
+    }),
+    enabled: !!selectedDate,
+  });
+
+  // Create appointment mutation
+  const { mutateAsync: createAppointment, isPending: isCreating } = useMutation(
+    trpc.appointment.createAppointment.mutationOptions({
+      onSuccess: () => {
+        setIsSuccess(true);
+        toast.success('Zahtev je poslat!', {
+          description: 'Javićemo vam se u roku od 30 minuta.',
+        });
+      },
+      onError: (error) => {
+        toast.error('Greška', {
+          description: error.message,
+        });
+      },
+    })
+  );
+
+  const form = useForm<BookingFormInput>({
+    resolver: zodResolver(bookingFormSchema) as never,
     defaultValues: {
       name: '',
       phone: '',
-      date: '',
+      date: undefined,
+      time: '',
+      symptoms: '',
     },
   });
 
-  const isPending = form.formState.isSubmitting;
+  const isPending = form.formState.isSubmitting || isCreating;
 
-  const onSubmit = (data: BookingFormData) => console.log(data);
+  // Calculate closed days of week from working hours
+  const closedDaysOfWeek = useMemo(() => {
+    return workingHours.filter((wh) => !wh.isOpen).map((wh) => wh.dayOfWeek);
+  }, [workingHours]);
+
+  // Convert non-working days to Date objects for calendar
+  const bookedDates = useMemo(() => {
+    return nonWorkingDays.map((nwd) => new Date(nwd.date));
+  }, [nonWorkingDays]);
+
+  // Time slots from API or empty array
+  const timeSlots = availableSlots?.slots ?? [];
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    setSelectedTime(null); // Reset time when date changes
+    form.setValue('date', date, { shouldValidate: true });
+    form.setValue('time', '', { shouldValidate: false });
+  };
+
+  const handleTimeSelect = (time: string) => {
+    setSelectedTime(time);
+    form.setValue('time', time, { shouldValidate: true });
+  };
+
+  const onSubmit = async (data: BookingFormInput) => {
+    if (!data.date) return;
+
+    await createAppointment({
+      name: data.name,
+      phone: data.phone,
+      date: data.date,
+      time: data.time,
+      symptoms: data.symptoms || undefined,
+    });
+  };
+
+  // Show success state after form submission
+  if (isSuccess) {
+    return (
+      <div className="relative overflow-hidden rounded-4xl border border-border/30 bg-card/95 p-4 shadow-hover backdrop-blur-xl md:p-8">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-primary/[0.04]" />
+
+        <div className="relative z-10 flex flex-col items-center justify-center py-12 text-center">
+          <div className="mb-6 flex size-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+            <CheckCircle className="size-10 text-green-600 dark:text-green-400" />
+          </div>
+
+          <h3 className="mb-2 font-heading text-2xl font-bold text-foreground md:text-3xl">
+            Zahtev je poslat!
+          </h3>
+          <p className="mb-6 max-w-sm text-muted-foreground">
+            Hvala vam na poverenju. Javićemo vam se u roku od 30 minuta radi
+            potvrde termina.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsSuccess(false);
+              setSelectedDate(undefined);
+              setSelectedTime(null);
+              form.reset();
+            }}
+            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Zakažite još jedan termin
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative bg-card/95 backdrop-blur-xl rounded-4xl p-4 md:p-8 shadow-hover border border-border/30 overflow-hidden">
-      {/* Background gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-primary/[0.04] pointer-events-none" />
+    <div className="relative overflow-hidden rounded-4xl border border-border/30 bg-card/95 p-4 shadow-hover backdrop-blur-xl md:p-8">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-primary/[0.04]" />
 
-      {/* Content */}
       <div className="relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8 animate-fade-up">
-          <h3 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-2">
+        <div className="animate-fade-up mb-6 text-center">
+          <h3 className="mb-2 font-heading text-2xl font-bold text-foreground md:text-3xl">
             Brzo zakazivanje
           </h3>
-          <p className="text-muted-foreground text-sm md:text-base">
+          <p className="text-sm text-muted-foreground md:text-base">
             Popunite formu i javićemo vam se u roku od 30 minuta
           </p>
         </div>
@@ -182,7 +185,7 @@ export default function BookingForm() {
                 value={field.value}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
-                icon={<User className="w-5 h-5" />}
+                icon={<User className="size-5" />}
                 step={1}
                 isInvalid={fieldState.invalid}
                 errorMessage={fieldState.error?.message}
@@ -203,7 +206,7 @@ export default function BookingForm() {
                 value={field.value}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
-                icon={<Phone className="w-5 h-5" />}
+                icon={<Phone className="size-5" />}
                 step={2}
                 isInvalid={fieldState.invalid}
                 errorMessage={fieldState.error?.message}
@@ -213,60 +216,99 @@ export default function BookingForm() {
             )}
           />
 
-          <Controller
-            name="date"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <FloatingInput
-                id="booking-date"
-                label="Željeni datum"
-                type="date"
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                icon={<Calendar className="w-5 h-5" />}
-                step={3}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
-                disabled={isPending}
-              />
-            )}
-          />
-
-          {/* Submit button */}
           <div
-            className="pt-2 animate-fade-up"
+            className="animate-fade-up"
+            style={{ animationDelay: '200ms', animationFillMode: 'both' }}
+          >
+            <div className="mb-2 flex items-center gap-3">
+              <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                3
+              </span>
+              <span className="text-sm font-medium text-foreground/80">
+                Izaberite datum i vreme
+              </span>
+            </div>
+
+            <AppointmentCalendar
+              selectedDate={selectedDate}
+              selectedTime={selectedTime}
+              onDateSelect={handleDateSelect}
+              onTimeSelect={handleTimeSelect}
+              timeSlots={timeSlots}
+              bookedDates={bookedDates}
+              disabledDaysOfWeek={closedDaysOfWeek}
+              isLoadingSlots={isSlotsLoading}
+              disabled={isPending}
+            />
+
+            {(form.formState.errors.date || form.formState.errors.time) && (
+              <p className="animate-fade-in mt-2 flex items-center gap-1.5 text-sm text-destructive">
+                <span className="inline-block size-1 rounded-full bg-destructive" />
+                {form.formState.errors.date?.message ||
+                  form.formState.errors.time?.message}
+              </p>
+            )}
+          </div>
+
+          <div
+            className="animate-fade-up"
+            style={{ animationDelay: '250ms', animationFillMode: 'both' }}
+          >
+            <div className="mb-2 flex items-center gap-3">
+              <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                4
+              </span>
+              <span className="text-sm font-medium text-foreground/80">
+                Opišite simptome (opciono)
+              </span>
+            </div>
+
+            <Controller
+              name="symptoms"
+              control={form.control}
+              render={({ field }) => (
+                <Textarea
+                  {...field}
+                  id="booking-symptoms"
+                  placeholder="Opišite vaše simptome ili razlog posete..."
+                  className="min-h-20 resize-none"
+                  disabled={isPending}
+                />
+              )}
+            />
+          </div>
+
+          <div
+            className="animate-fade-up pt-2"
             style={{ animationDelay: '350ms', animationFillMode: 'both' }}
           >
             <button
               type="submit"
               disabled={isPending}
               className={cn(
-                'group relative w-full h-14 rounded-2xl',
-                'gradient-primary text-white font-semibold text-base',
+                'group relative h-14 w-full rounded-2xl',
+                'gradient-primary text-base font-semibold text-white',
                 'shadow-soft hover:shadow-hover',
                 'transition-all duration-300',
                 'hover:scale-[1.02] active:scale-[0.98]',
-                'disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100',
+                'disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100',
                 'overflow-hidden'
               )}
             >
-              {/* Shimmer effect */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                <div className="absolute inset-0 translate-x-[-100%] bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-[100%]" />
               </div>
 
-              {/* Button content */}
               <span className="relative flex items-center justify-center gap-2">
                 {isPending ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="size-5 animate-spin" />
                     <span>Slanje...</span>
                   </>
                 ) : (
                   <>
                     <span>Zakažite sada</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                    <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
                   </>
                 )}
               </span>
@@ -274,23 +316,22 @@ export default function BookingForm() {
           </div>
         </form>
 
-        {/* Trust indicators */}
         <div
-          className="mt-8 pt-6 border-t border-border/30 animate-fade-up"
+          className="animate-fade-up mt-6 border-t border-border/30 pt-5"
           style={{ animationDelay: '400ms', animationFillMode: 'both' }}
         >
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
             <div className="flex items-center gap-2.5 text-sm">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                <CheckCircle className="w-4 h-4 text-primary" />
+              <div className="flex size-8 items-center justify-center rounded-full bg-primary/10">
+                <CheckCircle className="size-4 text-primary" />
               </div>
               <span className="text-muted-foreground">
                 Besplatna konsultacija
               </span>
             </div>
             <div className="flex items-center gap-2.5 text-sm">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                <CheckCircle className="w-4 h-4 text-primary" />
+              <div className="flex size-8 items-center justify-center rounded-full bg-primary/10">
+                <CheckCircle className="size-4 text-primary" />
               </div>
               <span className="text-muted-foreground">Bez čekanja</span>
             </div>

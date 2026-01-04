@@ -4,10 +4,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import {
+  CalendarClock,
   FileText,
   FolderHeart,
   LayoutDashboard,
   LogOut,
+  Settings,
   Stethoscope,
   Users,
 } from 'lucide-react';
@@ -23,9 +25,19 @@ const navItems = [
     icon: LayoutDashboard,
   },
   {
+    label: 'Termini',
+    href: '/admin/termini',
+    icon: CalendarClock,
+  },
+  {
     label: 'Korisnici',
     href: '/admin/korisnici',
     icon: Users,
+  },
+  {
+    label: 'Kartoni',
+    href: '/admin/kartoni',
+    icon: FolderHeart,
   },
   {
     label: 'Blog',
@@ -33,9 +45,9 @@ const navItems = [
     icon: FileText,
   },
   {
-    label: 'Kartoni',
-    href: '/admin/kartoni',
-    icon: FolderHeart,
+    label: 'Podešavanja',
+    href: '/admin/podesavanja',
+    icon: Settings,
   },
 ];
 

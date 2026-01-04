@@ -105,6 +105,49 @@ enum InvoiceStatus {
   CANCELLED
 }
 
+// ============================================
+// CLINIC SETTINGS
+// ============================================
+
+model WorkingHours {
+  id        String  @id @default(cuid())
+  dayOfWeek Int     @unique // 0=Nedelja, 1=Ponedeljak... 6=Subota
+  startTime String // "08:00"
+  endTime   String // "17:00"
+  isOpen    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("working_hours")
+}
+
+model NonWorkingDay {
+  id     String   @id @default(cuid())
+  date   DateTime @unique @db.Date
+  reason String?
+
+  createdAt DateTime @default(now())
+
+  @@map("non_working_day")
+}
+
+model ServiceType {
+  id              String  @id @default(cuid())
+  name            String
+  durationMinutes Int     @default(30)
+  description     String?
+  isActive        Boolean @default(true)
+  sortOrder       Int     @default(0)
+
+  appointments Appointment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("service_type")
+}
+
 model Dentist {
   id             String   @id @default(cuid())
 
@@ -216,31 +259,37 @@ model Invoice {
 }
 
 model Appointment {
-  id             String            @id @default(cuid())
+  id        String @id @default(cuid())
 
-  patientId      String
-  patient        Patient           @relation(fields: [patientId], references: [id])
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
 
-  dentistId      String?
-  dentist        Dentist?          @relation(fields: [dentistId], references: [id])
+  dentistId String?
+  dentist   Dentist? @relation(fields: [dentistId], references: [id])
 
-  isExternal     Boolean           @default(false)
-  serviceType    String?
-  status         AppointmentStatus @default(PENDING)
-  startTime      DateTime
-  endTime        DateTime
-  notes          String?
-  phone          String?
+  serviceTypeId String?
+  serviceType   ServiceType? @relation(fields: [serviceTypeId], references: [id])
+
+  isExternal         Boolean           @default(false)
+  serviceDescription String?
+  status             AppointmentStatus @default(PENDING)
+  startTime          DateTime
+  endTime            DateTime
+  notes              String?
+  phone              String?
+  symptoms           String?
+  rejectionReason    String?
 
   medicalRecords MedicalRecord[]
 
-  reminderSent   Boolean           @default(false)
+  reminderSent   Boolean   @default(false)
   reminderSentAt DateTime?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([patientId])
   @@index([dentistId])
+  @@index([serviceTypeId])
   @@index([status])
   @@index([startTime])
   @@map("appointment")
