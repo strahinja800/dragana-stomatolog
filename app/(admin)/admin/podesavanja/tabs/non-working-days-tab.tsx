@@ -8,8 +8,6 @@ import { sr } from 'date-fns/locale';
 import { CalendarPlus, Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,6 +22,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { api } from '@/convex/_generated/api';
+import { type Id } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
 
 export function NonWorkingDaysTab() {
@@ -52,7 +52,8 @@ export function NonWorkingDaysTab() {
       setReason('');
     } catch (error) {
       toast.error('Greška', {
-        description: error instanceof Error ? error.message : 'Nepoznata greška',
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
       });
     } finally {
       setIsCreating(false);
@@ -66,7 +67,8 @@ export function NonWorkingDaysTab() {
       toast.success('Neradni dan obrisan');
     } catch (error) {
       toast.error('Greška', {
-        description: error instanceof Error ? error.message : 'Nepoznata greška',
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
       });
     } finally {
       setDeletingId(null);

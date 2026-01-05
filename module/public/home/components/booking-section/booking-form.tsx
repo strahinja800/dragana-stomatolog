@@ -93,9 +93,7 @@ export default function BookingForm() {
   // Calculate closed days of week from working hours
   const closedDaysOfWeek = useMemo(() => {
     if (!workingHours) return [];
-    return workingHours
-      .filter((wh) => !wh.isOpen)
-      .map((wh) => wh.dayOfWeek);
+    return workingHours.filter((wh) => !wh.isOpen).map((wh) => wh.dayOfWeek);
   }, [workingHours]);
 
   // Convert non-working days to Date objects for calendar

@@ -8,9 +8,6 @@ import { sr } from 'date-fns/locale';
 import { Check, Clock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
-
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -29,6 +26,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { api } from '@/convex/_generated/api';
+import { type Id } from '@/convex/_generated/dataModel';
 
 interface ConfirmDialogProps {
   appointment: {
@@ -76,7 +75,8 @@ export function ConfirmDialog({ appointment, onClose }: ConfirmDialogProps) {
       handleClose();
     } catch (error) {
       toast.error('Greška pri potvrđivanju', {
-        description: error instanceof Error ? error.message : 'Nepoznata greška',
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
       });
     } finally {
       setIsPending(false);

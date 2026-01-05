@@ -8,9 +8,6 @@ import { sr } from 'date-fns/locale';
 import { AlertTriangle, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
-
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -22,6 +19,8 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { api } from '@/convex/_generated/api';
+import { type Id } from '@/convex/_generated/dataModel';
 
 interface RejectDialogProps {
   appointment: {
@@ -63,7 +62,8 @@ export function RejectDialog({ appointment, onClose }: RejectDialogProps) {
       handleClose();
     } catch (error) {
       toast.error('Greška pri odbijanju', {
-        description: error instanceof Error ? error.message : 'Nepoznata greška',
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
       });
     } finally {
       setIsPending(false);

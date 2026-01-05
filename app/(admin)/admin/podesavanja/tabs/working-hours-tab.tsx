@@ -6,11 +6,11 @@ import { useMutation, useQuery } from 'convex/react';
 import { Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { api } from '@/convex/_generated/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { api } from '@/convex/_generated/api';
 import { cn } from '@/lib/utils';
 
 const DAY_NAMES = [
@@ -93,7 +93,8 @@ export function WorkingHoursTab() {
       setHours(null); // Reset to use server data
     } catch (error) {
       toast.error('Greška pri čuvanju', {
-        description: error instanceof Error ? error.message : 'Nepoznata greška',
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
       });
     } finally {
       setIsPending(false);

@@ -8,9 +8,6 @@ import { sr } from 'date-fns/locale';
 import { CalendarDays, Clock, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
-
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -28,6 +25,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { api } from '@/convex/_generated/api';
+import { type Id } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
 
 interface RescheduleDialogProps {

@@ -53,10 +53,7 @@ export default function HeroSection() {
             <div className="text-center sm:text-left">
               <div className="flex items-center justify-center sm:justify-start gap-1">
                 {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-4 h-4 fill-primary text-primary"
-                  />
+                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
                 ))}
               </div>
               <p className="text-sm text-primary-foreground/70">

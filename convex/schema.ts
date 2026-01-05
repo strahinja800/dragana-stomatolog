@@ -7,7 +7,7 @@ const appointmentStatus = v.union(
   v.literal('CONFIRMED'),
   v.literal('CANCELLED'),
   v.literal('COMPLETED'),
-  v.literal('NO_SHOW'),
+  v.literal('NO_SHOW')
 );
 
 const gender = v.union(v.literal('MALE'), v.literal('FEMALE'));
@@ -15,13 +15,13 @@ const gender = v.union(v.literal('MALE'), v.literal('FEMALE'));
 const invoiceStatus = v.union(
   v.literal('PENDING'),
   v.literal('PAID'),
-  v.literal('CANCELLED'),
+  v.literal('CANCELLED')
 );
 
 const userRole = v.union(
   v.literal('patient'),
   v.literal('dentist'),
-  v.literal('admin'),
+  v.literal('admin')
 );
 
 export default defineSchema({

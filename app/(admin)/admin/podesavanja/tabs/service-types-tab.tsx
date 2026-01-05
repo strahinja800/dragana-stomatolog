@@ -6,8 +6,6 @@ import { useMutation, useQuery } from 'convex/react';
 import { Clock, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,6 +39,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { api } from '@/convex/_generated/api';
+import { type Id } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
 
 interface ServiceTypeForm {
@@ -114,7 +114,8 @@ export function ServiceTypesTab() {
         closeDialog();
       } catch (error) {
         toast.error('Greška', {
-          description: error instanceof Error ? error.message : 'Nepoznata greška',
+          description:
+            error instanceof Error ? error.message : 'Nepoznata greška',
         });
       } finally {
         setIsUpdating(false);
@@ -132,7 +133,8 @@ export function ServiceTypesTab() {
         closeDialog();
       } catch (error) {
         toast.error('Greška', {
-          description: error instanceof Error ? error.message : 'Nepoznata greška',
+          description:
+            error instanceof Error ? error.message : 'Nepoznata greška',
         });
       } finally {
         setIsCreating(false);
@@ -140,7 +142,9 @@ export function ServiceTypesTab() {
     }
   };
 
-  const toggleActive = async (service: NonNullable<typeof serviceTypes>[number]) => {
+  const toggleActive = async (
+    service: NonNullable<typeof serviceTypes>[number]
+  ) => {
     setIsUpdating(true);
     try {
       await updateServiceType({
@@ -149,7 +153,8 @@ export function ServiceTypesTab() {
       });
     } catch (error) {
       toast.error('Greška', {
-        description: error instanceof Error ? error.message : 'Nepoznata greška',
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
       });
     } finally {
       setIsUpdating(false);
@@ -164,7 +169,8 @@ export function ServiceTypesTab() {
       setDeleteId(null);
     } catch (error) {
       toast.error('Greška', {
-        description: error instanceof Error ? error.message : 'Nepoznata greška',
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
       });
     } finally {
       setIsDeleting(false);
