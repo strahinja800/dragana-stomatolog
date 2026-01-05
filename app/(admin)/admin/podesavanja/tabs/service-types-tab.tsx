@@ -2,14 +2,12 @@
 
 import { useState } from 'react';
 
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from 'convex/react';
 import { Clock, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,10 +42,9 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { useTRPC } from '@/trpc/client';
 
 interface ServiceTypeForm {
-  id?: string;
+  id?: Id<'serviceTypes'>;
   name: string;
   durationMinutes: number;
   description: string;
@@ -62,62 +59,19 @@ const defaultForm: ServiceTypeForm = {
 };
 
 export function ServiceTypesTab() {
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const serviceTypes = useQuery(api.settings.getServiceTypes, {});
+  const createServiceType = useMutation(api.settings.createServiceType);
+  const updateServiceType = useMutation(api.settings.updateServiceType);
+  const deleteServiceType = useMutation(api.settings.deleteServiceType);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<Id<'serviceTypes'> | null>(null);
   const [form, setForm] = useState<ServiceTypeForm>(defaultForm);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const isEditing = !!form.id;
-
-  const { data: serviceTypes } = useSuspenseQuery(
-    trpc.settings.getServiceTypes.queryOptions()
-  );
-
-  const { mutate: createService, isPending: isCreating } = useMutation(
-    trpc.settings.createServiceType.mutationOptions({
-      onSuccess: () => {
-        toast.success('Usluga kreirana');
-        queryClient.invalidateQueries({
-          queryKey: trpc.settings.getServiceTypes.queryKey(),
-        });
-        closeDialog();
-      },
-      onError: (error) => {
-        toast.error('Greška', { description: error.message });
-      },
-    })
-  );
-
-  const { mutate: updateService, isPending: isUpdating } = useMutation(
-    trpc.settings.updateServiceType.mutationOptions({
-      onSuccess: () => {
-        toast.success('Usluga ažurirana');
-        queryClient.invalidateQueries({
-          queryKey: trpc.settings.getServiceTypes.queryKey(),
-        });
-        closeDialog();
-      },
-      onError: (error) => {
-        toast.error('Greška', { description: error.message });
-      },
-    })
-  );
-
-  const { mutate: deleteService, isPending: isDeleting } = useMutation(
-    trpc.settings.deleteServiceType.mutationOptions({
-      onSuccess: () => {
-        toast.success('Usluga obrisana');
-        queryClient.invalidateQueries({
-          queryKey: trpc.settings.getServiceTypes.queryKey(),
-        });
-        setDeleteId(null);
-      },
-      onError: (error) => {
-        toast.error('Greška', { description: error.message });
-      },
-    })
-  );
 
   const closeDialog = () => {
     setIsDialogOpen(false);
@@ -129,9 +83,9 @@ export function ServiceTypesTab() {
     setIsDialogOpen(true);
   };
 
-  const openEdit = (service: (typeof serviceTypes)[0]) => {
+  const openEdit = (service: NonNullable<typeof serviceTypes>[number]) => {
     setForm({
-      id: service.id,
+      id: service._id,
       name: service.name,
       durationMinutes: service.durationMinutes,
       description: service.description ?? '',
@@ -140,38 +94,94 @@ export function ServiceTypesTab() {
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.name.trim()) {
       toast.error('Naziv je obavezan');
       return;
     }
 
     if (isEditing) {
-      updateService({
-        id: form.id!,
-        name: form.name,
-        durationMinutes: form.durationMinutes,
-        description: form.description || undefined,
-        isActive: form.isActive,
-      });
+      setIsUpdating(true);
+      try {
+        await updateServiceType({
+          id: form.id!,
+          name: form.name,
+          durationMinutes: form.durationMinutes,
+          description: form.description || undefined,
+          isActive: form.isActive,
+        });
+        toast.success('Usluga ažurirana');
+        closeDialog();
+      } catch (error) {
+        toast.error('Greška', {
+          description: error instanceof Error ? error.message : 'Nepoznata greška',
+        });
+      } finally {
+        setIsUpdating(false);
+      }
     } else {
-      createService({
-        name: form.name,
-        durationMinutes: form.durationMinutes,
-        description: form.description || undefined,
-        isActive: form.isActive,
-      });
+      setIsCreating(true);
+      try {
+        await createServiceType({
+          name: form.name,
+          durationMinutes: form.durationMinutes,
+          description: form.description || undefined,
+          isActive: form.isActive,
+        });
+        toast.success('Usluga kreirana');
+        closeDialog();
+      } catch (error) {
+        toast.error('Greška', {
+          description: error instanceof Error ? error.message : 'Nepoznata greška',
+        });
+      } finally {
+        setIsCreating(false);
+      }
     }
   };
 
-  const toggleActive = (service: (typeof serviceTypes)[0]) => {
-    updateService({
-      id: service.id,
-      isActive: !service.isActive,
-    });
+  const toggleActive = async (service: NonNullable<typeof serviceTypes>[number]) => {
+    setIsUpdating(true);
+    try {
+      await updateServiceType({
+        id: service._id,
+        isActive: !service.isActive,
+      });
+    } catch (error) {
+      toast.error('Greška', {
+        description: error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDelete = async (id: Id<'serviceTypes'>) => {
+    setIsDeleting(true);
+    try {
+      await deleteServiceType({ id });
+      toast.success('Usluga obrisana');
+      setDeleteId(null);
+    } catch (error) {
+      toast.error('Greška', {
+        description: error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const isPending = isCreating || isUpdating;
+
+  if (!serviceTypes) {
+    return (
+      <Card className="overflow-hidden border-border/50 shadow-sm">
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <>
@@ -215,7 +225,7 @@ export function ServiceTypesTab() {
               <TableBody>
                 {serviceTypes.map((service) => (
                   <TableRow
-                    key={service.id}
+                    key={service._id}
                     className={cn(!service.isActive && 'opacity-60')}
                   >
                     <TableCell className="font-medium">
@@ -257,7 +267,7 @@ export function ServiceTypesTab() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => setDeleteId(service.id)}
+                          onClick={() => setDeleteId(service._id)}
                           className="size-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                         >
                           <Trash2 className="size-4" />
@@ -379,7 +389,7 @@ export function ServiceTypesTab() {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Otkaži</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => deleteId && deleteService({ id: deleteId })}
+              onClick={() => deleteId && handleDelete(deleteId)}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >

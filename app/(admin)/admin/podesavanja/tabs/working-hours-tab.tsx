@@ -2,16 +2,16 @@
 
 import { useState } from 'react';
 
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from 'convex/react';
 import { Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { api } from '@/convex/_generated/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import { useTRPC } from '@/trpc/client';
 
 const DAY_NAMES = [
   'Nedelja',
@@ -41,56 +41,77 @@ interface WorkingHour {
 }
 
 export function WorkingHoursTab() {
-  const trpc = useTRPC();
+  const workingHours = useQuery(api.settings.getWorkingHours);
+  const upsertWorkingHours = useMutation(api.settings.upsertWorkingHours);
 
-  const { data: workingHours } = useSuspenseQuery(
-    trpc.settings.getWorkingHours.queryOptions()
-  );
+  const [hours, setHours] = useState<WorkingHour[] | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
-  // Initialize state directly from server data (BE returns all 7 days)
-  const [hours, setHours] = useState<WorkingHour[]>(() =>
-    workingHours.map((h) => ({
+  // Initialize state from server data when it loads
+  const displayHours =
+    hours ??
+    workingHours?.map((h) => ({
       dayOfWeek: h.dayOfWeek,
       startTime: h.startTime,
       endTime: h.endTime,
       isOpen: h.isOpen,
-    }))
-  );
-  const [hasChanges, setHasChanges] = useState(false);
-
-  const { mutate: saveHours, isPending } = useMutation(
-    trpc.settings.upsertWorkingHours.mutationOptions({
-      onSuccess: () => {
-        toast.success('Radno vreme sačuvano');
-        setHasChanges(false);
-      },
-      onError: (error) => {
-        toast.error('Greška pri čuvanju', {
-          description: error.message,
-        });
-      },
-    })
-  );
+    })) ??
+    [];
 
   const updateHour = (
     dayOfWeek: number,
     field: keyof WorkingHour,
     value: string | boolean
   ) => {
-    setHours((prev) =>
-      prev.map((h) =>
+    const currentHours =
+      hours ??
+      workingHours?.map((h) => ({
+        dayOfWeek: h.dayOfWeek,
+        startTime: h.startTime,
+        endTime: h.endTime,
+        isOpen: h.isOpen,
+      })) ??
+      [];
+
+    setHours(
+      currentHours.map((h) =>
         h.dayOfWeek === dayOfWeek ? { ...h, [field]: value } : h
       )
     );
     setHasChanges(true);
   };
 
-  const handleSave = () => {
-    saveHours(hours);
+  const handleSave = async () => {
+    if (!hours) return;
+
+    setIsPending(true);
+    try {
+      await upsertWorkingHours({ hours });
+      toast.success('Radno vreme sačuvano');
+      setHasChanges(false);
+      setHours(null); // Reset to use server data
+    } catch (error) {
+      toast.error('Greška pri čuvanju', {
+        description: error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    } finally {
+      setIsPending(false);
+    }
   };
 
+  if (!workingHours) {
+    return (
+      <Card className="overflow-hidden border-border/50 shadow-sm">
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   // Reorder to start from Monday (1) instead of Sunday (0)
-  const orderedHours = [...hours.slice(1), hours[0]];
+  const orderedHours = [...displayHours.slice(1), displayHours[0]];
 
   return (
     <Card className="overflow-hidden border-border/50 shadow-sm">

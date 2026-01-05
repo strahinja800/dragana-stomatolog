@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import { CalendarDays, Clock, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -26,15 +29,14 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { useTRPC } from '@/trpc/client';
 
 interface RescheduleDialogProps {
   appointment: {
-    id: string;
-    startTime: Date;
+    _id: Id<'appointments'>;
+    startTime: number;
     patient: {
       firstName: string;
-      lastName: string | null;
+      lastName: string;
     } | null;
   } | null;
   onClose: () => void;
@@ -44,30 +46,13 @@ export function RescheduleDialog({
   appointment,
   onClose,
 }: RescheduleDialogProps) {
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
-
   const [newDate, setNewDate] = useState<Date | undefined>();
   const [newTime, setNewTime] = useState('');
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
-  const { mutate: rescheduleAppointmentMutation, isPending } = useMutation(
-    trpc.appointment.rescheduleAppointment.mutationOptions({
-      onSuccess: () => {
-        toast.success('Termin promenjen', {
-          description: 'Pacijent će biti obavešten o novom vremenu',
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.appointment.getAllAppointments.queryKey(),
-        });
-        handleClose();
-      },
-      onError: (error) => {
-        toast.error('Greška pri promeni termina', {
-          description: error.message,
-        });
-      },
-    })
+  const rescheduleAppointmentMutation = useMutation(
+    api.appointments.rescheduleAppointment
   );
 
   const handleClose = () => {
@@ -76,14 +61,28 @@ export function RescheduleDialog({
     onClose();
   };
 
-  const handleReschedule = () => {
+  const handleReschedule = async () => {
     if (!appointment || !newDate || !newTime) return;
 
-    rescheduleAppointmentMutation({
-      id: appointment.id,
-      newDate,
-      newTime,
-    });
+    setIsPending(true);
+    try {
+      await rescheduleAppointmentMutation({
+        id: appointment._id,
+        newDate: newDate.getTime(),
+        newTime,
+      });
+      toast.success('Termin promenjen', {
+        description: 'Pacijent će biti obavešten o novom vremenu',
+      });
+      handleClose();
+    } catch (error) {
+      toast.error('Greška pri promeni termina', {
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    } finally {
+      setIsPending(false);
+    }
   };
 
   const patientName = appointment?.patient

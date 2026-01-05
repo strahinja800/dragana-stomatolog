@@ -2,19 +2,23 @@
 
 import { useState } from 'react';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from 'convex/react';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import {
   CalendarClock,
   Check,
   Clock,
+  Loader2,
   MoreHorizontal,
   Phone,
   RefreshCw,
   User,
   X,
 } from 'lucide-react';
+
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -34,7 +38,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { useTRPC } from '@/trpc/client';
 
 import { ConfirmDialog } from './confirm-dialog';
 import { RejectDialog } from './reject-dialog';
@@ -82,30 +85,28 @@ const STATUS_CONFIG: Record<
   },
 };
 
-type Appointment = {
-  id: string;
-  startTime: Date;
-  endTime: Date;
-  phone: string | null;
-  symptoms: string | null;
+export type Appointment = {
+  _id: Id<'appointments'>;
+  startTime: number;
+  endTime: number;
+  phone?: string | null;
+  symptoms?: string | null;
   status: AppointmentStatus;
-  rejectionReason: string | null;
+  rejectionReason?: string | null;
   patient: {
-    id: string;
+    _id: Id<'patients'>;
     firstName: string;
-    lastName: string | null;
-    phone: string | null;
+    lastName: string;
+    phone?: string | null;
   } | null;
   serviceType: {
-    id: string;
+    _id: Id<'serviceTypes'>;
     name: string;
     durationMinutes: number;
   } | null;
 };
 
 export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
-  const trpc = useTRPC();
-
   const [confirmAppointment, setConfirmAppointment] =
     useState<Appointment | null>(null);
   const [rejectAppointment, setRejectAppointment] =
@@ -113,13 +114,19 @@ export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
   const [rescheduleAppointment, setRescheduleAppointment] =
     useState<Appointment | null>(null);
 
-  const { data } = useSuspenseQuery(
-    trpc.appointment.getAllAppointments.queryOptions({
-      status: statusFilter,
-    })
-  );
+  const data = useQuery(api.appointments.getAllAppointments, {
+    status: statusFilter,
+  });
 
-  const appointments = (data as { appointments: Appointment[] }).appointments;
+  if (data === undefined) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  const appointments = data.appointments as Appointment[];
 
   if (appointments.length === 0) {
     return (
@@ -166,7 +173,7 @@ export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
 
               return (
                 <TableRow
-                  key={appointment.id}
+                  key={appointment._id}
                   className={cn(
                     'group transition-colors',
                     appointment.status === 'PENDING' &&

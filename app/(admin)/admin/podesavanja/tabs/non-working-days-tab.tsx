@@ -2,16 +2,14 @@
 
 import { useState } from 'react';
 
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from 'convex/react';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import { CalendarPlus, Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,55 +25,63 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { useTRPC } from '@/trpc/client';
 
 export function NonWorkingDaysTab() {
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const nonWorkingDays = useQuery(api.settings.getNonWorkingDays, {});
+  const createNonWorkingDay = useMutation(api.settings.createNonWorkingDay);
+  const deleteNonWorkingDay = useMutation(api.settings.deleteNonWorkingDay);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [reason, setReason] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const { data: nonWorkingDays } = useSuspenseQuery(
-    trpc.settings.getNonWorkingDays.queryOptions({})
-  );
-
-  const { mutate: createDay, isPending: isCreating } = useMutation(
-    trpc.settings.createNonWorkingDay.mutationOptions({
-      onSuccess: () => {
-        toast.success('Neradni dan dodat');
-        queryClient.invalidateQueries({
-          queryKey: trpc.settings.getNonWorkingDays.queryKey(),
-        });
-        setIsDialogOpen(false);
-        setSelectedDate(undefined);
-        setReason('');
-      },
-      onError: (error) => {
-        toast.error('Greška', { description: error.message });
-      },
-    })
-  );
-
-  const { mutate: deleteDay, isPending: isDeleting } = useMutation(
-    trpc.settings.deleteNonWorkingDay.mutationOptions({
-      onSuccess: () => {
-        toast.success('Neradni dan obrisan');
-        queryClient.invalidateQueries({
-          queryKey: trpc.settings.getNonWorkingDays.queryKey(),
-        });
-      },
-      onError: (error) => {
-        toast.error('Greška', { description: error.message });
-      },
-    })
-  );
-
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!selectedDate) return;
-    createDay({ date: selectedDate, reason: reason || undefined });
+
+    setIsCreating(true);
+    try {
+      await createNonWorkingDay({
+        date: selectedDate.getTime(),
+        reason: reason || undefined,
+      });
+      toast.success('Neradni dan dodat');
+      setIsDialogOpen(false);
+      setSelectedDate(undefined);
+      setReason('');
+    } catch (error) {
+      toast.error('Greška', {
+        description: error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    } finally {
+      setIsCreating(false);
+    }
   };
+
+  const handleDelete = async (id: Id<'nonWorkingDays'>) => {
+    setDeletingId(id);
+    try {
+      await deleteNonWorkingDay({ id });
+      toast.success('Neradni dan obrisan');
+    } catch (error) {
+      toast.error('Greška', {
+        description: error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  if (!nonWorkingDays) {
+    return (
+      <Card className="overflow-hidden border-border/50 shadow-sm">
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Get existing dates for calendar highlighting
   const existingDates = nonWorkingDays.map((d) => new Date(d.date));
@@ -167,7 +173,7 @@ export function NonWorkingDaysTab() {
           <div className="divide-y divide-border/50">
             {nonWorkingDays.map((day) => (
               <div
-                key={day.id}
+                key={day._id}
                 className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-muted/30"
               >
                 <div className="flex items-center gap-4">
@@ -198,14 +204,18 @@ export function NonWorkingDaysTab() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => deleteDay({ id: day.id })}
-                  disabled={isDeleting}
+                  onClick={() => handleDelete(day._id)}
+                  disabled={deletingId === day._id}
                   className={cn(
                     'text-muted-foreground hover:text-destructive',
                     'hover:bg-destructive/10'
                   )}
                 >
-                  <Trash2 className="size-4" />
+                  {deletingId === day._id ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="size-4" />
+                  )}
                 </Button>
               </div>
             ))}

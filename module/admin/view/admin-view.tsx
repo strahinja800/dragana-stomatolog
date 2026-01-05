@@ -1,10 +1,6 @@
 'use client';
 
-import { useTRPC } from '@/trpc/client';
-
 export function AdminView() {
-  const trpc = useTRPC();
-
   return (
     <div className="space-y-8">
       {/* Header */}

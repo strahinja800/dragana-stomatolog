@@ -4,13 +4,15 @@ import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { authClient } from '@/module/auth/lib/auth-client';
+import { authClient } from '@/lib/auth-client';
 
 import { UserMenuDesktop } from './user-menu-desktop';
 import { UserMenuMobile } from './user-menu-mobile';
 
 export default function UserMenu() {
   const { data: session, isPending } = authClient.useSession();
+
+  console.log('SESSION', session);
 
   const handleSignOut = async () => {
     await authClient.signOut();

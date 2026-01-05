@@ -21,7 +21,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { authClient } from '@/module/auth/lib/auth-client';
+import { authClient } from '@/lib/auth-client';
 
 const navItems = [
   {

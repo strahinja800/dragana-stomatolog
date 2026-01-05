@@ -2,15 +2,14 @@
 
 import { useState } from 'react';
 
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from 'convex/react';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import { Check, Clock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -30,51 +29,30 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useTRPC } from '@/trpc/client';
 
 interface ConfirmDialogProps {
   appointment: {
-    id: string;
-    startTime: Date;
+    _id: Id<'appointments'>;
+    startTime: number;
     patient: {
       firstName: string;
-      lastName: string | null;
+      lastName: string;
     } | null;
   } | null;
   onClose: () => void;
 }
 
 export function ConfirmDialog({ appointment, onClose }: ConfirmDialogProps) {
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
-
   const [serviceTypeId, setServiceTypeId] = useState<string>('');
   const [notes, setNotes] = useState('');
+  const [isPending, setIsPending] = useState(false);
 
-  const { data: serviceTypes } = useSuspenseQuery(
-    trpc.settings.getServiceTypes.queryOptions()
+  const serviceTypes = useQuery(api.settings.getServiceTypes);
+  const confirmAppointmentMutation = useMutation(
+    api.appointments.confirmAppointment
   );
 
-  const activeServices = serviceTypes.filter((s) => s.isActive);
-
-  const { mutate: confirmAppointmentMutation, isPending } = useMutation(
-    trpc.appointment.confirmAppointment.mutationOptions({
-      onSuccess: () => {
-        toast.success('Termin potvrđen', {
-          description: 'Pacijent će biti obavešten o potvrdi termina',
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.appointment.getAllAppointments.queryKey(),
-        });
-        handleClose();
-      },
-      onError: (error) => {
-        toast.error('Greška pri potvrđivanju', {
-          description: error.message,
-        });
-      },
-    })
-  );
+  const activeServices = serviceTypes?.filter((s) => s.isActive) ?? [];
 
   const handleClose = () => {
     setServiceTypeId('');
@@ -82,17 +60,30 @@ export function ConfirmDialog({ appointment, onClose }: ConfirmDialogProps) {
     onClose();
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!appointment || !serviceTypeId) return;
 
-    confirmAppointmentMutation({
-      id: appointment.id,
-      serviceTypeId,
-      notes: notes || undefined,
-    });
+    setIsPending(true);
+    try {
+      await confirmAppointmentMutation({
+        id: appointment._id,
+        serviceTypeId: serviceTypeId as Id<'serviceTypes'>,
+        notes: notes || undefined,
+      });
+      toast.success('Termin potvrđen', {
+        description: 'Pacijent će biti obavešten o potvrdi termina',
+      });
+      handleClose();
+    } catch (error) {
+      toast.error('Greška pri potvrđivanju', {
+        description: error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    } finally {
+      setIsPending(false);
+    }
   };
 
-  const selectedService = activeServices.find((s) => s.id === serviceTypeId);
+  const selectedService = activeServices.find((s) => s._id === serviceTypeId);
   const patientName = appointment?.patient
     ? `${appointment.patient.firstName} ${appointment.patient.lastName || ''}`.trim()
     : 'Nepoznat pacijent';
@@ -137,7 +128,7 @@ export function ConfirmDialog({ appointment, onClose }: ConfirmDialogProps) {
               </SelectTrigger>
               <SelectContent>
                 {activeServices.map((service) => (
-                  <SelectItem key={service.id} value={service.id}>
+                  <SelectItem key={service._id} value={service._id}>
                     <div className="flex items-center gap-2">
                       <span>{service.name}</span>
                       <span className="text-muted-foreground">

@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import { AlertTriangle, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -19,43 +22,25 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useTRPC } from '@/trpc/client';
 
 interface RejectDialogProps {
   appointment: {
-    id: string;
-    startTime: Date;
+    _id: Id<'appointments'>;
+    startTime: number;
     patient: {
       firstName: string;
-      lastName: string | null;
+      lastName: string;
     } | null;
   } | null;
   onClose: () => void;
 }
 
 export function RejectDialog({ appointment, onClose }: RejectDialogProps) {
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
-
   const [reason, setReason] = useState('');
+  const [isPending, setIsPending] = useState(false);
 
-  const { mutate: rejectAppointmentMutation, isPending } = useMutation(
-    trpc.appointment.rejectAppointment.mutationOptions({
-      onSuccess: () => {
-        toast.success('Termin odbijen', {
-          description: 'Pacijent će biti obavešten o odbijanju termina',
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.appointment.getAllAppointments.queryKey(),
-        });
-        handleClose();
-      },
-      onError: (error) => {
-        toast.error('Greška pri odbijanju', {
-          description: error.message,
-        });
-      },
-    })
+  const rejectAppointmentMutation = useMutation(
+    api.appointments.rejectAppointment
   );
 
   const handleClose = () => {
@@ -63,13 +48,26 @@ export function RejectDialog({ appointment, onClose }: RejectDialogProps) {
     onClose();
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!appointment || !reason.trim()) return;
 
-    rejectAppointmentMutation({
-      id: appointment.id,
-      reason: reason.trim(),
-    });
+    setIsPending(true);
+    try {
+      await rejectAppointmentMutation({
+        id: appointment._id,
+        reason: reason.trim(),
+      });
+      toast.success('Termin odbijen', {
+        description: 'Pacijent će biti obavešten o odbijanju termina',
+      });
+      handleClose();
+    } catch (error) {
+      toast.error('Greška pri odbijanju', {
+        description: error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    } finally {
+      setIsPending(false);
+    }
   };
 
   const patientName = appointment?.patient

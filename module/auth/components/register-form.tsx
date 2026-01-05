@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation } from 'convex/react';
 import { toast } from 'sonner';
 
 import logo from '@/assets/logo.png';
@@ -27,14 +27,13 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { authClient } from '@/module/auth/lib/auth-client';
+import { api } from '@/convex/_generated/api';
+import { authClient } from '@/lib/auth-client';
 import { parseAuthError } from '@/module/auth/lib/auth-error-handler';
 import {
   type RegisterFormSchemaInputs,
   registerSchema,
 } from '@/module/auth/types/auth-schema';
-import { type AuthUser } from '@/module/auth/types/auth-types';
-import { useTRPC } from '@/trpc/client';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -56,19 +55,7 @@ export function RegisterForm() {
 
   const isPending = form.formState.isSubmitting;
 
-  const trpc = useTRPC();
-
-  const { mutateAsync } = useMutation(
-    trpc.patient.createPatient.mutationOptions({
-      onSuccess: (data) => {
-        console.log('Patient created:', data);
-        router.push('/');
-      },
-      onError: (error) => {
-        console.error('Error creating patient:', error);
-      },
-    })
-  );
+  const createPatient = useMutation(api.patients.createPatient);
 
   const onSubmit = async (data: RegisterFormSchemaInputs) => {
     setServerError(null);
@@ -80,19 +67,22 @@ export function RegisterForm() {
         name: `${data.firstName} ${data.lastName}`,
       },
       {
-        onSuccess: (response) => {
+        onSuccess: async (response) => {
           toast.success('Uspešna registracija!', {
             description: `Dobrodošli, ${response.data.user.name}`,
           });
 
-          console.log('RESPONSE', response.data.user);
-          const userFromResponse = response.data.user as AuthUser;
-          mutateAsync({
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.email,
-            userId: userFromResponse.id,
-          });
+          try {
+            await createPatient({
+              firstName: data.firstName,
+              lastName: data.lastName,
+              email: data.email,
+              authId: response.data.user.id,
+            });
+            router.push('/');
+          } catch (error) {
+            console.error('Error creating patient:', error);
+          }
         },
         onError: (ctx) => {
           console.log('Register error', ctx);

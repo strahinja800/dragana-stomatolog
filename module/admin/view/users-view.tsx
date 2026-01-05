@@ -1,10 +1,6 @@
 'use client';
 
-import { useTRPC } from '@/trpc/client';
-
 export function UsersView() {
-  const trpc = useTRPC();
-
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -15,8 +11,7 @@ export function UsersView() {
         </p>
       </div>
 
-      {/* Users Table */}
-      {/* <UsersTable users={users} /> */}
+      {/* Users Table - TODO: Implement with Convex useQuery(api.users.listUsers) */}
     </div>
   );
 }
