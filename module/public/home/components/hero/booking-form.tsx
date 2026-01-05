@@ -64,8 +64,9 @@ function FloatingInput({
       style={{ animationDelay: `${step * 100}ms`, animationFillMode: 'both' }}
     >
       <div className="flex items-center gap-3 mb-2">
-        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-          {step}
+        <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-linear-to-br from-primary/20 to-primary/5 text-primary text-xs font-bold border border-primary/20 shadow-[0_2px_8px_rgba(0,0,0,0.1),0_0_20px_oklch(0.61_0.11_222/0.2)]">
+          <span className="absolute inset-0 rounded-full bg-linear-to-b from-white/10 to-transparent" />
+          <span className="relative z-10">{step}</span>
         </span>
         <label
           htmlFor={id}
@@ -79,8 +80,10 @@ function FloatingInput({
         {/* Icon */}
         <div
           className={cn(
-            'absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-300 z-10',
+            'absolute left-5 top-1/2 -translate-y-1/2 transition-all duration-500 z-10',
             'text-muted-foreground group-focus-within:text-primary',
+            'group-focus-within:drop-shadow-[0_0_8px_oklch(0.61_0.11_222/0.4)]',
+            'group-focus-within:scale-110',
             isInvalid && 'text-destructive'
           )}
         >
@@ -99,17 +102,19 @@ function FloatingInput({
           aria-invalid={isInvalid}
           className={cn(
             // Base styles
-            'peer w-full h-12 pl-12 pr-4 rounded-2xl',
-            'bg-background/50 backdrop-blur-sm',
-            'border-2 border-border/50',
+            'peer w-full h-14 pl-14 pr-5 rounded-2xl',
+            'bg-linear-to-br from-background/70 to-background/50 backdrop-blur-md',
+            'border-2 border-border/40',
+            'shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]',
             'text-foreground placeholder:text-muted-foreground/60',
-            'text-base transition-all duration-300',
+            'text-base transition-all duration-500 ease-out',
             // Focus styles
-            'focus:outline-none focus:border-primary/50',
-            'focus:shadow-[0_0_0_4px_hsl(199_89%_48%/0.1)]',
-            'focus:bg-background/80',
+            'focus:outline-none focus:border-primary/60',
+            'focus:shadow-[0_0_0_5px_oklch(0.61_0.11_222/0.12),0_8px_24px_-8px_oklch(0.61_0.11_222/0.3),inset_0_1px_2px_rgba(0,0,0,0.05)]',
+            'focus:bg-linear-to-br focus:from-background/90 focus:to-background/70',
             // Hover styles
-            'hover:border-border hover:bg-background/60',
+            'hover:border-primary/30 hover:bg-linear-to-br hover:from-background/80 hover:to-background/60',
+            'hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1),inset_0_1px_2px_rgba(0,0,0,0.05)]',
             // Disabled styles
             'disabled:opacity-50 disabled:cursor-not-allowed',
             // Invalid styles
@@ -122,8 +127,11 @@ function FloatingInput({
 
         {/* Valid indicator */}
         {isFilled && !isInvalid && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 animate-fade-in">
-            <CheckCircle className="w-5 h-5 text-primary" />
+          <div className="absolute right-5 top-1/2 -translate-y-1/2 animate-[fade-in_0.4s_ease-out,scale-bounce-in_0.5s_ease-out]">
+            <div className="relative">
+              <CheckCircle className="w-5 h-5 text-primary relative z-10 drop-shadow-[0_0_12px_oklch(0.61_0.11_222/0.6)]" />
+              <div className="absolute inset-0 rounded-full bg-primary/20 blur-md scale-150" />
+            </div>
           </div>
         )}
       </div>
@@ -154,16 +162,28 @@ export default function BookingForm() {
   const onSubmit = (data: BookingFormData) => console.log(data);
 
   return (
-    <div className="relative bg-card/95 backdrop-blur-xl rounded-4xl p-4 md:p-8 shadow-hover border border-border/30 overflow-hidden">
+    <div
+      className="relative bg-card/90 backdrop-blur-2xl rounded-4xl p-6 md:p-10 border-2 border-transparent overflow-hidden before:absolute before:inset-0 before:rounded-4xl before:p-[2px] before:bg-gradient-to-br before:from-primary/30 before:via-primary/10 before:to-primary/30 before:-z-10 before:blur-sm"
+      style={{
+        boxShadow: 'var(--shadow-premium-card)',
+      }}
+    >
       {/* Background gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-primary/[0.04] pointer-events-none" />
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-linear-to-br from-primary/8 via-primary/2 to-[oklch(0.71_0.13_215/0.06)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.61_0.11_222/0.15),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,oklch(0.71_0.13_215/0.1),transparent_50%)]" />
+      </div>
 
       {/* Content */}
       <div className="relative z-10">
         {/* Header */}
         <div className="text-center mb-8 animate-fade-up">
-          <h3 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-2">
-            Brzo zakazivanje
+          <h3 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-2 relative">
+            <span className="relative z-10">Brzo zakazivanje</span>
+            <span className="absolute inset-0 blur-xl opacity-30 bg-linear-to-r from-primary to-[oklch(0.71_0.13_215)] bg-clip-text text-transparent pointer-events-none">
+              Brzo zakazivanje
+            </span>
           </h3>
           <p className="text-muted-foreground text-sm md:text-base">
             Popunite formu i javićemo vam se u roku od 30 minuta
@@ -241,19 +261,36 @@ export default function BookingForm() {
             <button
               type="submit"
               disabled={isPending}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow =
+                  'var(--shadow-premium-button-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow =
+                  'var(--shadow-premium-button)';
+              }}
               className={cn(
-                'group relative w-full h-14 rounded-2xl',
-                'gradient-primary text-white font-semibold text-base',
-                'shadow-soft hover:shadow-hover',
-                'transition-all duration-300',
-                'hover:scale-[1.02] active:scale-[0.98]',
-                'disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100',
-                'overflow-hidden'
+                'group relative w-full h-16 rounded-2xl',
+                'text-white font-bold text-base tracking-wide',
+                'border-2 border-primary/30',
+                'overflow-hidden',
+                'transition-all duration-500 ease-out',
+                'hover:scale-[1.03] hover:border-primary/50 active:scale-[0.98]',
+                'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100'
               )}
+              style={{
+                background: 'var(--gradient-premium-button)',
+                boxShadow: 'var(--shadow-premium-button)',
+              }}
             >
-              {/* Shimmer effect */}
+              {/* Enhanced shimmer */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                <div className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1200 ease-out bg-linear-to-r from-transparent via-white/30 to-transparent" />
+              </div>
+
+              {/* NEW: Radial highlight */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-linear-to-b from-white/10 to-transparent rounded-t-2xl" />
               </div>
 
               {/* Button content */}
@@ -280,19 +317,23 @@ export default function BookingForm() {
           style={{ animationDelay: '400ms', animationFillMode: 'both' }}
         >
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-            <div className="flex items-center gap-2.5 text-sm">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                <CheckCircle className="w-4 h-4 text-primary" />
+            <div className="group/trust flex items-center gap-3 text-sm px-4 py-2.5 rounded-full bg-linear-to-br from-background/60 to-background/30 backdrop-blur-sm border border-border/30 transition-all duration-300 hover:border-primary/30 hover:shadow-[0_4px_16px_-4px_oklch(0.61_0.11_222/0.2)]">
+              <div className="relative flex items-center justify-center w-9 h-9 rounded-full bg-linear-to-br from-primary/20 to-primary/5 shadow-[0_2px_8px_rgba(0,0,0,0.1),0_0_16px_oklch(0.61_0.11_222/0.2)] group-hover/trust:shadow-[0_2px_12px_rgba(0,0,0,0.15),0_0_24px_oklch(0.61_0.11_222/0.35)] transition-shadow duration-300">
+                <CheckCircle className="w-4.5 h-4.5 text-primary relative z-10" />
+                <div className="absolute inset-0 rounded-full bg-linear-to-b from-white/10 to-transparent" />
               </div>
-              <span className="text-muted-foreground">
+              <span className="text-muted-foreground font-medium">
                 Besplatna konsultacija
               </span>
             </div>
-            <div className="flex items-center gap-2.5 text-sm">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                <CheckCircle className="w-4 h-4 text-primary" />
+            <div className="group/trust flex items-center gap-3 text-sm px-4 py-2.5 rounded-full bg-linear-to-br from-background/60 to-background/30 backdrop-blur-sm border border-border/30 transition-all duration-300 hover:border-primary/30 hover:shadow-[0_4px_16px_-4px_oklch(0.61_0.11_222/0.2)]">
+              <div className="relative flex items-center justify-center w-9 h-9 rounded-full bg-linear-to-br from-primary/20 to-primary/5 shadow-[0_2px_8px_rgba(0,0,0,0.1),0_0_16px_oklch(0.61_0.11_222/0.2)] group-hover/trust:shadow-[0_2px_12px_rgba(0,0,0,0.15),0_0_24px_oklch(0.61_0.11_222/0.35)] transition-shadow duration-300">
+                <CheckCircle className="w-4.5 h-4.5 text-primary relative z-10" />
+                <div className="absolute inset-0 rounded-full bg-linear-to-b from-white/10 to-transparent" />
               </div>
-              <span className="text-muted-foreground">Bez čekanja</span>
+              <span className="text-muted-foreground font-medium">
+                Bez čekanja
+              </span>
             </div>
           </div>
         </div>
