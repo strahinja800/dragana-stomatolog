@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import { toast } from 'sonner';
 
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo-negativ.jpg';
 import { Button } from '@/components/ui/button';
 import {
   Card,
