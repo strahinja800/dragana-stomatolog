@@ -1,15 +1,21 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
+import {
+  formatLocalTime,
+  getCurrentLocalTimeMinutes,
+  getLocalDayEnd,
+  getLocalDayOfWeek,
+  getLocalDayStart,
+  isLocalToday,
+  parseLocalTime,
+} from './lib/timezone';
 
 const DEFAULT_SLOT_DURATION = 30; // minutes
-const LOOK_AHEAD_DAYS = 60;
 
-function parseTimeToTimestamp(dateTimestamp: number, time: string): number {
-  const [hours, minutes] = time.split(':').map(Number);
-  const d = new Date(dateTimestamp);
-  d.setUTCHours(hours, minutes, 0, 0);
-  return d.getTime();
+interface TimeSlot {
+  time: string;
+  isAvailable: boolean;
 }
 
 // ============================================
@@ -17,44 +23,24 @@ function parseTimeToTimestamp(dateTimestamp: number, time: string): number {
 // ============================================
 
 /**
- * Vraća sve podatke potrebne za booking formu.
- * Backend računa sve - FE samo prikazuje.
+ * Vraća neradne dane za kalendar.
+ * - closedDaysOfWeek: dani u nedelji koji su uvek zatvoreni (0=Ned, 6=Sub)
+ * - disabledDates: specifični datumi koji su neradni (praznici, godišnji, itd.)
  */
-export const getBookingData = query({
+export const getNonWorkingDays = query({
   args: {},
   handler: async (ctx) => {
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-    const endDate = new Date(today);
-    endDate.setDate(today.getDate() + LOOK_AHEAD_DAYS);
+    const today = getLocalDayStart(Date.now());
 
-    // 1. Dohvati working hours (sa defaultima)
+    // 1. Zatvoreni dani u nedelji
     const workingHoursRaw = await ctx.db.query('workingHours').collect();
-    const workingHoursMap = Array.from({ length: 7 }, (_, dayOfWeek) => {
+    const closedDaysOfWeek = Array.from({ length: 7 }, (_, dayOfWeek) => {
       const existing = workingHoursRaw.find((h) => h.dayOfWeek === dayOfWeek);
-      return (
-        existing ?? {
-          dayOfWeek,
-          startTime: '08:00',
-          endTime: '17:00',
-          isOpen: dayOfWeek !== 0 && dayOfWeek !== 6,
-        }
-      );
-    });
+      const isOpen = existing?.isOpen ?? (dayOfWeek !== 0 && dayOfWeek !== 6);
+      return isOpen ? null : dayOfWeek;
+    }).filter((day): day is number => day !== null);
 
-    // Zatvoreni dani u nedelji (0=Ned, 6=Sub)
-    const closedDaysOfWeek = workingHoursMap
-      .filter((wh) => !wh.isOpen)
-      .map((wh) => wh.dayOfWeek);
-
-    // Radno vreme za svaki dan (0-6)
-    const workingHours = workingHoursMap.map((wh) => ({
-      dayOfWeek: wh.dayOfWeek,
-      startTime: wh.startTime,
-      endTime: wh.endTime,
-    }));
-
-    // 2. Dohvati sve non-working days (od danas pa nadalje)
+    // 2. Specifični neradni datumi
     const nonWorkingDaysRaw = await ctx.db
       .query('nonWorkingDays')
       .withIndex('by_date')
@@ -63,14 +49,73 @@ export const getBookingData = query({
 
     const disabledDates = nonWorkingDaysRaw.map((nwd) => nwd.date);
 
-    // 3. Dohvati sve zakazane termine (CONFIRMED/PENDING) za narednih 60 dana
+    return {
+      closedDaysOfWeek,
+      disabledDates,
+    };
+  },
+});
+
+/**
+ * Vraća time slotove za odabrani datum sa statusom dostupnosti.
+ * Uključuje logiku za neradne dane i prošle termine.
+ */
+export const getTimeSlotsForDate = query({
+  args: {
+    date: v.number(), // Unix timestamp (početak dana)
+  },
+  handler: async (ctx, args): Promise<TimeSlot[]> => {
+    const dayOfWeek = getLocalDayOfWeek(args.date);
+
+    // 1. Dohvati working hours za taj dan
+    const workingHoursRaw = await ctx.db.query('workingHours').collect();
+    const dayHours = workingHoursRaw.find((h) => h.dayOfWeek === dayOfWeek) ?? {
+      dayOfWeek,
+      startTime: '08:00',
+      endTime: '17:00',
+      isOpen: dayOfWeek !== 0 && dayOfWeek !== 6,
+    };
+
+    // Ako je neradni dan, vrati prazan niz
+    if (!dayHours.isOpen) {
+      return [];
+    }
+
+    // 2. Proveri da li je non-working day
+    const dayStart = getLocalDayStart(args.date);
+    const dayEnd = getLocalDayEnd(args.date);
+
+    const nonWorkingDay = await ctx.db
+      .query('nonWorkingDays')
+      .withIndex('by_date')
+      .filter((q) =>
+        q.and(
+          q.gte(q.field('date'), dayStart.getTime()),
+          q.lte(q.field('date'), dayEnd.getTime())
+        )
+      )
+      .first();
+
+    if (nonWorkingDay) {
+      return [];
+    }
+
+    // 3. Generiši sve slotove za taj dan
+    const slots: TimeSlot[] = [];
+    const [startHour, startMin] = dayHours.startTime.split(':').map(Number);
+    const [endHour, endMin] = dayHours.endTime.split(':').map(Number);
+
+    let currentMinutes = startHour * 60 + startMin;
+    const endMinutes = endHour * 60 + endMin;
+
+    // 4. Dohvati zauzete termine za taj dan
     const bookedAppointments = await ctx.db
       .query('appointments')
       .withIndex('by_startTime')
       .filter((q) =>
         q.and(
-          q.gte(q.field('startTime'), today.getTime()),
-          q.lte(q.field('startTime'), endDate.getTime()),
+          q.gte(q.field('startTime'), dayStart.getTime()),
+          q.lte(q.field('startTime'), dayEnd.getTime()),
           q.or(
             q.eq(q.field('status'), 'CONFIRMED'),
             q.eq(q.field('status'), 'PENDING')
@@ -79,16 +124,32 @@ export const getBookingData = query({
       )
       .collect();
 
-    // 4. Grupiši termine po datumu i pretvori u bookedSlots
-    // Vraćamo samo startTime timestamp - FE će formatirati prema lokalnom vremenu
-    const bookedSlots = bookedAppointments.map((appt) => appt.startTime);
+    const bookedTimes = new Set(
+      bookedAppointments.map((appt) => formatLocalTime(appt.startTime))
+    );
 
-    return {
-      closedDaysOfWeek,
-      disabledDates,
-      workingHours,
-      bookedSlots,
-    };
+    // 5. Proveri da li je danas - za filtriranje prošlih termina
+    const isTodaySelected = isLocalToday(args.date);
+    const currentTimeMinutes = getCurrentLocalTimeMinutes();
+
+    // 6. Generiši slotove sa statusom
+    while (currentMinutes + DEFAULT_SLOT_DURATION <= endMinutes) {
+      const hours = Math.floor(currentMinutes / 60);
+      const mins = currentMinutes % 60;
+      const time = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+
+      const isBooked = bookedTimes.has(time);
+      const isPast = isTodaySelected && currentMinutes <= currentTimeMinutes;
+
+      slots.push({
+        time,
+        isAvailable: !isBooked && !isPast,
+      });
+
+      currentMinutes += DEFAULT_SLOT_DURATION;
+    }
+
+    return slots;
   },
 });
 
@@ -111,7 +172,7 @@ export const createAppointment = mutation({
     const lastName = nameParts.slice(1).join(' ') || '';
 
     // Calculate start and end time
-    const startTime = parseTimeToTimestamp(args.date, args.time);
+    const startTime = parseLocalTime(args.date, args.time);
     const endTime = startTime + DEFAULT_SLOT_DURATION * 60 * 1000;
 
     // Check if slot is still available
@@ -339,7 +400,7 @@ export const rescheduleAppointment = mutation({
       }
     }
 
-    const newStartTime = parseTimeToTimestamp(args.newDate, args.newTime);
+    const newStartTime = parseLocalTime(args.newDate, args.newTime);
     const newEndTime = newStartTime + duration * 60 * 1000;
 
     await ctx.db.patch(args.id, {
