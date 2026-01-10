@@ -7,7 +7,9 @@ import { requireAdmin } from '@/module/auth/lib/auth-utils';
 export default async function SettingsPage() {
   await requireAdmin('/admin/podesavanja');
 
-  const preloadedWorkingHours = await preloadQuery(api.settings.getWorkingHours);
+  const preloadedWorkingHours = await preloadQuery(
+    api.settings.getWorkingHours
+  );
 
   return <SettingsView preloadedWorkingHours={preloadedWorkingHours} />;
 }

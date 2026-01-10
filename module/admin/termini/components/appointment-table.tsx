@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { type Preloaded, usePreloadedQuery, useQuery } from 'convex/react';
+import { useQuery } from 'convex/react';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import {
@@ -51,7 +51,6 @@ type AppointmentStatus =
 
 interface AppointmentTableProps {
   statusFilter?: AppointmentStatus;
-  preloadedData?: Preloaded<typeof api.appointments.getAllAppointments>;
 }
 
 const STATUS_CONFIG: Record<
@@ -106,10 +105,7 @@ export type Appointment = {
   } | null;
 };
 
-export function AppointmentTable({
-  statusFilter,
-  preloadedData,
-}: AppointmentTableProps) {
+export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
   const [confirmAppointment, setConfirmAppointment] =
     useState<Appointment | null>(null);
   const [rejectAppointment, setRejectAppointment] =
@@ -117,16 +113,9 @@ export function AppointmentTable({
   const [rescheduleAppointment, setRescheduleAppointment] =
     useState<Appointment | null>(null);
 
-  // Use preloaded data if available, otherwise use query
-  const preloadedResult = preloadedData
-    ? usePreloadedQuery(preloadedData)
-    : null;
-  const queryResult = useQuery(
-    api.appointments.getAllAppointments,
-    preloadedData ? 'skip' : { status: statusFilter }
-  );
-
-  const data = preloadedResult ?? queryResult;
+  const data = useQuery(api.appointments.getAllAppointments, {
+    status: statusFilter,
+  });
 
   if (data === undefined) {
     return (

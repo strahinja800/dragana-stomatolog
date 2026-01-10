@@ -8,10 +8,9 @@ import { Calendar, Clock, Stethoscope } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { type api } from '@/convex/_generated/api';
-
-import { NonWorkingDaysTab } from '../components/non-working-days-tab';
-import { ServiceTypesTab } from '../components/service-types-tab';
-import { WorkingHoursTab } from '../components/working-hours-tab';
+import { NonWorkingDaysTab } from '@/module/admin/podesavanja/components/non-working-days-tab';
+import { ServiceTypesTab } from '@/module/admin/podesavanja/components/service-types-tab';
+import { WorkingHoursTab } from '@/module/admin/podesavanja/components/working-hours-tab';
 
 function TabSkeleton() {
   return (
