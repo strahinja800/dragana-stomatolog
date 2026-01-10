@@ -27,7 +27,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { authClient } from '@/module/auth/lib/auth-client';
+import { authClient } from '@/lib/auth-client';
 import { parseAuthError } from '@/module/auth/lib/auth-error-handler';
 import {
   type LoginFormSchemaInputs,

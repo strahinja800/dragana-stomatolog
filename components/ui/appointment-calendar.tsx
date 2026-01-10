@@ -33,7 +33,8 @@ interface AppointmentCalendarProps {
   onDateSelect: (date: Date | undefined) => void;
   onTimeSelect: (time: string) => void;
   timeSlots?: string[];
-  bookedDates?: Date[];
+  /** Timestamps (Unix ms) of dates to disable - backend returns these directly */
+  disabledDates?: number[];
   disabledDaysOfWeek?: number[];
   disabled?: boolean;
   disablePastDates?: boolean;
@@ -48,7 +49,7 @@ function AppointmentCalendar({
   onDateSelect,
   onTimeSelect,
   timeSlots = DEFAULT_TIME_SLOTS,
-  bookedDates = [],
+  disabledDates: disabledTimestamps = [],
   disabledDaysOfWeek = [],
   disabled = false,
   disablePastDates = true,
@@ -56,9 +57,12 @@ function AppointmentCalendar({
   locale = 'sr-Latn',
   className,
 }: AppointmentCalendarProps) {
-  const disabledDates = [
+  // Convert timestamps to Date objects for react-day-picker
+  const disabledDateObjects = disabledTimestamps.map((ts) => new Date(ts));
+
+  const calendarDisabledDates = [
     ...(disablePastDates ? [{ before: new Date() }] : []),
-    ...bookedDates,
+    ...disabledDateObjects,
     ...(disabledDaysOfWeek.length > 0
       ? [{ dayOfWeek: disabledDaysOfWeek }]
       : []),
@@ -71,64 +75,65 @@ function AppointmentCalendar({
         className
       )}
     >
-      <div className="relative md:pr-40">
-        <div className="flex justify-center p-4">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={onDateSelect}
-            disabled={disabledDates}
-            showOutsideDays={false}
-            modifiers={{
-              booked: bookedDates,
-            }}
-            modifiersClassNames={{
-              booked: '[&>button]:line-through opacity-100',
-            }}
-            className="bg-transparent p-0 [--cell-size:--spacing(9)]"
-            formatters={{
-              formatWeekdayName: (date) =>
-                date.toLocaleString(locale, { weekday: 'short' }),
-              formatCaption: (date) =>
-                date.toLocaleString(locale, {
-                  month: 'long',
-                  year: 'numeric',
-                }),
-            }}
-          />
-        </div>
+      <div className="flex flex-col divide-y md:flex-row md:divide-x md:divide-y-0">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={onDateSelect}
+          disabled={calendarDisabledDates}
+          showOutsideDays={false}
+          weekStartsOn={1}
+          modifiers={{
+            booked: disabledDateObjects,
+          }}
+          modifiersClassNames={{
+            booked: '[&>button]:line-through opacity-100',
+          }}
+          className="bg-transparent  w-full"
+          formatters={{
+            formatWeekdayName: (date) =>
+              date.toLocaleString(locale, { weekday: 'short' }),
+            formatCaption: (date) =>
+              date.toLocaleString(locale, {
+                month: 'long',
+                year: 'numeric',
+              }),
+          }}
+        />
 
-        <div className="flex w-full flex-col gap-4 border-t max-md:h-48 md:absolute md:inset-y-0 md:right-0 md:w-40 md:border-l md:border-t-0">
-          <ScrollArea className="h-full">
-            <div className="flex flex-col gap-2 p-4">
-              {!selectedDate ? (
-                <p className="text-center text-sm text-muted-foreground">
-                  Izaberite datum
-                </p>
-              ) : isLoadingSlots ? (
-                <p className="text-center text-sm text-muted-foreground">
-                  Učitavanje...
-                </p>
-              ) : timeSlots.length === 0 ? (
-                <p className="text-center text-sm text-muted-foreground">
-                  Nema slobodnih termina
-                </p>
-              ) : (
-                timeSlots.map((time) => (
-                  <Button
-                    key={time}
-                    type="button"
-                    variant={selectedTime === time ? 'default' : 'outline'}
-                    onClick={() => onTimeSelect(time)}
-                    className="w-full shadow-none"
-                    disabled={disabled}
-                  >
-                    {time}
-                  </Button>
-                ))
-              )}
+        <div className="relative min-h-48 w-full">
+          <div className="absolute inset-0 grid gap-4">
+            <div className="space-y-2 px-4 pt-4">
+              <p className="text-center text-sm font-medium">
+                {!selectedDate
+                  ? 'Izaberite datum'
+                  : isLoadingSlots
+                    ? 'Učitavanje...'
+                    : timeSlots.length === 0
+                      ? 'Nema slobodnih termina'
+                      : 'Dostupni termini'}
+              </p>
             </div>
-          </ScrollArea>
+            <ScrollArea className="h-full overflow-y-auto">
+              <div className="grid grid-cols-1 gap-2 px-4 pb-4">
+                {selectedDate &&
+                  !isLoadingSlots &&
+                  timeSlots.map((time) => (
+                    <Button
+                      key={time}
+                      type="button"
+                      className="rounded-full"
+                      size="sm"
+                      variant={selectedTime === time ? 'default' : 'outline'}
+                      onClick={() => onTimeSelect(time)}
+                      disabled={disabled}
+                    >
+                      {time}
+                    </Button>
+                  ))}
+              </div>
+            </ScrollArea>
+          </div>
         </div>
       </div>
 

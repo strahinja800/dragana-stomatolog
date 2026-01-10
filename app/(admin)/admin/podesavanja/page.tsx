@@ -1,19 +1,15 @@
-import { requireAdmin } from '@/module/auth/lib/auth-utils';
-import { HydrateClient, prefetch, trpc } from '@/trpc/server';
+import { preloadQuery } from 'convex/nextjs';
 
-import { SettingsView } from './settings-view';
+import { api } from '@/convex/_generated/api';
+import { SettingsView } from '@/module/admin/podesavanja/views/settings-view';
+import { requireAdmin } from '@/module/auth/lib/auth-utils';
 
 export default async function SettingsPage() {
   await requireAdmin('/admin/podesavanja');
 
-  // Prefetch all settings data
-  prefetch(trpc.settings.getWorkingHours.queryOptions());
-  prefetch(trpc.settings.getNonWorkingDays.queryOptions({}));
-  prefetch(trpc.settings.getServiceTypes.queryOptions());
-
-  return (
-    <HydrateClient>
-      <SettingsView />
-    </HydrateClient>
+  const preloadedWorkingHours = await preloadQuery(
+    api.settings.getWorkingHours
   );
+
+  return <SettingsView preloadedWorkingHours={preloadedWorkingHours} />;
 }

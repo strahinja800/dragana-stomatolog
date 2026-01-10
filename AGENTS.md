@@ -17,20 +17,27 @@ Instructions for AI agents (Claude Code, Cursor, Copilot) working on this projec
 4. **Error handling**: Include error handling, error boundaries, and edge cases.
 5. **Import order**: Write usage first, then import (prevents auto-removal of unused imports).
 
-## III. Figma Integration
+## III. Backend (Convex)
+
+- **Schema**: Define tables in `convex/schema.ts` using `defineTable` and validators from `convex/values`
+- **Queries**: Use `query()` for read operations (real-time by default)
+- **Mutations**: Use `mutation()` for write operations
+- **Backend-first logic**: All data transformation/normalization happens in Convex functions, not frontend
+
+## IV. Figma Integration
 
 When importing assets via Figma MCP:
 
 - **Never** retain generated hash/random filenames
 - Always rename to descriptive, semantic names (e.g., `hero-bg.png` instead of `vector_12ab.svg`)
 
-## IV. Communication
+## V. Communication
 
 1. **Tone**: Natural, friendly but professional. Simple, direct language.
 2. **Language**: Serbian for UI text and user-facing content. English for code and comments.
 3. **Clarity**: Ask clarifying questions if anything is unclear before implementation.
 
-## V. Project Conventions
+## VI. Project Conventions
 
 - Use `@/` path alias for all imports
 - Styling with `cn()` utility from `@/lib/utils`
@@ -39,3 +46,4 @@ When importing assets via Figma MCP:
 - Images in `assets/`, exported through `data/data.ts`
 - Navigation defined in `constants/navigations.ts`
 - Feature components go in `module/` organized by domain
+- Convex functions organized by domain in `convex/` folder

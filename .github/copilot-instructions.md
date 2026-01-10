@@ -21,7 +21,8 @@ module/public/home/components/
 ## Development Workflow
 
 ```bash
-npm run dev         # Start dev server (localhost:3000)
+npm run dev         # Start Next.js dev server (localhost:3000)
+npm run convex      # Start Convex dev server (run in separate terminal)
 npm run validate    # Run format, lint, and type-check (do this before commits)
 tsc --noEmit        # Type-check only (run before suggesting code changes)
 ```
@@ -39,17 +40,60 @@ tsc --noEmit        # Type-check only (run before suggesting code changes)
 - **Tailwind CSS 4** with shadcn/ui (radix-vega style)
 - **TypeScript 5** with strict mode
 
-### Backend (planned)
+### Backend
 
-- **Neon DB** - Managed PostgreSQL, serverless
-- **Prisma ORM** - Type-safe database queries with migrations
-- **oRPC** - Type-safe API with OpenAPI specification
-- **Better Auth** - Authentication with shadcn/ui components
-- **Resend** - Email notifications (React Email templates)
+- **Convex** - Serverless backend with real-time sync
+- **Better Auth** - Authentication with Convex adapter
 
-### Hosting
+### Convex Patterns
 
-- **Coolify** - Self-hosted PaaS on VPS
+**Queries** (read data, real-time by default):
+
+```tsx
+'use client';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+
+export function MyComponent() {
+  const data = useQuery(api.myModule.myQuery);
+  if (data === undefined) return <Loading />;
+  // render data
+}
+```
+
+**Mutations** (write data):
+
+```tsx
+'use client';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+
+export function MyComponent() {
+  const updateData = useMutation(api.myModule.myMutation);
+  const handleClick = () => updateData({ field: 'value' });
+}
+```
+
+**Backend functions** (`convex/*.ts`):
+
+```ts
+import { v } from 'convex/values';
+import { mutation, query } from './_generated/server';
+
+export const myQuery = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query('myTable').collect();
+  },
+});
+
+export const myMutation = mutation({
+  args: { field: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert('myTable', { field: args.field });
+  },
+});
+```
 
 ## Code Conventions
 
@@ -83,15 +127,12 @@ const {
 
 **Minimalism**: Implement only what's needed. No unused code, placeholders, or commented-out blocks. Keep the codebase lean.
 
+**Backend-first logic**: All data transformation/normalization happens in Convex functions, not frontend components.
+
 **Component atomicity**: Break complex components into smaller pieces. Each file should have a single, focused responsibility.
 
 **shadcn components**: Located in [components/ui/](../components/ui/). Do not manually edit - regenerate via shadcn CLI if changes needed.
 
 **Figma assets**: When importing from Figma, rename hash/random filenames to semantic names (e.g., `hero-bg.png` instead of `vector_12ab.svg`).
-
-## Future Features (Planned)
-
-- User dashboard: Online appointment booking with availability calendar
-- Admin dashboard: Blog management and patient records with automated email system
 
 See [README.md](../README.md) for detailed project overview and [AGENTS.md](../AGENTS.md) for extended AI agent guidelines.
