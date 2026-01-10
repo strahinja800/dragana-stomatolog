@@ -11,6 +11,7 @@
 import type * as appointments from "../appointments.js";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
+import type * as lib_timezone from "../lib/timezone.js";
 import type * as patients from "../patients.js";
 import type * as settings from "../settings.js";
 import type * as users from "../users.js";
@@ -25,6 +26,7 @@ declare const fullApi: ApiFromModules<{
   appointments: typeof appointments;
   auth: typeof auth;
   http: typeof http;
+  "lib/timezone": typeof lib_timezone;
   patients: typeof patients;
   settings: typeof settings;
   users: typeof users;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,8 +13,6 @@ import { FloatingInput } from '@/components/ui/floating-input';
 import { Textarea } from '@/components/ui/textarea';
 import { api } from '@/convex/_generated/api';
 import { cn } from '@/lib/utils';
-
-const SLOT_DURATION = 30; // minutes
 
 const bookingFormSchema = z.object({
   name: z.string().min(1, 'Ime je obavezno'),
@@ -34,70 +32,23 @@ type BookingFormInput = {
   symptoms: string;
 };
 
-function generateTimeSlots(startTime: string, endTime: string): string[] {
-  const slots: string[] = [];
-  const [startHour, startMin] = startTime.split(':').map(Number);
-  const [endHour, endMin] = endTime.split(':').map(Number);
-
-  let currentMinutes = startHour * 60 + startMin;
-  const endMinutes = endHour * 60 + endMin;
-
-  while (currentMinutes + SLOT_DURATION <= endMinutes) {
-    const hours = Math.floor(currentMinutes / 60);
-    const mins = currentMinutes % 60;
-    slots.push(
-      `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`
-    );
-    currentMinutes += SLOT_DURATION;
-  }
-
-  return slots;
-}
-
 export default function BookingForm() {
   const [isSuccess, setIsSuccess] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date()
+  );
 
-  const bookingData = useQuery(api.appointments.getBookingData);
+  const nonWorkingDays = useQuery(api.appointments.getNonWorkingDays);
+  const { closedDaysOfWeek, disabledDates } = nonWorkingDays ?? {
+    closedDaysOfWeek: [],
+    disabledDates: [],
+  };
 
-  const { closedDaysOfWeek, disabledDates, workingHours, bookedSlots } =
-    bookingData ?? {
-      closedDaysOfWeek: [],
-      disabledDates: [],
-      workingHours: [],
-      bookedSlots: [],
-    };
+  const timeSlots = useQuery(api.appointments.getTimeSlotsForDate, {
+    date: selectedDate?.getTime() ?? new Date().getTime(),
+  });
 
-  // Get available slots for the selected date
-  const availableSlots = useMemo(() => {
-    if (!selectedDate) return [];
-
-    const dayOfWeek = selectedDate.getDay();
-    const dayHours = workingHours.find((wh) => wh.dayOfWeek === dayOfWeek);
-    if (!dayHours) return [];
-
-    const allSlots = generateTimeSlots(dayHours.startTime, dayHours.endTime);
-
-    // Filter booked slots for selected date (using local time)
-    const selectedYear = selectedDate.getFullYear();
-    const selectedMonth = selectedDate.getMonth();
-    const selectedDay = selectedDate.getDate();
-
-    const bookedTimesForDate = bookedSlots
-      .map((ts) => new Date(ts))
-      .filter(
-        (d) =>
-          d.getFullYear() === selectedYear &&
-          d.getMonth() === selectedMonth &&
-          d.getDate() === selectedDay
-      )
-      .map(
-        (d) =>
-          `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
-      );
-
-    return allSlots.filter((slot) => !bookedTimesForDate.includes(slot));
-  }, [selectedDate, workingHours, bookedSlots]);
+  console.log('timeSlots', timeSlots);
 
   const form = useForm<BookingFormInput>({
     resolver: zodResolver(bookingFormSchema) as never,
@@ -254,10 +205,11 @@ export default function BookingForm() {
               selectedTime={selectedTime}
               onDateSelect={handleDateSelect}
               onTimeSelect={handleTimeSelect}
-              timeSlots={availableSlots}
+              timeSlots={timeSlots ?? []}
               disabledDates={disabledDates}
               disabledDaysOfWeek={closedDaysOfWeek}
               disabled={isPending}
+              isLoadingSlots={timeSlots === undefined}
             />
 
             {(form.formState.errors.date || form.formState.errors.time) && (

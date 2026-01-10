@@ -7,32 +7,17 @@ import { Calendar } from '@/components/ui/calendar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
-const DEFAULT_TIME_SLOTS = [
-  '09:00',
-  '09:30',
-  '10:00',
-  '10:30',
-  '11:00',
-  '11:30',
-  '12:00',
-  '12:30',
-  '13:00',
-  '13:30',
-  '14:00',
-  '14:30',
-  '15:00',
-  '15:30',
-  '16:00',
-  '16:30',
-  '17:00',
-];
+interface TimeSlot {
+  time: string;
+  isAvailable: boolean;
+}
 
 interface AppointmentCalendarProps {
   selectedDate?: Date;
   selectedTime?: string | null;
   onDateSelect: (date: Date | undefined) => void;
   onTimeSelect: (time: string) => void;
-  timeSlots?: string[];
+  timeSlots?: TimeSlot[];
   /** Timestamps (Unix ms) of dates to disable - backend returns these directly */
   disabledDates?: number[];
   disabledDaysOfWeek?: number[];
@@ -48,7 +33,7 @@ function AppointmentCalendar({
   selectedTime,
   onDateSelect,
   onTimeSelect,
-  timeSlots = DEFAULT_TIME_SLOTS,
+  timeSlots = [],
   disabledDates: disabledTimestamps = [],
   disabledDaysOfWeek = [],
   disabled = false,
@@ -118,17 +103,19 @@ function AppointmentCalendar({
               <div className="grid grid-cols-1 gap-2 px-4 pb-4">
                 {selectedDate &&
                   !isLoadingSlots &&
-                  timeSlots.map((time) => (
+                  timeSlots.map((slot) => (
                     <Button
-                      key={time}
+                      key={slot.time}
                       type="button"
                       className="rounded-full"
                       size="sm"
-                      variant={selectedTime === time ? 'default' : 'outline'}
-                      onClick={() => onTimeSelect(time)}
-                      disabled={disabled}
+                      variant={
+                        selectedTime === slot.time ? 'default' : 'outline'
+                      }
+                      onClick={() => onTimeSelect(slot.time)}
+                      disabled={disabled || !slot.isAvailable}
                     >
-                      {time}
+                      {slot.time}
                     </Button>
                   ))}
               </div>
