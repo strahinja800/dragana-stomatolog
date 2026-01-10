@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { Phone } from 'lucide-react';
 
-import logo from '@/assets/logo.png';
+import logo from '@/assets/DENTALHOLIST-Logo-NEGATIV-3.jpg';
 import { Button } from '@/components/ui/button';
 import { NAV_LINKS } from '@/constants/navigations';
 import { cn } from '@/lib/utils';
@@ -19,9 +19,14 @@ export function PublicNavbarDesktop({ pathname }: PublicNavbarDesktopProps) {
     <>
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2">
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center gap-2">
           <div className="rounded-xl flex items-center justify-center">
-            <Image src={logo} alt="DentalCare" height={100} />
+            <Image
+              src={logo}
+              alt="DentalCare"
+              height={45}
+              className="rounded-2xl"
+            />
           </div>
           <span className="font-heading text-2xl font-semibold text-foreground max-[900px]:hidden">
             DentalCare

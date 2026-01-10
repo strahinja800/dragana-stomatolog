@@ -1,15 +1,6 @@
 import Link from 'next/link';
 
-import {
-  Calendar,
-  Home,
-  Mail,
-  MapPin,
-  Menu,
-  Phone,
-  Sparkles,
-  Users,
-} from 'lucide-react';
+import { Calendar, Mail, MapPin, Menu, Phone, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -20,16 +11,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { NAV_LINKS } from '@/constants/navigations';
 import { cn } from '@/lib/utils';
 
 import UserMenu from './user-menu';
-
-const NAV_ITEMS = [
-  { href: '/', label: 'Početna', icon: Home },
-  { href: '/usluge', label: 'Usluge', icon: Sparkles },
-  { href: '/o-nama', label: 'O nama', icon: Users },
-  { href: '/kontakt', label: 'Kontakt', icon: Mail },
-];
 
 type PublicNavbarMobileProps = {
   pathname: string;
@@ -86,7 +71,7 @@ export function PublicNavbarMobile({
           {/* Navigation */}
           <nav className="relative flex-1 px-4 py-6">
             <div className="space-y-1.5">
-              {NAV_ITEMS.map((item, index) => {
+              {NAV_LINKS.map((item, index) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
 
