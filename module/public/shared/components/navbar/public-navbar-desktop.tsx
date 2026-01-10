@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { Phone } from 'lucide-react';
 
-import logo from '@/assets/DENTALHOLIST-Logo-NEGATIV-3.jpg';
+import logo from '@/assets/logo-negativ.jpg';
 import { Button } from '@/components/ui/button';
 import { NAV_LINKS } from '@/constants/navigations';
 import { cn } from '@/lib/utils';
