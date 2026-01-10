@@ -122,6 +122,7 @@ export default defineSchema({
     treatment: v.string(),
     notes: v.optional(v.string()),
     invoiceId: v.optional(v.id('invoices')),
+    attachments: v.optional(v.array(v.id('attachments'))),
   }).index('by_appointmentId', ['appointmentId']),
 
   attachments: defineTable({
