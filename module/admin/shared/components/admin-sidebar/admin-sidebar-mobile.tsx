@@ -3,14 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import {
-  FileText,
-  FolderHeart,
-  LayoutDashboard,
-  LogOut,
-  Stethoscope,
-  Users,
-} from 'lucide-react';
+import { LogOut, Stethoscope } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -20,31 +13,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import {
+  ADMIN_ACTIONS,
+  ADMIN_BRAND,
+  ADMIN_NAV_ITEMS,
+} from '@/constants/admin-navigation';
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
-
-const navItems = [
-  {
-    label: 'Kontrolna tabla',
-    href: '/admin',
-    icon: LayoutDashboard,
-  },
-  {
-    label: 'Korisnici',
-    href: '/admin/korisnici',
-    icon: Users,
-  },
-  {
-    label: 'Blog',
-    href: '/admin/blog',
-    icon: FileText,
-  },
-  {
-    label: 'Kartoni',
-    href: '/admin/kartoni',
-    icon: FolderHeart,
-  },
-];
 
 interface AdminSidebarMobileProps {
   isOpen: boolean;
@@ -66,21 +41,23 @@ export function AdminSidebarMobile({
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="right" className="flex w-64 flex-col p-0">
         {/* Header */}
-        <SheetHeader className="border-border/50 flex h-16 flex-row items-center gap-3 space-y-0 border-b px-6">
-          <div className="bg-primary/10 flex size-9 items-center justify-center rounded-xl">
-            <Stethoscope className="text-primary size-5" />
+        <SheetHeader className="flex h-16 flex-row items-center gap-3 space-y-0 border-b border-border/50 px-6">
+          <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10">
+            <Stethoscope className="size-5 text-primary" />
           </div>
           <div className="flex flex-col gap-0">
             <SheetTitle className="text-sm font-semibold">
-              DentalCare
+              {ADMIN_BRAND.name}
             </SheetTitle>
-            <SheetDescription className="text-xs">Admin Panel</SheetDescription>
+            <SheetDescription className="text-xs">
+              {ADMIN_BRAND.subtitle}
+            </SheetDescription>
           </div>
         </SheetHeader>
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1 p-4">
-          {navItems.map((item) => {
+          {ADMIN_NAV_ITEMS.map((item) => {
             const isActive =
               pathname === item.href ||
               (item.href !== '/admin' && pathname.startsWith(item.href));
@@ -110,14 +87,14 @@ export function AdminSidebarMobile({
         </nav>
 
         {/* Footer */}
-        <div className="border-border/50 border-t p-4">
+        <div className="border-t border-border/50 p-4">
           <Button
             variant="ghost"
-            className="text-muted-foreground hover:text-destructive w-full justify-start gap-3"
+            className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive"
             onClick={handleSignOut}
           >
             <LogOut className="size-5" />
-            Odjavi se
+            {ADMIN_ACTIONS.signOut}
           </Button>
         </div>
       </SheetContent>

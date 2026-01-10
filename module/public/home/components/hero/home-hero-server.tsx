@@ -6,7 +6,7 @@ import { dentist1, dentist2, heroImage } from '@/data/data';
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-[80vh] flex items-center overflow-hidden md:mt-16">
+    <section className="relative min-h-[40vh] flex items-center overflow-hidden md:mt-10">
       {/* Full background image */}
       <div className="absolute inset-0">
         <Image

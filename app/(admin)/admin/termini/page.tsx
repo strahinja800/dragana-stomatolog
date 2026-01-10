@@ -1,6 +1,8 @@
-import { requireAdmin } from '@/module/auth/lib/auth-utils';
+import { preloadQuery } from 'convex/nextjs';
 
-import { AppointmentsView } from './appointments-view';
+import { api } from '@/convex/_generated/api';
+import { AppointmentsView } from '@/module/admin/termini/views/appointments-view';
+import { requireAdmin } from '@/module/auth/lib/auth-utils';
 
 export const metadata = {
   title: 'Termini | Admin',
@@ -9,5 +11,10 @@ export const metadata = {
 export default async function AppointmentsPage() {
   await requireAdmin('/admin/termini');
 
-  return <AppointmentsView />;
+  const preloadedAppointments = await preloadQuery(
+    api.appointments.getAllAppointments,
+    {}
+  );
+
+  return <AppointmentsView preloadedAppointments={preloadedAppointments} />;
 }

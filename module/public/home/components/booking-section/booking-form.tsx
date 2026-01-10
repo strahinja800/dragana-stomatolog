@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,6 +13,8 @@ import { FloatingInput } from '@/components/ui/floating-input';
 import { Textarea } from '@/components/ui/textarea';
 import { api } from '@/convex/_generated/api';
 import { cn } from '@/lib/utils';
+
+const SLOT_DURATION = 30; // minutes
 
 const bookingFormSchema = z.object({
   name: z.string().min(1, 'Ime je obavezno'),
@@ -32,50 +34,70 @@ type BookingFormInput = {
   symptoms: string;
 };
 
+function generateTimeSlots(startTime: string, endTime: string): string[] {
+  const slots: string[] = [];
+  const [startHour, startMin] = startTime.split(':').map(Number);
+  const [endHour, endMin] = endTime.split(':').map(Number);
+
+  let currentMinutes = startHour * 60 + startMin;
+  const endMinutes = endHour * 60 + endMin;
+
+  while (currentMinutes + SLOT_DURATION <= endMinutes) {
+    const hours = Math.floor(currentMinutes / 60);
+    const mins = currentMinutes % 60;
+    slots.push(
+      `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`
+    );
+    currentMinutes += SLOT_DURATION;
+  }
+
+  return slots;
+}
+
 export default function BookingForm() {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
 
-  // Convex queries
-  const workingHours = useQuery(api.settings.getWorkingHours);
-  const nonWorkingDays = useQuery(api.settings.getNonWorkingDays, {});
+  const bookingData = useQuery(api.appointments.getBookingData);
 
-  // Fetch available slots when date is selected
-  const availableSlots = useQuery(
-    api.appointments.getAvailableSlots,
-    selectedDate ? { date: selectedDate.getTime() } : 'skip'
-  );
+  const { closedDaysOfWeek, disabledDates, workingHours, bookedSlots } =
+    bookingData ?? {
+      closedDaysOfWeek: [],
+      disabledDates: [],
+      workingHours: [],
+      bookedSlots: [],
+    };
 
-  // Create appointment mutation
-  const createAppointmentMutation = useMutation(
-    api.appointments.createAppointment
-  );
+  // Get available slots for the selected date
+  const availableSlots = useMemo(() => {
+    if (!selectedDate) return [];
 
-  const createAppointment = async (data: {
-    name: string;
-    phone: string;
-    date: Date;
-    time: string;
-    symptoms?: string;
-  }) => {
-    setIsCreating(true);
-    try {
-      await createAppointmentMutation({
-        name: data.name,
-        phone: data.phone,
-        date: data.date.getTime(),
-        time: data.time,
-        symptoms: data.symptoms,
-      });
-      setIsSuccess(true);
-    } catch (error) {
-      console.error('Failed to create appointment:', error);
-    } finally {
-      setIsCreating(false);
-    }
-  };
+    const dayOfWeek = selectedDate.getDay();
+    const dayHours = workingHours.find((wh) => wh.dayOfWeek === dayOfWeek);
+    if (!dayHours) return [];
+
+    const allSlots = generateTimeSlots(dayHours.startTime, dayHours.endTime);
+
+    // Filter booked slots for selected date (using local time)
+    const selectedYear = selectedDate.getFullYear();
+    const selectedMonth = selectedDate.getMonth();
+    const selectedDay = selectedDate.getDate();
+
+    const bookedTimesForDate = bookedSlots
+      .map((ts) => new Date(ts))
+      .filter(
+        (d) =>
+          d.getFullYear() === selectedYear &&
+          d.getMonth() === selectedMonth &&
+          d.getDate() === selectedDay
+      )
+      .map(
+        (d) =>
+          `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
+      );
+
+    return allSlots.filter((slot) => !bookedTimesForDate.includes(slot));
+  }, [selectedDate, workingHours, bookedSlots]);
 
   const form = useForm<BookingFormInput>({
     resolver: zodResolver(bookingFormSchema) as never,
@@ -88,71 +110,39 @@ export default function BookingForm() {
     },
   });
 
-  const isPending = form.formState.isSubmitting || isCreating;
+  const selectedTime = form.watch('time');
 
-  // Calculate closed days of week from working hours
-  const closedDaysOfWeek = useMemo(() => {
-    if (!workingHours) return [];
-    return workingHours.filter((wh) => !wh.isOpen).map((wh) => wh.dayOfWeek);
-  }, [workingHours]);
+  const createAppointmentMutation = useMutation(
+    api.appointments.createAppointment
+  );
 
-  // Convert non-working days to Date objects for calendar
-  const bookedDates = useMemo(() => {
-    if (!nonWorkingDays) return [];
-    return nonWorkingDays.map((nwd) => new Date(nwd.date));
-  }, [nonWorkingDays]);
-
-  // Time slots from API or empty array
-  const timeSlots = availableSlots?.slots ?? [];
-
-  // Auto-select first available date on load
-  useEffect(() => {
-    if (selectedDate || !workingHours) return;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    // Find first available date (not closed day, not non-working day, not in past)
-    for (let i = 0; i < 60; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-
-      const dayOfWeek = date.getDay();
-      const isClosedDay = closedDaysOfWeek.includes(dayOfWeek);
-      const isNonWorkingDay = bookedDates.some(
-        (d) => d.toDateString() === date.toDateString()
-      );
-
-      if (!isClosedDay && !isNonWorkingDay) {
-        setSelectedDate(date);
-        form.setValue('date', date, { shouldValidate: false });
-        break;
-      }
-    }
-  }, [workingHours, closedDaysOfWeek, bookedDates, selectedDate, form]);
+  const isPending = form.formState.isSubmitting;
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
-    setSelectedTime(null); // Reset time when date changes
-    form.setValue('date', date, { shouldValidate: true });
+    form.setValue('date', date, { shouldValidate: !!date });
     form.setValue('time', '', { shouldValidate: false });
   };
 
   const handleTimeSelect = (time: string) => {
-    setSelectedTime(time);
     form.setValue('time', time, { shouldValidate: true });
   };
 
   const onSubmit = async (data: BookingFormInput) => {
     if (!data.date) return;
 
-    await createAppointment({
-      name: data.name,
-      phone: data.phone,
-      date: data.date,
-      time: data.time,
-      symptoms: data.symptoms || undefined,
-    });
+    try {
+      await createAppointmentMutation({
+        name: data.name,
+        phone: data.phone,
+        date: data.date.getTime(),
+        time: data.time,
+        symptoms: data.symptoms || undefined,
+      });
+      setIsSuccess(true);
+    } catch (error) {
+      console.error('Failed to create appointment:', error);
+    }
   };
 
   // Show success state after form submission
@@ -178,8 +168,6 @@ export default function BookingForm() {
             type="button"
             onClick={() => {
               setIsSuccess(false);
-              setSelectedDate(undefined);
-              setSelectedTime(null);
               form.reset();
             }}
             className="text-sm font-medium text-primary underline-offset-4 hover:underline"
@@ -266,8 +254,8 @@ export default function BookingForm() {
               selectedTime={selectedTime}
               onDateSelect={handleDateSelect}
               onTimeSelect={handleTimeSelect}
-              timeSlots={timeSlots}
-              bookedDates={bookedDates}
+              timeSlots={availableSlots}
+              disabledDates={disabledDates}
               disabledDaysOfWeek={closedDaysOfWeek}
               disabled={isPending}
             />

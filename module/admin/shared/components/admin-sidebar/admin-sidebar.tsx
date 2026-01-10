@@ -3,53 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import {
-  CalendarClock,
-  FileText,
-  FolderHeart,
-  LayoutDashboard,
-  LogOut,
-  Settings,
-  Stethoscope,
-  Users,
-} from 'lucide-react';
+import { LogOut, Stethoscope } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import {
+  ADMIN_ACTIONS,
+  ADMIN_BRAND,
+  ADMIN_NAV_ITEMS,
+} from '@/constants/admin-navigation';
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
-
-const navItems = [
-  {
-    label: 'Kontrolna tabla',
-    href: '/admin',
-    icon: LayoutDashboard,
-  },
-  {
-    label: 'Termini',
-    href: '/admin/termini',
-    icon: CalendarClock,
-  },
-  {
-    label: 'Korisnici',
-    href: '/admin/korisnici',
-    icon: Users,
-  },
-  {
-    label: 'Kartoni',
-    href: '/admin/kartoni',
-    icon: FolderHeart,
-  },
-  {
-    label: 'Blog',
-    href: '/admin/blog',
-    icon: FileText,
-  },
-  {
-    label: 'Podešavanja',
-    href: '/admin/podesavanja',
-    icon: Settings,
-  },
-];
 
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -60,21 +23,23 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="bg-card border-border/50 fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r lg:flex">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r border-border/50 bg-card lg:flex">
       {/* Logo */}
-      <div className="border-border/50 flex h-16 items-center gap-3 border-b px-6">
-        <div className="bg-primary/10 flex size-9 items-center justify-center rounded-xl">
-          <Stethoscope className="text-primary size-5" />
+      <div className="flex h-16 items-center gap-3 border-b border-border/50 px-6">
+        <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10">
+          <Stethoscope className="size-5 text-primary" />
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-semibold">DentalCare</span>
-          <span className="text-muted-foreground text-xs">Admin Panel</span>
+          <span className="text-sm font-semibold">{ADMIN_BRAND.name}</span>
+          <span className="text-xs text-muted-foreground">
+            {ADMIN_BRAND.subtitle}
+          </span>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 p-4">
-        {navItems.map((item) => {
+        {ADMIN_NAV_ITEMS.map((item) => {
           const isActive =
             pathname === item.href ||
             (item.href !== '/admin' && pathname.startsWith(item.href));
@@ -103,14 +68,14 @@ export function AdminSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="border-border/50 border-t p-4">
+      <div className="border-t border-border/50 p-4">
         <Button
           variant="ghost"
-          className="text-muted-foreground hover:text-destructive w-full justify-start gap-3"
+          className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive"
           onClick={handleSignOut}
         >
           <LogOut className="size-5" />
-          Odjavi se
+          {ADMIN_ACTIONS.signOut}
         </Button>
       </div>
     </aside>

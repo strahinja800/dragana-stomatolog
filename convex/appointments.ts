@@ -3,30 +3,7 @@ import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 
 const DEFAULT_SLOT_DURATION = 30; // minutes
-
-function generateTimeSlots(
-  startTime: string,
-  endTime: string,
-  durationMinutes: number
-): string[] {
-  const slots: string[] = [];
-  const [startHour, startMin] = startTime.split(':').map(Number);
-  const [endHour, endMin] = endTime.split(':').map(Number);
-
-  let currentMinutes = startHour * 60 + startMin;
-  const endMinutes = endHour * 60 + endMin;
-
-  while (currentMinutes + durationMinutes <= endMinutes) {
-    const hours = Math.floor(currentMinutes / 60);
-    const mins = currentMinutes % 60;
-    slots.push(
-      `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`
-    );
-    currentMinutes += durationMinutes;
-  }
-
-  return slots;
-}
+const LOOK_AHEAD_DAYS = 60;
 
 function parseTimeToTimestamp(dateTimestamp: number, time: string): number {
   const [hours, minutes] = time.split(':').map(Number);
@@ -39,76 +16,61 @@ function parseTimeToTimestamp(dateTimestamp: number, time: string): number {
 // PUBLIC QUERIES
 // ============================================
 
-export const getAvailableSlots = query({
-  args: {
-    date: v.number(), // Unix timestamp
-  },
-  handler: async (ctx, args) => {
-    // Add 12 hours to avoid timezone issues (noon is safe from day boundary shifts)
-    const noonDate = new Date(args.date + 12 * 60 * 60 * 1000);
-    const dayOfWeek = noonDate.getUTCDay();
+/**
+ * Vraća sve podatke potrebne za booking formu.
+ * Backend računa sve - FE samo prikazuje.
+ */
+export const getBookingData = query({
+  args: {},
+  handler: async (ctx) => {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + LOOK_AHEAD_DAYS);
 
-    // Normalize to noon UTC for database queries
-    const targetDate = new Date(args.date);
-    targetDate.setUTCHours(12, 0, 0, 0);
-    const dateTimestamp = targetDate.getTime();
+    // 1. Dohvati working hours (sa defaultima)
+    const workingHoursRaw = await ctx.db.query('workingHours').collect();
+    const workingHoursMap = Array.from({ length: 7 }, (_, dayOfWeek) => {
+      const existing = workingHoursRaw.find((h) => h.dayOfWeek === dayOfWeek);
+      return (
+        existing ?? {
+          dayOfWeek,
+          startTime: '08:00',
+          endTime: '17:00',
+          isOpen: dayOfWeek !== 0 && dayOfWeek !== 6,
+        }
+      );
+    });
 
-    // 1. Check if it's a non-working day
-    const nonWorkingDay = await ctx.db
+    // Zatvoreni dani u nedelji (0=Ned, 6=Sub)
+    const closedDaysOfWeek = workingHoursMap
+      .filter((wh) => !wh.isOpen)
+      .map((wh) => wh.dayOfWeek);
+
+    // Radno vreme za svaki dan (0-6)
+    const workingHours = workingHoursMap.map((wh) => ({
+      dayOfWeek: wh.dayOfWeek,
+      startTime: wh.startTime,
+      endTime: wh.endTime,
+    }));
+
+    // 2. Dohvati sve non-working days (od danas pa nadalje)
+    const nonWorkingDaysRaw = await ctx.db
       .query('nonWorkingDays')
-      .withIndex('by_date', (q) => q.eq('date', dateTimestamp))
-      .unique();
+      .withIndex('by_date')
+      .filter((q) => q.gte(q.field('date'), today.getTime()))
+      .collect();
 
-    if (nonWorkingDay) {
-      return { slots: [], reason: nonWorkingDay.reason || 'Neradni dan' };
-    }
+    const disabledDates = nonWorkingDaysRaw.map((nwd) => nwd.date);
 
-    // 2. Get working hours for this day of week (with defaults)
-    let workingHours = await ctx.db
-      .query('workingHours')
-      .withIndex('by_dayOfWeek', (q) => q.eq('dayOfWeek', dayOfWeek))
-      .unique();
-
-    // Use defaults if not found (same logic as getWorkingHours in settings.ts)
-    if (!workingHours) {
-      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-      if (isWeekend) {
-        return { slots: [], reason: 'Zatvoreno' };
-      }
-      // Default working hours for weekdays
-      workingHours = {
-        _id: `default-${dayOfWeek}` as never,
-        _creationTime: Date.now(),
-        dayOfWeek,
-        startTime: '08:00',
-        endTime: '17:00',
-        isOpen: true,
-      };
-    }
-
-    if (!workingHours.isOpen) {
-      return { slots: [], reason: 'Zatvoreno' };
-    }
-
-    // 3. Generate all possible slots
-    const allSlots = generateTimeSlots(
-      workingHours.startTime,
-      workingHours.endTime,
-      DEFAULT_SLOT_DURATION
-    );
-
-    // 4. Get confirmed/pending appointments for this date
-    const startOfDay = dateTimestamp;
-    const endOfDay = new Date(targetDate);
-    endOfDay.setUTCHours(23, 59, 59, 999);
-
+    // 3. Dohvati sve zakazane termine (CONFIRMED/PENDING) za narednih 60 dana
     const bookedAppointments = await ctx.db
       .query('appointments')
       .withIndex('by_startTime')
       .filter((q) =>
         q.and(
-          q.gte(q.field('startTime'), startOfDay),
-          q.lte(q.field('startTime'), endOfDay.getTime()),
+          q.gte(q.field('startTime'), today.getTime()),
+          q.lte(q.field('startTime'), endDate.getTime()),
           q.or(
             q.eq(q.field('status'), 'CONFIRMED'),
             q.eq(q.field('status'), 'PENDING')
@@ -117,17 +79,16 @@ export const getAvailableSlots = query({
       )
       .collect();
 
-    // 5. Filter out booked slots
-    const availableSlots = allSlots.filter((slot) => {
-      const slotStart = parseTimeToTimestamp(dateTimestamp, slot);
-      const slotEnd = slotStart + DEFAULT_SLOT_DURATION * 60 * 1000;
+    // 4. Grupiši termine po datumu i pretvori u bookedSlots
+    // Vraćamo samo startTime timestamp - FE će formatirati prema lokalnom vremenu
+    const bookedSlots = bookedAppointments.map((appt) => appt.startTime);
 
-      return !bookedAppointments.some((appt) => {
-        return slotStart < appt.endTime && slotEnd > appt.startTime;
-      });
-    });
-
-    return { slots: availableSlots, reason: null };
+    return {
+      closedDaysOfWeek,
+      disabledDates,
+      workingHours,
+      bookedSlots,
+    };
   },
 });
 

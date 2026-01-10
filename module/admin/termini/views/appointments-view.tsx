@@ -2,14 +2,16 @@
 
 import { Suspense, useState } from 'react';
 
+import { type Preloaded } from 'convex/react';
 import { CalendarClock, Loader2 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { type api } from '@/convex/_generated/api';
+import { AppointmentTable } from '@/module/admin/termini/components/appointment-table';
 
-import { AppointmentTable } from './components/appointment-table';
-
-type StatusFilter = 'ALL' | 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+type StatusFilter = 'ALL' | AppointmentStatus;
 
 const STATUS_TABS: { value: StatusFilter; label: string }[] = [
   { value: 'ALL', label: 'Svi termini' },
@@ -26,7 +28,13 @@ function TableSkeleton() {
   );
 }
 
-export function AppointmentsView() {
+interface AppointmentsViewProps {
+  preloadedAppointments: Preloaded<typeof api.appointments.getAllAppointments>;
+}
+
+export function AppointmentsView({
+  preloadedAppointments,
+}: AppointmentsViewProps) {
   const [activeTab, setActiveTab] = useState<StatusFilter>('ALL');
 
   return (
@@ -68,12 +76,19 @@ export function AppointmentsView() {
           </CardHeader>
 
           <CardContent className="p-0">
-            {STATUS_TABS.map((tab) => (
+            {/* ALL tab - preloaded data */}
+            <TabsContent value="ALL" className="m-0">
+              <AppointmentTable preloadedData={preloadedAppointments} />
+            </TabsContent>
+
+            {/* Other tabs - lazy loaded */}
+            {STATUS_TABS.filter(
+              (tab): tab is { value: AppointmentStatus; label: string } =>
+                tab.value !== 'ALL'
+            ).map((tab) => (
               <TabsContent key={tab.value} value={tab.value} className="m-0">
                 <Suspense fallback={<TableSkeleton />}>
-                  <AppointmentTable
-                    statusFilter={tab.value === 'ALL' ? undefined : tab.value}
-                  />
+                  <AppointmentTable statusFilter={tab.value} />
                 </Suspense>
               </TabsContent>
             ))}

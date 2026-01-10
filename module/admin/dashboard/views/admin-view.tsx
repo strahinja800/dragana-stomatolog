@@ -6,7 +6,7 @@ export function AdminView() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Kontrolna tabla</h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-muted-foreground">
           Dobrodošli u admin panel. Ovde možete upravljati korisnicima i
           sadržajem.
         </p>
@@ -21,7 +21,7 @@ export function AdminView() {
       /> */}
 
       {/* Placeholder for future content */}
-      <div className="text-muted-foreground rounded-xl border border-dashed p-12 text-center">
+      <div className="rounded-xl border border-dashed p-12 text-center text-muted-foreground">
         <p>Ovde možeš dodati dodatni sadržaj za kontrolnu tablu.</p>
       </div>
     </div>

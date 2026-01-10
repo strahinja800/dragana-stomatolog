@@ -5,10 +5,10 @@ import { useState } from 'react';
 import { Menu } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { ADMIN_BRAND } from '@/constants/admin-navigation';
 import { cn } from '@/lib/utils';
-import { AdminSidebar } from '@/module/admin/components/admin-sidebar/admin-sidebar';
-
-import { AdminSidebarMobile } from './admin-sidebar-mobile';
+import { AdminSidebar } from '@/module/admin/shared/components/admin-sidebar/admin-sidebar';
+import { AdminSidebarMobile } from '@/module/admin/shared/components/admin-sidebar/admin-sidebar-mobile';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -18,13 +18,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="bg-muted/30 min-h-screen">
+    <div className="min-h-screen bg-muted/30">
       {/* Desktop Sidebar */}
       <AdminSidebar />
 
       {/* Mobile Menu Button */}
-      <div className="bg-card/80 border-border/50 fixed left-0 right-0 top-0 z-50 flex h-16 items-center justify-between border-b px-4 backdrop-blur-lg lg:hidden">
-        <span className="text-sm font-semibold">DentalCare Admin</span>
+      <div className="fixed left-0 right-0 top-0 z-50 flex h-16 items-center justify-between border-b border-border/50 bg-card/80 px-4 backdrop-blur-lg lg:hidden">
+        <span className="text-sm font-semibold">{ADMIN_BRAND.mobileTitle}</span>
         <Button
           variant="ghost"
           size="icon"

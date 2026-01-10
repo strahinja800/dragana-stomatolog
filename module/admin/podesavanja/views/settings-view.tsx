@@ -2,14 +2,16 @@
 
 import { Suspense } from 'react';
 
+import { type Preloaded } from 'convex/react';
 import { Calendar, Clock, Stethoscope } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { type api } from '@/convex/_generated/api';
 
-import { NonWorkingDaysTab } from './tabs/non-working-days-tab';
-import { ServiceTypesTab } from './tabs/service-types-tab';
-import { WorkingHoursTab } from './tabs/working-hours-tab';
+import { NonWorkingDaysTab } from '../components/non-working-days-tab';
+import { ServiceTypesTab } from '../components/service-types-tab';
+import { WorkingHoursTab } from '../components/working-hours-tab';
 
 function TabSkeleton() {
   return (
@@ -20,7 +22,11 @@ function TabSkeleton() {
   );
 }
 
-export function SettingsView() {
+interface SettingsViewProps {
+  preloadedWorkingHours: Preloaded<typeof api.settings.getWorkingHours>;
+}
+
+export function SettingsView({ preloadedWorkingHours }: SettingsViewProps) {
   return (
     <div className="space-y-8">
       {/* Header with gradient accent */}
@@ -66,9 +72,7 @@ export function SettingsView() {
         </TabsList>
 
         <TabsContent value="working-hours" className="mt-6">
-          <Suspense fallback={<TabSkeleton />}>
-            <WorkingHoursTab />
-          </Suspense>
+          <WorkingHoursTab preloadedData={preloadedWorkingHours} />
         </TabsContent>
 
         <TabsContent value="non-working-days" className="mt-6">

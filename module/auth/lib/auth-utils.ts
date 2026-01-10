@@ -5,28 +5,20 @@ import { fetchAuthQuery, isAuthenticated } from '@/lib/auth-server';
 import { USER_ROLES } from '@/module/auth/types/auth-types';
 
 export const requireAuth = async (currentPath: string) => {
-  const authenticated = await isAuthenticated();
+  const user = await fetchAuthQuery(api.auth.getCurrentUser);
 
-  if (!authenticated) {
+  if (!user) {
     redirect(`/login?redirect=${currentPath}`);
   }
-
-  const user = await fetchAuthQuery(api.auth.getCurrentUser);
 
   return user;
 };
 
 export const requireAdmin = async (currentPath: string) => {
-  const authenticated = await isAuthenticated();
-
-  if (!authenticated) {
-    redirect(`/login?redirect=${currentPath}`);
-  }
-
   const user = await fetchAuthQuery(api.auth.getCurrentUser);
 
   if (!user || user.role !== USER_ROLES.ADMIN) {
-    redirect('/');
+    redirect(`/login?redirect=${currentPath}`);
   }
 
   return user;

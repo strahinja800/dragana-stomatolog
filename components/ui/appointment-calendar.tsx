@@ -33,7 +33,8 @@ interface AppointmentCalendarProps {
   onDateSelect: (date: Date | undefined) => void;
   onTimeSelect: (time: string) => void;
   timeSlots?: string[];
-  bookedDates?: Date[];
+  /** Timestamps (Unix ms) of dates to disable - backend returns these directly */
+  disabledDates?: number[];
   disabledDaysOfWeek?: number[];
   disabled?: boolean;
   disablePastDates?: boolean;
@@ -48,7 +49,7 @@ function AppointmentCalendar({
   onDateSelect,
   onTimeSelect,
   timeSlots = DEFAULT_TIME_SLOTS,
-  bookedDates = [],
+  disabledDates: disabledTimestamps = [],
   disabledDaysOfWeek = [],
   disabled = false,
   disablePastDates = true,
@@ -56,9 +57,12 @@ function AppointmentCalendar({
   locale = 'sr-Latn',
   className,
 }: AppointmentCalendarProps) {
-  const disabledDates = [
+  // Convert timestamps to Date objects for react-day-picker
+  const disabledDateObjects = disabledTimestamps.map((ts) => new Date(ts));
+
+  const calendarDisabledDates = [
     ...(disablePastDates ? [{ before: new Date() }] : []),
-    ...bookedDates,
+    ...disabledDateObjects,
     ...(disabledDaysOfWeek.length > 0
       ? [{ dayOfWeek: disabledDaysOfWeek }]
       : []),
@@ -76,11 +80,11 @@ function AppointmentCalendar({
           mode="single"
           selected={selectedDate}
           onSelect={onDateSelect}
-          disabled={disabledDates}
+          disabled={calendarDisabledDates}
           showOutsideDays={false}
           weekStartsOn={1}
           modifiers={{
-            booked: bookedDates,
+            booked: disabledDateObjects,
           }}
           modifiersClassNames={{
             booked: '[&>button]:line-through opacity-100',

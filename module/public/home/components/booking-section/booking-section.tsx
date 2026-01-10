@@ -32,7 +32,7 @@ export default function BookingSection() {
       <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid lg:grid-cols-5 gap-10 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-5 gap-10 lg:gap-16 items-start">
           {/* Left side - description */}
           <div className="lg:col-span-2 space-y-6 text-center lg:text-left">
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground">

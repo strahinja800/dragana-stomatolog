@@ -63,7 +63,7 @@ export function StatsCards({
           key={stat.key}
           className={cn(
             'group cursor-default overflow-hidden border-0 shadow-card transition-all duration-300',
-            'hover:shadow-hover hover:-translate-y-1'
+            'hover:-translate-y-1 hover:shadow-hover'
           )}
           style={{
             animationDelay: `${index * 100}ms`,
@@ -79,7 +79,7 @@ export function StatsCards({
               <stat.icon className={cn('size-6', stat.color)} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-muted-foreground truncate text-sm">
+              <p className="truncate text-sm text-muted-foreground">
                 {stat.label}
               </p>
               <p className="text-2xl font-bold tracking-tight">

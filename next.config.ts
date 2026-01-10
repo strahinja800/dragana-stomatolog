@@ -1,7 +1,22 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  //   typedRoutes: true,
+  //   reactCompiler: true,
+  logging: {
+    fetches: {
+      fullUrl: true,
+      hmrRefreshes: true,
+    },
+    incomingRequests: true,
+  },
+
+  experimental: {
+    staleTimes: {
+      dynamic: 120,
+      static: 180,
+    },
+  },
 };
 
 export default nextConfig;

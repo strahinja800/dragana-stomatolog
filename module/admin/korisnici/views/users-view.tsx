@@ -6,7 +6,7 @@ export function UsersView() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Korisnici</h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-muted-foreground">
           Pregled i upravljanje svim registrovanim korisnicima.
         </p>
       </div>

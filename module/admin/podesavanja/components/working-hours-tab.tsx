@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { useMutation, useQuery } from 'convex/react';
+import { type Preloaded, useMutation, usePreloadedQuery } from 'convex/react';
 import { Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -40,8 +40,12 @@ interface WorkingHour {
   isOpen: boolean;
 }
 
-export function WorkingHoursTab() {
-  const workingHours = useQuery(api.settings.getWorkingHours);
+interface WorkingHoursTabProps {
+  preloadedData: Preloaded<typeof api.settings.getWorkingHours>;
+}
+
+export function WorkingHoursTab({ preloadedData }: WorkingHoursTabProps) {
+  const workingHours = usePreloadedQuery(preloadedData);
   const upsertWorkingHours = useMutation(api.settings.upsertWorkingHours);
 
   const [hours, setHours] = useState<WorkingHour[] | null>(null);
@@ -100,16 +104,6 @@ export function WorkingHoursTab() {
       setIsPending(false);
     }
   };
-
-  if (!workingHours) {
-    return (
-      <Card className="overflow-hidden border-border/50 shadow-sm">
-        <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="size-6 animate-spin text-muted-foreground" />
-        </CardContent>
-      </Card>
-    );
-  }
 
   // Reorder to start from Monday (1) instead of Sunday (0)
   const orderedHours = [...displayHours.slice(1), displayHours[0]];

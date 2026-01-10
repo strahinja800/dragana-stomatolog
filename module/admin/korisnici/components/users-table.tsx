@@ -70,7 +70,7 @@ export function UsersTable({ users }: UsersTableProps) {
               <TableRow>
                 <TableCell
                   colSpan={6}
-                  className="text-muted-foreground h-24 text-center"
+                  className="h-24 text-center text-muted-foreground"
                 >
                   Nema registrovanih korisnika.
                 </TableCell>
@@ -91,7 +91,7 @@ export function UsersTable({ users }: UsersTableProps) {
                     <div className="flex items-center gap-3">
                       <Avatar className="size-9">
                         {user.image && <AvatarImage src={user.image} />}
-                        <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
+                        <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
                           {getInitials(user.name)}
                         </AvatarFallback>
                       </Avatar>

@@ -1,4 +1,4 @@
-import { AdminLayout } from '@/module/admin/components/admin-layout/admin-layout';
+import { AdminLayout } from '@/module/admin/shared/components/admin-layout/admin-layout';
 
 export default function AdminRootLayout({
   children,
