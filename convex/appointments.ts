@@ -2,13 +2,13 @@ import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
 import {
-  formatLocalTime,
-  getCurrentLocalTimeMinutes,
-  getLocalDayEnd,
-  getLocalDayOfWeek,
-  getLocalDayStart,
-  isLocalToday,
-  parseLocalTime,
+    formatLocalTime,
+    getCurrentLocalTimeMinutes,
+    getLocalDayEnd,
+    getLocalDayOfWeek,
+    getLocalDayStart,
+    isLocalToday,
+    parseLocalTime,
 } from './lib/timezone';
 
 const DEFAULT_SLOT_DURATION = 30; // minutes

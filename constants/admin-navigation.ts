@@ -1,7 +1,6 @@
 import {
   CalendarClock,
   FileText,
-  FolderHeart,
   LayoutDashboard,
   Settings,
   Users,
@@ -18,15 +17,11 @@ export const ADMIN_NAV_ITEMS = [
     href: '/admin/termini',
     icon: CalendarClock,
   },
+
   {
-    label: 'Korisnici',
-    href: '/admin/korisnici',
+    label: 'Pacijenti',
+    href: '/admin/patients',
     icon: Users,
-  },
-  {
-    label: 'Kartoni',
-    href: '/admin/kartoni',
-    icon: FolderHeart,
   },
   {
     label: 'Blog',
