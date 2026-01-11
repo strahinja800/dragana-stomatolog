@@ -9,7 +9,7 @@ export default function ServicesHero() {
       <section className="py-40 gradient-hero">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
-            <span className="inline-block px-4 py-2 rounded-full bg-[rgb(217,241,252)] text-[rgb(13,162,231)] text-sm font-medium mb-6">
+            <span className="inline-block px-4 py-2 rounded-full bg-(--primary-light) text-primary text-sm font-medium mb-6">
               Naše usluge
             </span>
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">

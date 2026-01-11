@@ -6,7 +6,7 @@ export default function TestimonialsSection() {
     <section className="py-16 md:py-24 gradient-hero">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="inline-block px-4 py-2 rounded-full bg-[rgb(217,241,252)] text-[rgb(13,162,231)] text-sm font-medium mb-4">
+          <span className="inline-block px-4 py-2 rounded-full bg-(--primary-light) text-primary text-sm font-medium mb-4">
             Iskustva pacijenata
           </span>
           <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-4">

@@ -32,7 +32,7 @@ export function BlogArticle({ post }: Props) {
           </div>
           <div className="p-6">
             <div className="flex items-center gap-3 mb-4">
-              <span className="px-3 py-1 rounded-full bg-[rgb(217,241,252)] text-[rgb(13,162,231)] text-xs font-medium">
+              <span className="px-3 py-1 rounded-full bg-(--primary-light) text-primary text-xs font-medium">
                 {post.category}
               </span>
               <span className="text-sm text-muted-foreground">{post.date}</span>

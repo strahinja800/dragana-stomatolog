@@ -8,7 +8,7 @@ export default function AboutHero() {
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-6">
-            <span className="inline-block px-4 py-2 rounded-full bg-[rgb(217,241,252)] text-[rgb(13,162,231)] text-sm font-medium">
+            <span className="inline-block px-4 py-2 rounded-full bg-(--primary-light) text-primary text-sm font-medium">
               O nama
             </span>
             <h1 className="text-4xl md:text-5xl font-heading font-bold text-foreground">
