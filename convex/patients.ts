@@ -1,19 +1,27 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
+import { gender } from './schema';
 
 export const createPatient = mutation({
   args: {
     firstName: v.string(),
     lastName: v.string(),
     email: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    dateOfBirth: v.optional(v.number()),
+    gender: v.optional(gender),
     authId: v.optional(v.string()),
+    isMain: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const patientId = await ctx.db.insert('patients', {
       firstName: args.firstName,
       lastName: args.lastName,
       email: args.email,
+      phone: args.phone,
+      dateOfBirth: args.dateOfBirth,
+      gender: args.gender,
       authId: args.authId,
       isMain: true,
     });
@@ -52,5 +60,14 @@ export const getPatientWithAppointments = query({
       patient,
       appointments,
     };
+  },
+});
+
+export const deletePatient = mutation({
+  args: {
+    patientId: v.id('patients'),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.patientId);
   },
 });

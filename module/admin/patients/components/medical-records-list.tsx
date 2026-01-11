@@ -6,11 +6,11 @@ import { useMutation } from 'convex/react';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { api } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
 
-import { DeleteRecordDialog } from './delete-record-dialog';
 import { NewRecordDialog } from './new-record-dialog';
 
 interface MedicalRecord {
@@ -55,7 +55,7 @@ export function MedicalRecordsList({
   return (
     <div className="px-4 py-3">
       <div className="mb-3 flex items-center justify-between">
-        <h4 className="text-sm font-semibold">Medical Records</h4>
+        <h4 className="text-sm font-semibold">Medicinski zapisi</h4>
         <NewRecordDialog appointmentId={appointmentId} />
       </div>
 
@@ -105,14 +105,18 @@ export function MedicalRecordsList({
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">
-          Nema medical records za ovaj termin.
+          Nema medicinskih zapisa za ovaj termin.
         </p>
       )}
 
-      <DeleteRecordDialog
+      <ConfirmDialog
         open={!!recordToDelete}
         onOpenChange={(open) => !open && setRecordToDelete(null)}
         onConfirm={confirmDelete}
+        title="Potvrda brisanja"
+        description="Da li ste sigurni da želite da obrišete ovaj medical record?"
+        confirmText="Obriši"
+        variant="destructive"
       />
     </div>
   );

@@ -10,7 +10,7 @@ const appointmentStatus = v.union(
   v.literal('NO_SHOW')
 );
 
-const gender = v.union(v.literal('MALE'), v.literal('FEMALE'));
+export const gender = v.union(v.literal('MALE'), v.literal('FEMALE'));
 
 const invoiceStatus = v.union(
   v.literal('PENDING'),
