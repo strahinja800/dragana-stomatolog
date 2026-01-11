@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { api } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
 
+import { MedicalRecordAttachmentsDrawer } from './medical-record-attachments-drawer';
 import { NewRecordDialog } from './new-record-dialog';
 
 interface MedicalRecord {
@@ -85,14 +86,20 @@ export function MedicalRecordsList({
                     {record.treatment}
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  onClick={() => setRecordToDelete(record._id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <MedicalRecordAttachmentsDrawer
+                    medicalRecordId={record._id}
+                  />
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => setRecordToDelete(record._id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               {record.notes && (
                 <div className="mt-2 text-muted-foreground">

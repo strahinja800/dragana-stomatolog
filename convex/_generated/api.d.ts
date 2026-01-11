@@ -9,7 +9,9 @@
  */
 
 import type * as appointments from "../appointments.js";
+import type * as attachments from "../attachments.js";
 import type * as auth from "../auth.js";
+import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as lib_timezone from "../lib/timezone.js";
 import type * as medicalRecords from "../medicalRecords.js";
@@ -25,7 +27,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   appointments: typeof appointments;
+  attachments: typeof attachments;
   auth: typeof auth;
+  files: typeof files;
   http: typeof http;
   "lib/timezone": typeof lib_timezone;
   medicalRecords: typeof medicalRecords;

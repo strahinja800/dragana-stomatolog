@@ -86,14 +86,14 @@ export function NewPatientDrawer() {
   };
 
   return (
-    <Drawer open={open} onOpenChange={setOpen} direction="bottom">
+    <Drawer open={open} onOpenChange={setOpen} direction="right">
       <DrawerTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
           Novi pacijent
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="h-screen">
+      <DrawerContent className="h-screen max-w-4xl">
         <div className="mx-auto h-full w-full max-w-2xl overflow-y-auto">
           <DrawerHeader>
             <DrawerTitle>Novi pacijent</DrawerTitle>
