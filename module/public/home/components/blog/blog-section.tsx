@@ -13,7 +13,7 @@ export default function BlogSection() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-16">
           <div>
-            <span className="inline-block px-4 py-2 rounded-full bg-[rgb(217,241,252)] text-[rgb(13,162,231)] text-sm font-medium mb-4">
+            <span className="inline-block px-4 py-2 rounded-full bg-(--primary-light) text-primary text-sm font-medium mb-4">
               Blog
             </span>
             <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground">
