@@ -16,7 +16,9 @@ module/public/home/components/
     booking-form-submit.tsx       # Child component
 ```
 
-**Data management**: Static content (services, team, testimonials) exports from [data/data.ts](../data/data.ts). Images imported from [assets/](../assets/) using Next.js Image. Navigation links in [constants/navigations.ts](../constants/navigations.ts).
+**Admin module**: Admin features in [module/admin/](../module/admin/) organized by domain (dashboard, termini, patients, podesavanja). Admin routes in [app/(admin)/](<../app/(admin)/>). All pages require admin role via `requireAdmin()`.
+
+**Data management**: Static content (services, team, testimonials) exports from [data/data.ts](../data/data.ts). Images imported from [assets/](../assets/) using Next.js Image. Navigation links in [constants/navigations.ts](../constants/navigations.ts). Admin navigation in [constants/admin-navigation.ts](../constants/admin-navigation.ts).
 
 ## Development Workflow
 
@@ -44,6 +46,7 @@ tsc --noEmit        # Type-check only (run before suggesting code changes)
 
 - **Convex** - Serverless backend with real-time sync
 - **Better Auth** - Authentication with Convex adapter
+- **Timezone** - Serbia (Europe/Belgrade) via `convex/lib/timezone.ts`
 
 ### Convex Patterns
 
@@ -93,6 +96,15 @@ export const myMutation = mutation({
     return await ctx.db.insert('myTable', { field: args.field });
   },
 });
+```
+
+**Timezone-aware queries** (Serbia):
+
+```ts
+import { getLocalDayStart, getLocalDayEnd } from './lib/timezone';
+
+const dayStart = getLocalDayStart(date);
+const dayEnd = getLocalDayEnd(date);
 ```
 
 ## Code Conventions

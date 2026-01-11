@@ -26,27 +26,48 @@ app/                    # Next.js App Router
     layout.tsx          # Public layout with navbar
     page.tsx            # Home page
   (admin)/              # Route group for admin pages
-    admin/              # Admin dashboard pages
+    layout.tsx          # Admin layout wrapper
+    admin/
+      page.tsx          # Dashboard (kontrolna tabla)
+      loading.tsx       # Loading state
+      termini/page.tsx  # Appointments management
+      patients/page.tsx # Patients list
+      podesavanja/page.tsx # Settings (working hours, services)
+      blog/page.tsx     # Blog management (under construction)
   api/auth/             # Better Auth API routes
   layout.tsx            # Root layout (fonts, metadata)
   globals.css           # Tailwind + shadcn theme (OKLCH colors)
 
 convex/                 # Convex backend
   _generated/           # Auto-generated Convex types
-  betterAuth/           # Better Auth adapter for Convex
-  schema.ts             # Database schema definition
-  settings.ts           # Clinic settings queries/mutations
-  appointments.ts       # Appointment queries/mutations
-  patients.ts           # Patient queries/mutations
-  users.ts              # User queries/mutations
-  auth.ts               # Auth configuration
+  betterAuth/           # Better Auth component
+    schema.ts           # Better Auth database tables
+    auth.ts             # Auth configuration for CLI
+    adapter.ts          # Database adapter API
+    convex.config.ts    # Component definition
+  lib/
+    timezone.ts         # Serbia timezone utilities (Europe/Belgrade)
+  schema.ts             # Database schema (workingHours, appointments, patients, etc.)
+  settings.ts           # Clinic settings (working hours, services, non-working days)
+  appointments.ts       # Appointment booking and management
+  patients.ts           # Patient management
+  users.ts              # User roles and management
+  auth.ts               # Auth component integration
+  http.ts               # HTTP routes for auth endpoints
+  convex.config.ts      # App configuration with Better Auth
+  auth.config.ts        # Auth providers configuration
 
 module/                 # Feature modules (domain-driven structure)
   public/
     home/components/    # Home page components
     shared/components/  # Shared public components (navbar, footer)
   admin/
-    components/         # Admin dashboard components
+    shared/components/  # AdminLayout, AdminSidebar, AdminSidebarMobile
+    dashboard/          # Dashboard view and stats components
+    termini/            # Appointment table, dialogs (confirm, reject, reschedule)
+    patients/           # Patients view and table
+    podesavanja/        # Settings tabs (working hours, non-working days, services)
+    types/              # Zod schemas for settings
   auth/
     components/         # Auth forms (login, register)
 
@@ -80,6 +101,22 @@ hooks/                  # Custom React hooks
 **Forms**: Use `react-hook-form` for form handling.
 
 **Icons**: Use `lucide-react` for icons.
+
+### Admin Panel
+
+Admin interfejs (`/admin`) omogućava upravljanje klinikom:
+
+- **Kontrolna tabla** - Dashboard sa statistikama
+- **Termini** - Pregled i upravljanje zakazanim terminima (potvrda, odbijanje, pomeranje)
+- **Pacijenti** - Lista registrovanih pacijenata
+- **Podešavanja** - Radno vreme, neradni dani, vrste usluga
+- **Blog** - Upravljanje blog sadržajem (u izradi)
+
+Sve admin stranice zahtevaju admin ulogu (`requireAdmin()` iz `@/module/auth/lib/auth-utils`).
+
+Admin komponente koriste real-time Convex queries za automatsko osvežavanje podataka.
+
+Navigacija je definisana u `constants/admin-navigation.ts`.
 
 **Backend-first logika**: Sva transformacija, normalizacija i priprema podataka mora biti u Convex funkcijama, a ne na frontendu. Frontend komponente treba da dobiju podatke "spremne za upotrebu" bez dodatne obrade.
 
