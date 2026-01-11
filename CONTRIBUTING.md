@@ -1,6 +1,6 @@
 # Kako raditi na projektu
 
-## Pocetno podesavanje
+## Početno podešavanje
 
 1. **Kloniraj repo:**
 
@@ -15,31 +15,42 @@
    npm install
    ```
 
-3. **Podesi environment varijable:**
+3. **Podesi Next.js environment varijable:**
 
    ```bash
    cp .env.example .env.local
    ```
 
-   Zatim popuni `.env.local` sa pravim vrednostima:
-   - `BETTER_AUTH_SECRET` - generisi sa `openssl rand -base64 32`
-   - `DATABASE_URL` - dobices od team lead-a ili iz Neon dashboard-a
+4. **Podesi Convex environment varijable:**
 
-4. **Pokreni Convex dev server:**
+   Ove varijable se postavljaju direktno u Convex runtime (ne u `.env.local`):
+
+   ```bash
+   npx convex env set SITE_URL http://localhost:3000
+   npx convex env set BETTER_AUTH_SECRET "$(openssl rand -base64 32)"
+   ```
+
+   Da proveriš da li su postavljene:
+
+   ```bash
+   npx convex env list
+   ```
+
+5. **Pokreni Convex dev server:**
 
    ```bash
    npm run convex
    ```
 
-   Ovo ce te povezati sa deljenim dev deploymentom.
+   Ovo će te povezati sa deljenim dev deployment-om.
 
-5. **Pokreni Next.js:**
+6. **Pokreni Next.js:**
 
    ```bash
    npm run dev
    ```
 
-6. **Otvori u browseru:** http://localhost:3000
+7. **Otvori u browseru:** http://localhost:3000
 
 ## Git Workflow
 
@@ -70,7 +81,7 @@
 
 5. **Otvori Pull Request na GitHub-u**
 
-6. **Sacekaj review i merge**
+6. **Sačekaj review i merge**
 
 ### Konvencije za commit poruke
 
@@ -83,15 +94,15 @@
 
 ## Convex Schema Izmene
 
-Ako menjas database schema (`convex/schema.ts`):
+Ako menjaš database schema (`convex/schema.ts`):
 
-1. **Komuniciraj sa timom pre izmena** - da ne bi doslo do konflikta
+1. **Komuniciraj sa timom pre izmena** - da ne bi došlo do konflikta
 2. **Testiraj lokalno** pre push-a
 3. **Migracije se automatski primenjuju** pri deploy-u
 
-### Sta se desava pri push-u
+### Šta se dešava pri push-u
 
-- **PR ka main:** GitHub Action deployuje Convex funkcije na preview deployment
+- **PR ka main:** GitHub Action deployuje Convex funkcije na preview deployment i automatski postavlja env varijable
 - **Merge u main:** GitHub Action deployuje na production
 
 ## Struktura projekta
@@ -110,11 +121,12 @@ lib/                  # Utility funkcije
 npm run dev           # Pokreni Next.js dev server
 npm run convex        # Pokreni Convex dev server
 npm run build         # Build za produkciju
-npm run lint          # Proveri lint greske
+npm run lint          # Proveri lint greške
 tsc --noEmit          # Type check bez emitovanja
+npx convex env list   # Prikaži Convex env varijable
 ```
 
-## Potrebna pomoc?
+## Potrebna pomoć?
 
-- Pogledaj CLAUDE.md za detaljne tehnicke instrukcije
-- Pitaj u timu ako nesto nije jasno
+- Pogledaj CLAUDE.md za detaljne tehničke instrukcije
+- Pitaj u timu ako nešto nije jasno
