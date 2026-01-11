@@ -23,6 +23,9 @@ Instructions for AI agents (Claude Code, Cursor, Copilot) working on this projec
 - **Queries**: Use `query()` for read operations (real-time by default)
 - **Mutations**: Use `mutation()` for write operations
 - **Backend-first logic**: All data transformation/normalization happens in Convex functions, not frontend
+- **HTTP routes**: Define API endpoints in `convex/http.ts` for auth and external integrations
+- **Timezone handling**: Use `convex/lib/timezone.ts` for Serbia timezone (Europe/Belgrade)
+- **Auth**: Better Auth component in `convex/betterAuth/` with admin plugin
 
 ## IV. Figma Integration
 
@@ -47,3 +50,11 @@ When importing assets via Figma MCP:
 - Navigation defined in `constants/navigations.ts`
 - Feature components go in `module/` organized by domain
 - Convex functions organized by domain in `convex/` folder
+
+## VII. Admin Module
+
+- **Views**: Main page content in `module/admin/{domain}/views/`
+- **Components**: Feature components in `module/admin/{domain}/components/`
+- **Shared**: Layout and navigation in `module/admin/shared/components/`
+- **Protection**: All admin pages use `requireAdmin()` from `@/module/auth/lib/auth-utils`
+- **Navigation**: Defined in `constants/admin-navigation.ts`

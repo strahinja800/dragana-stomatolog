@@ -13,13 +13,10 @@ Moderni website za stomatološku ordinaciju izrađen u Next.js 16 sa React 19 i 
 - **shadcn/ui** - Radix-based komponente
 - **react-hook-form** - Upravljanje formama
 
-### Backend (planned)
+### Backend
 
-- **Neon DB** - Managed PostgreSQL, serverless
-- **Prisma ORM** - Type-safe database queries with migrations
-- **oRPC** - Type-safe API with OpenAPI specification
-- **Better Auth** - Authentication with shadcn/ui components
-- **Resend** - Email notifications (React Email templates)
+- **Convex** - Serverless backend sa real-time sync
+- **Better Auth** - Autentifikacija sa Convex adapterom
 
 ### Hosting
 
@@ -34,22 +31,30 @@ npm install
 # Development server
 npm run dev
 
+# Convex dev server (u posebnom terminalu)
+npm run convex
+
 # Production build
 npm run build
 ```
 
 ## Struktura projekta
 
-```
+```text
 app/                    # Next.js App Router
   (public)/             # Javne stranice
+  (admin)/              # Admin panel
+convex/                 # Convex backend
+  schema.ts             # Database schema
+  appointments.ts       # Termini
+  settings.ts           # Podešavanja
+  auth.ts               # Autentifikacija
 module/                 # Feature moduli
-  public/
-    home/components/    # Home sekcije
-    services/views/     # Usluge stranica
-    shared/components/  # Navbar, Footer
+  public/               # Javne komponente
+  admin/                # Admin komponente
+  auth/                 # Auth komponente
 components/ui/          # shadcn komponente
-constants/              # Navigacija, usluge, statistika
+constants/              # Navigacija, admin nav
 assets/                 # Slike
 ```
 
@@ -58,37 +63,40 @@ assets/                 # Slike
 | Komanda            | Opis                       |
 | ------------------ | -------------------------- |
 | `npm run dev`      | Development server         |
+| `npm run convex`   | Convex dev server          |
 | `npm run build`    | Production build           |
 | `npm run lint`     | ESLint provera             |
 | `npm run validate` | Format + Lint + TypeScript |
 
-### Database (Prisma)
-
-| Komanda                  | Opis                          |
-| ------------------------ | ----------------------------- |
-| `npx prisma generate`    | Generate Prisma Client        |
-| `npx prisma migrate dev` | Run migrations (development)  |
-| `npx prisma db push`     | Push schema without migration |
-| `npx prisma studio`      | Open database GUI             |
-
 ## Stranice
+
+### Javne
 
 - `/` - Početna stranica
 - `/usluge` - Pregled usluga
 
-## Planirane funkcionalnosti
+### Admin
 
-### User Dashboard
+- `/admin` - Kontrolna tabla
+- `/admin/termini` - Upravljanje terminima
+- `/admin/patients` - Pacijenti
+- `/admin/podesavanja` - Podešavanja klinike
+- `/admin/blog` - Blog (u izradi)
+
+## Funkcionalnosti
+
+### Implementirano
 
 - Online zakazivanje termina sa prikazom slobodnih termina
-- Opcija za dodatnu poruku pri zakazivanju
+- Admin panel za upravljanje terminima (potvrda, odbijanje, pomeranje)
+- Podešavanje radnog vremena i neradnih dana
+- Upravljanje vrstama usluga
+
+### Planirano
+
 - Email podsetnici za termine
-
-### Admin Dashboard
-
 - Upravljanje blog postovima
 - Pregled i upravljanje kartonima pacijenata
-- Automatski email sistem na osnovu kartona pacijenta
 
 ## Konvencije
 
