@@ -1,6 +1,6 @@
 # Kako raditi na projektu
 
-## Pocetno podesavanje
+## Početno podešavanje
 
 1. **Kloniraj repo:**
 
@@ -22,8 +22,7 @@
    ```
 
    Zatim popuni `.env.local` sa pravim vrednostima:
-   - `BETTER_AUTH_SECRET` - generisi sa `openssl rand -base64 32`
-   - `DATABASE_URL` - dobices od team lead-a ili iz Neon dashboard-a
+   - `BETTER_AUTH_SECRET` - generiši sa `openssl rand -base64 32`
 
 4. **Pokreni Convex dev server:**
 
@@ -31,7 +30,7 @@
    npm run convex
    ```
 
-   Ovo ce te povezati sa deljenim dev deploymentom.
+   Ovo će te povezati sa deljenim dev deploymentom.
 
 5. **Pokreni Next.js:**
 
@@ -70,7 +69,7 @@
 
 5. **Otvori Pull Request na GitHub-u**
 
-6. **Sacekaj review i merge**
+6. **Sačekaj review i merge**
 
 ### Konvencije za commit poruke
 
@@ -83,13 +82,13 @@
 
 ## Convex Schema Izmene
 
-Ako menjas database schema (`convex/schema.ts`):
+Ako menjaš database schema (`convex/schema.ts`):
 
-1. **Komuniciraj sa timom pre izmena** - da ne bi doslo do konflikta
+1. **Komuniciraj sa timom pre izmena** - da ne bi došlo do konflikta
 2. **Testiraj lokalno** pre push-a
 3. **Migracije se automatski primenjuju** pri deploy-u
 
-### Sta se desava pri push-u
+### Šta se dešava pri push-u
 
 - **PR ka main:** GitHub Action deployuje Convex funkcije na preview deployment
 - **Merge u main:** GitHub Action deployuje na production
@@ -110,11 +109,11 @@ lib/                  # Utility funkcije
 npm run dev           # Pokreni Next.js dev server
 npm run convex        # Pokreni Convex dev server
 npm run build         # Build za produkciju
-npm run lint          # Proveri lint greske
+npm run lint          # Proveri lint greške
 tsc --noEmit          # Type check bez emitovanja
 ```
 
-## Potrebna pomoc?
+## Potrebna pomoć?
 
-- Pogledaj CLAUDE.md za detaljne tehnicke instrukcije
-- Pitaj u timu ako nesto nije jasno
+- Pogledaj CLAUDE.md za detaljne tehničke instrukcije
+- Pitaj u timu ako nešto nije jasno
