@@ -24,22 +24,16 @@ jobs:
 
       - name: Deploy to Preview (PR)
         if: github.event_name == 'pull_request'
-        id: preview-deploy
-        run: |
-          OUTPUT=$(npx convex deploy --preview-create "${{ github.head_ref }}" 2>&1)
-          echo "$OUTPUT"
-          # Extract the preview deployment name from output
-          PREVIEW_NAME=$(echo "$OUTPUT" | grep -oP 'Created preview deployment "\K[^"]+' || echo "${{ github.head_ref }}")
-          echo "preview_name=$PREVIEW_NAME" >> $GITHUB_OUTPUT
+        run: npx convex deploy --preview-create "${{ github.head_ref }}"
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}
 
       - name: Set Preview Environment Variables
         if: github.event_name == 'pull_request'
         run: |
-          # Set SITE_URL for the preview deployment
-          # The preview site URL follows the pattern: https://<preview-name>.convex.site
-          npx convex env set SITE_URL "https://${{ steps.preview-deploy.outputs.preview_name }}.convex.site" --preview-name "${{ github.head_ref }}"
+          # SITE_URL must be the Coolify preview URL (frontend), not Convex site URL
+          # Coolify format: {{pr_number}}.dragana-stomatolog.hektor-tech.com
+          npx convex env set SITE_URL "https://${{ github.event.pull_request.number }}.dragana-stomatolog.hektor-tech.com" --preview-name "${{ github.head_ref }}"
           npx convex env set BETTER_AUTH_SECRET "${{ secrets.BETTER_AUTH_SECRET }}" --preview-name "${{ github.head_ref }}"
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}
@@ -53,7 +47,7 @@ jobs:
       - name: Set Production Environment Variables
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          npx convex env set SITE_URL "${{ secrets.CONVEX_SITE_URL }}"
+          npx convex env set SITE_URL "https://dragana-stomatolog.hektor-tech.com"
           npx convex env set BETTER_AUTH_SECRET "${{ secrets.BETTER_AUTH_SECRET }}"
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
