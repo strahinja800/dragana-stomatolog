@@ -130,3 +130,12 @@ npx convex env list   # Prikaži Convex env varijable
 
 - Pogledaj CLAUDE.md za detaljne tehničke instrukcije
 - Pitaj u timu ako nešto nije jasno
+
+## Preview Deployments
+
+Kada otvoriš PR, automatski se kreiraju:
+
+1. **Convex preview deployment** - GitHub Action deployuje Convex funkcije
+2. **Coolify preview** - frontend na `{{pr_number}}.dragana-stomatolog.hektor-tech.com`
+
+Auth će raditi jer GitHub Action automatski postavlja `SITE_URL` na Coolify preview URL.
