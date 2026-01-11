@@ -54,12 +54,12 @@ export function NewRecordDialog({ appointmentId }: NewRecordDialogProps) {
       });
       reset();
       setOpen(false);
-      toast.success('Medical record je uspešno sačuvan');
+      toast.success('Medicinski zapis je uspešno sačuvan');
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : 'Greška pri čuvanju medical recorda';
+          : 'Greška pri čuvanju medicinskog zapisa';
       toast.error(message);
     }
   };
@@ -69,12 +69,12 @@ export function NewRecordDialog({ appointmentId }: NewRecordDialogProps) {
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
           <Plus className="mr-2 h-4 w-4" />
-          Dodaj record
+          Dodaj zapis
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Novi Medical Record</DialogTitle>
+          <DialogTitle>Novi medicinski zapis</DialogTitle>
           <DialogDescription>
             Unesite podatke o tretmanu i dijagnozi
           </DialogDescription>

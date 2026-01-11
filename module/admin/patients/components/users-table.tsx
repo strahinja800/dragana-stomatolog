@@ -57,7 +57,7 @@ export function UsersTable({ users }: UsersTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="w-75">Korisnik</TableHead>
+              <TableHead className="w-[300px]">Korisnik</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Uloga</TableHead>
               <TableHead>Status</TableHead>

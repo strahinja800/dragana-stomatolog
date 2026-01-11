@@ -43,12 +43,12 @@ export function MedicalRecordsList({
     try {
       await deleteRecord({ recordId: recordToDelete });
       setRecordToDelete(null);
-      toast.success('Medical record je uspešno obrisan');
+      toast.success('Medicinski zapis je uspešno obrisan');
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : 'Greška pri brisanju medical recorda';
+          : 'Greška pri brisanju medicinskog zapisa';
       toast.error(message);
     }
   };
@@ -121,7 +121,7 @@ export function MedicalRecordsList({
         onOpenChange={(open) => !open && setRecordToDelete(null)}
         onConfirm={confirmDelete}
         title="Potvrda brisanja"
-        description="Da li ste sigurni da želite da obrišete ovaj medical record?"
+        description="Da li ste sigurni da želite da obrišete ovaj medicinski zapis? Ova akcija se ne može poništiti."
         confirmText="Obriši"
         variant="destructive"
       />
