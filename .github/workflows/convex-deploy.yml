@@ -26,7 +26,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: npx convex deploy --preview-create "${{ github.head_ref }}"
         env:
-          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}
 
       - name: Deploy to Production (main)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
