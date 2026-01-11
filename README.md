@@ -104,3 +104,7 @@ assets/                 # Slike
 - Module-based arhitektura
 - `@/` path alias za importe
 - `cn()` utility za Tailwind klase
+
+## Tim
+
+Za detalje o tome kako doprineti projektu, pogledaj [CONTRIBUTING.md](CONTRIBUTING.md).
