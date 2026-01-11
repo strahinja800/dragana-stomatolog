@@ -10,7 +10,7 @@ const appointmentStatus = v.union(
   v.literal('NO_SHOW')
 );
 
-const gender = v.union(v.literal('MALE'), v.literal('FEMALE'));
+export const gender = v.union(v.literal('MALE'), v.literal('FEMALE'));
 
 const invoiceStatus = v.union(
   v.literal('PENDING'),
@@ -122,16 +122,19 @@ export default defineSchema({
     treatment: v.string(),
     notes: v.optional(v.string()),
     invoiceId: v.optional(v.id('invoices')),
-    attachments: v.optional(v.array(v.id('attachments'))),
   }).index('by_appointmentId', ['appointmentId']),
 
   attachments: defineTable({
-    medicalRecordId: v.id('medicalRecords'),
+    medicalRecordId: v.id("medicalRecords"),
+    storageId: v.id("_storage"),
     fileName: v.string(),
-    fileUrl: v.string(),
     fileType: v.string(),
+    fileSize: v.optional(v.number()),
     description: v.optional(v.string()),
-  }).index('by_medicalRecordId', ['medicalRecordId']),
+    uploadedAt: v.number(),
+  })
+    .index("by_medicalRecordId", ["medicalRecordId"])
+    .index("by_storageId", ["storageId"]),
 
   // ============================================
   // BILLING
