@@ -149,6 +149,37 @@ export default defineSchema({
   })
     .index('by_patientId', ['patientId'])
     .index('by_status', ['status']),
+
+  // ============================================
+  // About Values
+  // ============================================
+  aboutValues: defineTable({
+    icon: v.string(),
+    title: v.string(),
+    description: v.string(),
+    sortOrder: v.number(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    })
+    .index('by_sortOrder', ['sortOrder'])
+    .index('by_isActive_sortOrder', ['isActive', 'sortOrder']),
+
+
+  // ============================================
+  // Milestones
+  // ============================================
+  milestones: defineTable({
+    year: v.string(),
+    title: v.string(),
+    description: v.string(),
+    sortOrder: v.number(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    })
+    .index('by_sortOrder', ['sortOrder'])
+    .index('by_isActive_sortOrder', ['isActive', 'sortOrder']),
 });
 
 // Export types for use in functions

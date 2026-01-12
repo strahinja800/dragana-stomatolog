@@ -1,6 +1,7 @@
 import {
   CalendarClock,
   FileText,
+  Heart,
   LayoutDashboard,
   Settings,
   Users,
@@ -17,11 +18,15 @@ export const ADMIN_NAV_ITEMS = [
     href: '/admin/termini',
     icon: CalendarClock,
   },
-
   {
     label: 'Pacijenti',
     href: '/admin/patients',
     icon: Users,
+  },
+  {
+    label: 'O Nama',
+    href: '/admin/o-nama',
+    icon: Heart,
   },
   {
     label: 'Blog',
