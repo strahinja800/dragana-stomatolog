@@ -180,6 +180,24 @@ export default defineSchema({
     })
     .index('by_sortOrder', ['sortOrder'])
     .index('by_isActive_sortOrder', ['isActive', 'sortOrder']),
+
+   // ============================================
+   // Team Members
+   // ============================================
+   teamMembers: defineTable({
+    name: v.string(),
+    role: v.string(),
+    specialty: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    imageStorageId: v.optional(v.id('_storage')), // slika u Convex storage
+    imageAlt: v.optional(v.string()),
+    sortOrder: v.number(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    })
+    .index('by_sortOrder', ['sortOrder'])
+    .index('by_isActive_sortOrder', ['isActive', 'sortOrder']),
 });
 
 // Export types for use in functions

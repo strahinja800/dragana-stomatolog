@@ -1,10 +1,16 @@
+'use client';
+
 import Image from 'next/image';
 
+import { useQuery } from 'convex/react';
 import { GraduationCap } from 'lucide-react';
 
-import { TEAM } from '@/constants/about-page';
+import { api } from '@/convex/_generated/api';
 
 export default function AboutTeam() {
+  const teamMembers = useQuery(api.teamMembers.getActiveTeamMembersWithImages);
+  if (!teamMembers) return;
+
   return (
     <section className="py-24 gradient-hero">
       <div className="container mx-auto px-4">
@@ -18,16 +24,18 @@ export default function AboutTeam() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {TEAM.map((member, index) => (
+          {teamMembers.map((member, index) => (
             <div
               key={index}
               className="p-8 rounded-2xl bg-card border border-border shadow-card hover:shadow-hover transition-all duration-300"
             >
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                 <Image
-                  src={member.image}
+                  src={member.imageUrl || '/default-image.png'}
                   alt={member.name}
                   className="w-32 h-32 rounded-2xl object-cover shrink-0"
+                  width={128}
+                  height={128}
                 />
                 <div className="text-center sm:text-left">
                   <h3 className="text-xl font-heading font-semibold text-foreground mb-1">

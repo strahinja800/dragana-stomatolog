@@ -17,6 +17,16 @@ const nextConfig: NextConfig = {
       static: 180,
     },
   },
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.convex.cloud',
+        pathname: '/api/storage/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

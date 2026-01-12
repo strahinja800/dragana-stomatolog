@@ -19,6 +19,7 @@ import type * as medicalRecords from "../medicalRecords.js";
 import type * as milestones from "../milestones.js";
 import type * as patients from "../patients.js";
 import type * as settings from "../settings.js";
+import type * as teamMembers from "../teamMembers.js";
 import type * as users from "../users.js";
 
 import type {
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   milestones: typeof milestones;
   patients: typeof patients;
   settings: typeof settings;
+  teamMembers: typeof teamMembers;
   users: typeof users;
 }>;
 

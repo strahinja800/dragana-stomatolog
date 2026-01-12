@@ -14,20 +14,26 @@ import { AboutValueForm } from '@/module/admin/about/components/about-value-form
 import { AboutValuesTable } from '@/module/admin/about/components/about-values-table';
 import { MilestoneForm } from '@/module/admin/about/components/milestone-form';
 import { MilestonesTable } from '@/module/admin/about/components/milestones-table';
+import { TeamMemberForm } from '@/module/admin/about/components/team-member-form';
+import { TeamMembersTable } from '@/module/admin/about/components/team-members-table';
 
 interface AboutAdminViewProps {
   preloadedValues: Preloaded<typeof api.aboutValues.getAllAboutValues>;
   preloadedMilestones: Preloaded<typeof api.milestones.getAllMilestones>;
+  preloadedTeamMembers: Preloaded<typeof api.teamMembers.getAllTeamMembers>;
 }
 
 export function AboutAdminView({
   preloadedValues,
   preloadedMilestones,
+  preloadedTeamMembers,
 }: AboutAdminViewProps) {
   const values = usePreloadedQuery(preloadedValues);
   const milestones = usePreloadedQuery(preloadedMilestones);
+  const teamMembers = usePreloadedQuery(preloadedTeamMembers);
   const [isValueFormOpen, setIsValueFormOpen] = useState(false);
   const [isMilestoneFormOpen, setIsMilestoneFormOpen] = useState(false);
+  const [isTeamMemberFormOpen, setIsTeamMemberFormOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -42,6 +48,7 @@ export function AboutAdminView({
         <TabsList>
           <TabsTrigger value="values">Vrednosti</TabsTrigger>
           <TabsTrigger value="history">Istorija</TabsTrigger>
+          <TabsTrigger value="team">Tim</TabsTrigger>
         </TabsList>
 
         <TabsContent value="values" className="space-y-4">
@@ -91,6 +98,30 @@ export function AboutAdminView({
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="team" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-semibold">Naš tim</h2>
+              <p className="text-sm text-muted-foreground">
+                Članovi tima koji se prikazuju na stranici
+              </p>
+            </div>
+            <Button onClick={() => setIsTeamMemberFormOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Dodaj člana tima
+            </Button>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Svi članovi tima</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TeamMembersTable members={teamMembers} />
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
 
       <AboutValueForm
@@ -101,6 +132,11 @@ export function AboutAdminView({
       <MilestoneForm
         open={isMilestoneFormOpen}
         onClose={() => setIsMilestoneFormOpen(false)}
+      />
+
+      <TeamMemberForm
+        open={isTeamMemberFormOpen}
+        onClose={() => setIsTeamMemberFormOpen(false)}
       />
     </div>
   );

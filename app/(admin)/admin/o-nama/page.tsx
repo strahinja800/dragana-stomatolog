@@ -11,11 +11,15 @@ export default async function AboutAdminPage() {
   const preloadedMilestones = await preloadQuery(
     api.milestones.getAllMilestones
   );
+  const preloadedTeamMembers = await preloadQuery(
+    api.teamMembers.getAllTeamMembers
+  );
 
   return (
     <AboutAdminView
       preloadedValues={preloadedValues}
       preloadedMilestones={preloadedMilestones}
+      preloadedTeamMembers={preloadedTeamMembers}
     />
   );
 }
