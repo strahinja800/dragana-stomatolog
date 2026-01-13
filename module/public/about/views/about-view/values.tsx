@@ -1,15 +1,11 @@
-'use client';
-
-import { useQuery } from 'convex/react';
-
-import { api } from '@/convex/_generated/api';
+import type { Doc } from '@/convex/_generated/dataModel';
 import { getIcon } from '@/module/public/about/lib/icon-map';
 
-export default function AboutValues() {
-  const values = useQuery(api.aboutValues.getActiveAboutValues);
+interface AboutValuesProps {
+  values: Doc<'aboutValues'>[];
+}
 
-  if (!values) return;
-
+export default function AboutValues({ values }: AboutValuesProps) {
   return (
     <section className="py-24 bg-background">
       <div className="container mx-auto px-4">

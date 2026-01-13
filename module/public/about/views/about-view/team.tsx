@@ -1,16 +1,17 @@
-'use client';
-
 import Image from 'next/image';
 
-import { useQuery } from 'convex/react';
+import type { FunctionReturnType } from 'convex/server';
 import { GraduationCap } from 'lucide-react';
 
-import { api } from '@/convex/_generated/api';
+import type { api } from '@/convex/_generated/api';
 
-export default function AboutTeam() {
-  const teamMembers = useQuery(api.teamMembers.getActiveTeamMembersWithImages);
-  if (!teamMembers) return;
+interface AboutTeamProps {
+  teamMembers: FunctionReturnType<
+    typeof api.teamMembers.getActiveTeamMembersWithImages
+  >;
+}
 
+export default function AboutTeam({ teamMembers }: AboutTeamProps) {
   return (
     <section className="py-24 gradient-hero">
       <div className="container mx-auto px-4">

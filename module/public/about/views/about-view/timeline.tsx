@@ -1,15 +1,11 @@
-'use client';
-
-import { useQuery } from 'convex/react';
-
-import { api } from '@/convex/_generated/api';
+import type { Doc } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
 
-export default function AboutTimeline() {
-  const milestones = useQuery(api.milestones.getActiveMilestones);
+interface AboutTimelineProps {
+  milestones: Doc<'milestones'>[];
+}
 
-  if (!milestones) return;
-
+export default function AboutTimeline({ milestones }: AboutTimelineProps) {
   return (
     <section className="py-24 bg-background">
       <div className="container mx-auto px-4">

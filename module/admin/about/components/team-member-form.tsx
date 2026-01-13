@@ -67,25 +67,15 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
   );
 
   const form = useForm<FormData>({
-    defaultValues: member
-      ? {
-          name: member.name,
-          role: member.role,
-          specialty: member.specialty || '',
-          bio: member.bio || '',
-          imageAlt: member.imageAlt || '',
-          sortOrder: member.sortOrder,
-          isActive: member.isActive,
-        }
-      : {
-          name: '',
-          role: '',
-          specialty: '',
-          bio: '',
-          imageAlt: '',
-          sortOrder: 1,
-          isActive: true,
-        },
+    defaultValues: {
+      name: member?.name || '',
+      role: member?.role || '',
+      specialty: member?.specialty || '',
+      bio: member?.bio || '',
+      imageAlt: member?.imageAlt || '',
+      sortOrder: member?.sortOrder || 1,
+      isActive: member?.isActive ?? true,
+    },
   });
 
   const {

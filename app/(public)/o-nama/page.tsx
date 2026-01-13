@@ -1,25 +1,24 @@
-import AboutCta from '@/module/public/about/views/about-view/cta';
-import AboutHero from '@/module/public/about/views/about-view/hero';
-import AboutTeam from '@/module/public/about/views/about-view/team';
-import AboutTimeline from '@/module/public/about/views/about-view/timeline';
-import AboutValues from '@/module/public/about/views/about-view/values';
+import { preloadQuery } from 'convex/nextjs';
 
-export default function AboutPage() {
+import { api } from '@/convex/_generated/api';
+import { AboutView } from '@/module/public/about/views/about-view/about-view';
+
+export default async function AboutPage() {
+  const preloadedValues = await preloadQuery(
+    api.aboutValues.getActiveAboutValues
+  );
+  const preloadedMilestones = await preloadQuery(
+    api.milestones.getActiveMilestones
+  );
+  const preloadedTeamMembers = await preloadQuery(
+    api.teamMembers.getActiveTeamMembersWithImages
+  );
+
   return (
-    <>
-      {/* Hero Section */}
-      <AboutHero />
-      {/* Values Section */}
-      <AboutValues />
-
-      {/* Team Section */}
-      <AboutTeam />
-
-      {/* Timeline Section */}
-      <AboutTimeline />
-
-      {/* CTA Section */}
-      <AboutCta />
-    </>
+    <AboutView
+      preloadedValues={preloadedValues}
+      preloadedMilestones={preloadedMilestones}
+      preloadedTeamMembers={preloadedTeamMembers}
+    />
   );
 }
