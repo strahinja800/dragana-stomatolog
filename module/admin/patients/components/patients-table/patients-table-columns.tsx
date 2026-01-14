@@ -57,7 +57,7 @@ export const columns: ColumnDef<Patient>[] = [
       );
     },
     cell: ({ row }) => (
-      <span className="font-medium">{row.getValue('firstName')}</span>
+      <span className="font-medium ml-5">{row.getValue('firstName')}</span>
     ),
   },
   {
@@ -91,6 +91,9 @@ export const columns: ColumnDef<Patient>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => (
+      <span className="font-medium ml-5">{row.getValue('lastName')}</span>
+    ),
   },
   {
     accessorKey: 'email',
@@ -122,7 +125,9 @@ export const columns: ColumnDef<Patient>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.getValue('email') || '—',
+    cell: ({ row }) => (
+      <span className="font-medium ml-5">{row.getValue('email') || '—'}</span>
+    ),
   },
   {
     accessorKey: 'phone',
@@ -154,7 +159,9 @@ export const columns: ColumnDef<Patient>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.getValue('phone') || '—',
+    cell: ({ row }) => (
+      <span className="font-medium ml-5">{row.getValue('phone') || '—'}</span>
+    ),
   },
   {
     accessorKey: 'isMain',
