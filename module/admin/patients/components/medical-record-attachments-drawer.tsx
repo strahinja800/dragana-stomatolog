@@ -2,7 +2,9 @@
 
 import { useRef, useState } from 'react';
 
-import { useMutation, useQuery } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { useQuery } from 'convex/react';
 import { Paperclip, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -38,9 +40,34 @@ export function MedicalRecordAttachmentsDrawer({
     medicalRecordId,
   });
 
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
-  const createAttachment = useMutation(api.attachments.createAttachment);
-  const deleteAttachment = useMutation(api.attachments.deleteAttachment);
+  const generateUploadUrlFn = useConvexMutation(api.files.generateUploadUrl);
+  const { mutateAsync: generateUploadUrl } = useMutation({
+    mutationFn: generateUploadUrlFn,
+  });
+
+  const createAttachmentFn = useConvexMutation(
+    api.attachments.createAttachment
+  );
+  const { mutateAsync: createAttachment } = useMutation({
+    mutationFn: createAttachmentFn,
+  });
+
+  const deleteAttachmentFn = useConvexMutation(
+    api.attachments.deleteAttachment
+  );
+  const { mutate: deleteAttachment } = useMutation({
+    mutationFn: deleteAttachmentFn,
+    onSuccess: () => {
+      toast.success('Fajl je obrisan');
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Greška prilikom brisanja fajla';
+      toast.error(message);
+    },
+  });
 
   const onPickFile = () => inputRef.current?.click();
 
@@ -48,7 +75,7 @@ export function MedicalRecordAttachmentsDrawer({
     try {
       setIsUploading(true);
 
-      const uploadUrl = await generateUploadUrl();
+      const uploadUrl = await generateUploadUrl({});
 
       const res = await fetch(uploadUrl, {
         method: 'POST',
@@ -85,15 +112,8 @@ export function MedicalRecordAttachmentsDrawer({
     await onUpload(file);
   };
 
-  const onRemove = async (attachmentId: Id<'attachments'>) => {
-    try {
-      await deleteAttachment({ attachmentId });
-      toast.success('Fajl je obrisan');
-    } catch (e) {
-      const message =
-        e instanceof Error ? e.message : 'Greška prilikom brisanja fajla';
-      toast.error(message);
-    }
+  const onRemove = (attachmentId: Id<'attachments'>) => {
+    deleteAttachment({ attachmentId });
   };
 
   return (

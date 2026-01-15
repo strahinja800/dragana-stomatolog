@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { useQuery } from 'convex/react';
+import { type Preloaded, useQuery } from 'convex/react';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import {
@@ -34,7 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { api } from '@/convex/_generated/api';
+import { api, type api as ApiType } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
 
@@ -51,6 +51,7 @@ type AppointmentStatus =
 
 interface AppointmentTableProps {
   statusFilter?: AppointmentStatus;
+  preloadedServiceTypes: Preloaded<typeof ApiType.settings.getServiceTypes>;
 }
 
 const STATUS_CONFIG: Record<
@@ -105,7 +106,10 @@ export type Appointment = {
   } | null;
 };
 
-export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
+export function AppointmentTable({
+  statusFilter,
+  preloadedServiceTypes,
+}: AppointmentTableProps) {
   const [confirmAppointment, setConfirmAppointment] =
     useState<Appointment | null>(null);
   const [rejectAppointment, setRejectAppointment] =
@@ -328,6 +332,7 @@ export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
       <ConfirmDialog
         appointment={confirmAppointment}
         onClose={() => setConfirmAppointment(null)}
+        preloadedServiceTypes={preloadedServiceTypes}
       />
       <RejectDialog
         appointment={rejectAppointment}

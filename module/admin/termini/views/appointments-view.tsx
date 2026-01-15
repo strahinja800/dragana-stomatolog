@@ -2,10 +2,12 @@
 
 import { Suspense, useState } from 'react';
 
+import { type Preloaded } from 'convex/react';
 import { CalendarClock, Loader2 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { type api } from '@/convex/_generated/api';
 import { AppointmentTable } from '@/module/admin/termini/components/appointment-table';
 
 type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
@@ -26,7 +28,13 @@ function TableSkeleton() {
   );
 }
 
-export function AppointmentsView() {
+interface AppointmentsViewProps {
+  preloadedServiceTypes: Preloaded<typeof api.settings.getServiceTypes>;
+}
+
+export function AppointmentsView({
+  preloadedServiceTypes,
+}: AppointmentsViewProps) {
   const [activeTab, setActiveTab] = useState<StatusFilter>('ALL');
 
   return (
@@ -71,7 +79,9 @@ export function AppointmentsView() {
             {/* ALL tab */}
             <TabsContent value="ALL" className="m-0">
               <Suspense fallback={<TableSkeleton />}>
-                <AppointmentTable />
+                <AppointmentTable
+                  preloadedServiceTypes={preloadedServiceTypes}
+                />
               </Suspense>
             </TabsContent>
 
@@ -82,7 +92,10 @@ export function AppointmentsView() {
             ).map((tab) => (
               <TabsContent key={tab.value} value={tab.value} className="m-0">
                 <Suspense fallback={<TableSkeleton />}>
-                  <AppointmentTable statusFilter={tab.value} />
+                  <AppointmentTable
+                    statusFilter={tab.value}
+                    preloadedServiceTypes={preloadedServiceTypes}
+                  />
                 </Suspense>
               </TabsContent>
             ))}

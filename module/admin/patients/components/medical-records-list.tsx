@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -35,22 +36,28 @@ export function MedicalRecordsList({
 }: MedicalRecordsListProps) {
   const [recordToDelete, setRecordToDelete] =
     useState<Id<'medicalRecords'> | null>(null);
-  const deleteRecord = useMutation(api.medicalRecords.deleteMedicalRecord);
 
-  const confirmDelete = async () => {
-    if (!recordToDelete) return;
-
-    try {
-      await deleteRecord({ recordId: recordToDelete });
+  const deleteRecordFn = useConvexMutation(
+    api.medicalRecords.deleteMedicalRecord
+  );
+  const { mutate: deleteRecord } = useMutation({
+    mutationFn: deleteRecordFn,
+    onSuccess: () => {
       setRecordToDelete(null);
       toast.success('Medical record je uspešno obrisan');
-    } catch (error) {
+    },
+    onError: (error) => {
       const message =
         error instanceof Error
           ? error.message
           : 'Greška pri brisanju medical recorda';
       toast.error(message);
-    }
+    },
+  });
+
+  const confirmDelete = () => {
+    if (!recordToDelete) return;
+    deleteRecord({ recordId: recordToDelete });
   };
 
   return (

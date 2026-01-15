@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 
-import { useMutation, useQuery } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { type Preloaded, usePreloadedQuery } from 'convex/react';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import { Check, Clock, Loader2 } from 'lucide-react';
@@ -26,7 +28,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/convex/_generated/api';
+import { api, type api as ApiType } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
 
 interface ConfirmDialogProps {
@@ -39,19 +41,19 @@ interface ConfirmDialogProps {
     } | null;
   } | null;
   onClose: () => void;
+  preloadedServiceTypes: Preloaded<typeof ApiType.settings.getServiceTypes>;
 }
 
-export function ConfirmDialog({ appointment, onClose }: ConfirmDialogProps) {
+export function ConfirmDialog({
+  appointment,
+  onClose,
+  preloadedServiceTypes,
+}: ConfirmDialogProps) {
   const [serviceTypeId, setServiceTypeId] = useState<string>('');
   const [notes, setNotes] = useState('');
-  const [isPending, setIsPending] = useState(false);
 
-  const serviceTypes = useQuery(api.settings.getServiceTypes);
-  const confirmAppointmentMutation = useMutation(
-    api.appointments.confirmAppointment
-  );
-
-  const activeServices = serviceTypes?.filter((s) => s.isActive) ?? [];
+  const serviceTypes = usePreloadedQuery(preloadedServiceTypes);
+  const activeServices = serviceTypes.filter((s) => s.isActive);
 
   const handleClose = () => {
     setServiceTypeId('');
@@ -59,28 +61,32 @@ export function ConfirmDialog({ appointment, onClose }: ConfirmDialogProps) {
     onClose();
   };
 
-  const handleConfirm = async () => {
-    if (!appointment || !serviceTypeId) return;
-
-    setIsPending(true);
-    try {
-      await confirmAppointmentMutation({
-        id: appointment._id,
-        serviceTypeId: serviceTypeId as Id<'serviceTypes'>,
-        notes: notes || undefined,
-      });
+  const confirmAppointmentFn = useConvexMutation(
+    api.appointments.confirmAppointment
+  );
+  const { mutate: confirmAppointment, isPending } = useMutation({
+    mutationFn: confirmAppointmentFn,
+    onSuccess: () => {
       toast.success('Termin potvrđen', {
         description: 'Pacijent će biti obavešten o potvrdi termina',
       });
       handleClose();
-    } catch (error) {
+    },
+    onError: (error) => {
       toast.error('Greška pri potvrđivanju', {
         description:
           error instanceof Error ? error.message : 'Nepoznata greška',
       });
-    } finally {
-      setIsPending(false);
-    }
+    },
+  });
+
+  const handleConfirm = () => {
+    if (!appointment || !serviceTypeId) return;
+    confirmAppointment({
+      id: appointment._id,
+      serviceTypeId: serviceTypeId as Id<'serviceTypes'>,
+      notes: notes || undefined,
+    });
   };
 
   const selectedService = activeServices.find((s) => s._id === serviceTypeId);

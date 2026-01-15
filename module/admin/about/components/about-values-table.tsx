@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Edit, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -40,43 +41,39 @@ interface AboutValuesTableProps {
 export function AboutValuesTable({ values }: AboutValuesTableProps) {
   const [editingValue, setEditingValue] = useState<AboutValue | null>(null);
   const [deletingId, setDeletingId] = useState<Id<'aboutValues'> | null>(null);
-  const updateValue = useMutation({
-    ...api.aboutValues.updateAboutValue,
+
+  const updateValueFn = useConvexMutation(api.aboutValues.updateAboutValue);
+  const { mutate: updateValue } = useMutation({
+    mutationFn: updateValueFn,
     onSuccess: () => {
       toast.success('Vrednost uspešno ažurirana');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error('Greška pri ažuriranju vrednosti');
       console.error(error);
     },
-    onSettled: () => {
-      setEditingValue(null);
-    },
   });
-  const deleteValue = useMutation({
-    ...api.aboutValues.deleteAboutValue,
+
+  const deleteValueFn = useConvexMutation(api.aboutValues.deleteAboutValue);
+  const { mutate: deleteValue } = useMutation({
+    mutationFn: deleteValueFn,
     onSuccess: () => {
       toast.success('Vrednost uspešno obrisana');
+      setDeletingId(null);
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error('Greška pri brisanju vrednosti');
       console.error(error);
     },
-    onSettled: () => {
-      setDeletingId(null);
-    },
   });
 
-  const handleToggleActive = async (
-    id: Id<'aboutValues'>,
-    currentState: boolean
-  ) => {
-    await updateValue({ id, isActive: !currentState });
+  const handleToggleActive = (id: Id<'aboutValues'>, currentState: boolean) => {
+    updateValue({ id, isActive: !currentState });
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!deletingId) return;
-    await deleteValue({ id: deletingId });
+    deleteValue({ id: deletingId });
   };
 
   return (

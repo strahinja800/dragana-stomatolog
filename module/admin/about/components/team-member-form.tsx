@@ -4,7 +4,9 @@ import { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 
-import { useMutation, useQuery } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { useQuery } from 'convex/react';
 import { ImageIcon, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -78,7 +80,7 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
   } = form;
 
@@ -88,46 +90,42 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
     onClose();
   };
 
-  const createMember = useMutation({
-    ...api.teamMembers.createTeamMember,
+  const createMemberFn = useConvexMutation(api.teamMembers.createTeamMember);
+  const { mutate: createMember, isPending: isCreating } = useMutation({
+    mutationFn: createMemberFn,
     onSuccess: () => {
       toast.success('Član tima uspešno kreiran');
+      handleReset();
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error('Greška pri kreiranju člana tima');
       console.error(error);
     },
-    onSettled: handleReset,
   });
-  const updateMember = useMutation({
-    ...api.teamMembers.updateTeamMember,
+
+  const updateMemberFn = useConvexMutation(api.teamMembers.updateTeamMember);
+  const { mutate: updateMember, isPending: isUpdating } = useMutation({
+    mutationFn: updateMemberFn,
     onSuccess: () => {
       toast.success('Član tima uspešno ažuriran');
+      handleReset();
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error('Greška pri ažuriranju člana tima');
       console.error(error);
     },
-    onSettled: handleReset,
-  });
-  const generateUploadUrl = useMutation({
-    ...api.files.generateUploadUrl,
-    onSuccess: () => {
-      toast.success('Slika uspešno uploadovana');
-    },
-    onError: (error: any) => {
-      toast.error('Greška pri uploadu slike');
-      console.error(error);
-    },
-    onSettled: () => {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    },
   });
 
-  const onSubmit = async (data: FormData) => {
+  const generateUploadUrlFn = useConvexMutation(api.files.generateUploadUrl);
+  const { mutateAsync: generateUploadUrl } = useMutation({
+    mutationFn: generateUploadUrlFn,
+  });
+
+  const isSubmitting = isCreating || isUpdating;
+
+  const onSubmit = (data: FormData) => {
     if (member) {
-      await updateMember({
+      updateMember({
         id: member._id,
         name: data.name,
         role: data.role,
@@ -139,7 +137,7 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
         isActive: data.isActive,
       });
     } else {
-      await createMember({
+      createMember({
         name: data.name,
         role: data.role,
         specialty: data.specialty || undefined,
@@ -164,7 +162,7 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
     try {
       setIsUploading(true);
 
-      const uploadUrl = await generateUploadUrl();
+      const uploadUrl = await generateUploadUrl({});
 
       const res = await fetch(uploadUrl, {
         method: 'POST',

@@ -2,7 +2,8 @@
 
 import { Controller, useForm } from 'react-hook-form';
 
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -43,62 +44,75 @@ interface FormData {
 }
 
 export function AboutValueForm({ open, onClose, value }: AboutValueFormProps) {
-  const createValue = useMutation(api.aboutValues.createAboutValue);
-  const updateValue = useMutation(api.aboutValues.updateAboutValue);
-
   const form = useForm<FormData>({
-    defaultValues: value
-      ? {
-          icon: value.icon,
-          title: value.title,
-          description: value.description,
-          sortOrder: value.sortOrder,
-          isActive: value.isActive,
-        }
-      : {
-          icon: '',
-          title: '',
-          description: '',
-          sortOrder: 1,
-          isActive: true,
-        },
+    defaultValues: {
+      icon: value?.icon ?? '',
+      title: value?.title ?? '',
+      description: value?.description ?? '',
+      sortOrder: value?.sortOrder ?? 1,
+      isActive: value?.isActive ?? true,
+    },
   });
 
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
   } = form;
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      if (value) {
-        await updateValue({
-          id: value._id,
-          icon: data.icon,
-          title: data.title,
-          description: data.description,
-          sortOrder: data.sortOrder,
-          isActive: data.isActive,
-        });
-        toast.success('Vrednost uspešno ažurirana');
-      } else {
-        await createValue({
-          icon: data.icon,
-          title: data.title,
-          description: data.description,
-          sortOrder: data.sortOrder,
-          isActive: data.isActive,
-        });
-        toast.success('Vrednost uspešno kreirana');
-      }
-      reset();
-      onClose();
-    } catch (error) {
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
+  const createValueFn = useConvexMutation(api.aboutValues.createAboutValue);
+  const { mutate: createValue, isPending: isCreating } = useMutation({
+    mutationFn: createValueFn,
+    onSuccess: () => {
+      toast.success('Vrednost uspešno kreirana');
+      handleClose();
+    },
+    onError: (error) => {
       toast.error('Greška pri čuvanju vrednosti');
       console.error(error);
+    },
+  });
+
+  const updateValueFn = useConvexMutation(api.aboutValues.updateAboutValue);
+  const { mutate: updateValue, isPending: isUpdating } = useMutation({
+    mutationFn: updateValueFn,
+    onSuccess: () => {
+      toast.success('Vrednost uspešno ažurirana');
+      handleClose();
+    },
+    onError: (error) => {
+      toast.error('Greška pri čuvanju vrednosti');
+      console.error(error);
+    },
+  });
+
+  const isSubmitting = isCreating || isUpdating;
+
+  const onSubmit = (data: FormData) => {
+    if (value) {
+      updateValue({
+        id: value._id,
+        icon: data.icon,
+        title: data.title,
+        description: data.description,
+        sortOrder: data.sortOrder,
+        isActive: data.isActive,
+      });
+    } else {
+      createValue({
+        icon: data.icon,
+        title: data.title,
+        description: data.description,
+        sortOrder: data.sortOrder,
+        isActive: data.isActive,
+      });
     }
   };
 

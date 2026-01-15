@@ -2,7 +2,8 @@
 
 import { Controller, useForm } from 'react-hook-form';
 
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -47,62 +48,75 @@ export function MilestoneForm({
   onClose,
   milestone,
 }: MilestoneFormProps) {
-  const createMilestone = useMutation(api.milestones.createMilestone);
-  const updateMilestone = useMutation(api.milestones.updateMilestone);
-
   const form = useForm<FormData>({
-    defaultValues: milestone
-      ? {
-          year: milestone.year,
-          title: milestone.title,
-          description: milestone.description,
-          sortOrder: milestone.sortOrder,
-          isActive: milestone.isActive,
-        }
-      : {
-          year: '',
-          title: '',
-          description: '',
-          sortOrder: 1,
-          isActive: true,
-        },
+    defaultValues: {
+      year: milestone?.year ?? '',
+      title: milestone?.title ?? '',
+      description: milestone?.description ?? '',
+      sortOrder: milestone?.sortOrder ?? 1,
+      isActive: milestone?.isActive ?? true,
+    },
   });
 
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
   } = form;
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      if (milestone) {
-        await updateMilestone({
-          id: milestone._id,
-          year: data.year,
-          title: data.title,
-          description: data.description,
-          sortOrder: data.sortOrder,
-          isActive: data.isActive,
-        });
-        toast.success('Milestone uspešno ažuriran');
-      } else {
-        await createMilestone({
-          year: data.year,
-          title: data.title,
-          description: data.description,
-          sortOrder: data.sortOrder,
-          isActive: data.isActive,
-        });
-        toast.success('Milestone uspešno kreiran');
-      }
-      reset();
-      onClose();
-    } catch (error) {
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
+  const createMilestoneFn = useConvexMutation(api.milestones.createMilestone);
+  const { mutate: createMilestone, isPending: isCreating } = useMutation({
+    mutationFn: createMilestoneFn,
+    onSuccess: () => {
+      toast.success('Milestone uspešno kreiran');
+      handleClose();
+    },
+    onError: (error) => {
       toast.error('Greška pri čuvanju milestone-a');
       console.error(error);
+    },
+  });
+
+  const updateMilestoneFn = useConvexMutation(api.milestones.updateMilestone);
+  const { mutate: updateMilestone, isPending: isUpdating } = useMutation({
+    mutationFn: updateMilestoneFn,
+    onSuccess: () => {
+      toast.success('Milestone uspešno ažuriran');
+      handleClose();
+    },
+    onError: (error) => {
+      toast.error('Greška pri čuvanju milestone-a');
+      console.error(error);
+    },
+  });
+
+  const isSubmitting = isCreating || isUpdating;
+
+  const onSubmit = (data: FormData) => {
+    if (milestone) {
+      updateMilestone({
+        id: milestone._id,
+        year: data.year,
+        title: data.title,
+        description: data.description,
+        sortOrder: data.sortOrder,
+        isActive: data.isActive,
+      });
+    } else {
+      createMilestone({
+        year: data.year,
+        title: data.title,
+        description: data.description,
+        sortOrder: data.sortOrder,
+        isActive: data.isActive,
+      });
     }
   };
 

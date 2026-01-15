@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Edit, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -43,26 +44,36 @@ export function MilestonesTable({ milestones }: MilestonesTableProps) {
     null
   );
   const [deletingId, setDeletingId] = useState<Id<'milestones'> | null>(null);
-  const updateMilestone = useMutation(api.milestones.updateMilestone);
-  const deleteMilestone = useMutation(api.milestones.deleteMilestone);
 
-  const handleToggleActive = async (
-    id: Id<'milestones'>,
-    currentState: boolean
-  ) => {
-    await updateMilestone({ id, isActive: !currentState });
-  };
+  const updateMilestoneFn = useConvexMutation(api.milestones.updateMilestone);
+  const { mutate: updateMilestone } = useMutation({
+    mutationFn: updateMilestoneFn,
+    onError: (error) => {
+      toast.error('Greška pri ažuriranju milestone-a');
+      console.error(error);
+    },
+  });
 
-  const handleDelete = async () => {
-    if (!deletingId) return;
-    try {
-      await deleteMilestone({ id: deletingId });
+  const deleteMilestoneFn = useConvexMutation(api.milestones.deleteMilestone);
+  const { mutate: deleteMilestone } = useMutation({
+    mutationFn: deleteMilestoneFn,
+    onSuccess: () => {
       toast.success('Milestone uspešno obrisan');
       setDeletingId(null);
-    } catch (error) {
+    },
+    onError: (error) => {
       toast.error('Greška pri brisanju milestone-a');
       console.error(error);
-    }
+    },
+  });
+
+  const handleToggleActive = (id: Id<'milestones'>, currentState: boolean) => {
+    updateMilestone({ id, isActive: !currentState });
+  };
+
+  const handleDelete = () => {
+    if (!deletingId) return;
+    deleteMilestone({ id: deletingId });
   };
 
   return (

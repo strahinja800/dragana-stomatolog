@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -35,33 +36,40 @@ interface NewRecordDialogProps {
 
 export function NewRecordDialog({ appointmentId }: NewRecordDialogProps) {
   const [open, setOpen] = useState(false);
-  const createRecord = useMutation(api.medicalRecords.createMedicalRecord);
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<MedicalRecordFormData>();
 
-  const onSubmit = async (data: MedicalRecordFormData) => {
-    try {
-      await createRecord({
-        appointmentId,
-        treatment: data.treatment,
-        tooth: data.tooth || undefined,
-        diagnosis: data.diagnosis || undefined,
-        notes: data.notes || undefined,
-      });
+  const createRecordFn = useConvexMutation(
+    api.medicalRecords.createMedicalRecord
+  );
+  const { mutate: createRecord, isPending } = useMutation({
+    mutationFn: createRecordFn,
+    onSuccess: () => {
       reset();
       setOpen(false);
       toast.success('Medical record je uspešno sačuvan');
-    } catch (error) {
+    },
+    onError: (error) => {
       const message =
         error instanceof Error
           ? error.message
           : 'Greška pri čuvanju medical recorda';
       toast.error(message);
-    }
+    },
+  });
+
+  const onSubmit = (data: MedicalRecordFormData) => {
+    createRecord({
+      appointmentId,
+      treatment: data.treatment,
+      tooth: data.tooth || undefined,
+      diagnosis: data.diagnosis || undefined,
+      notes: data.notes || undefined,
+    });
   };
 
   return (
@@ -134,8 +142,8 @@ export function NewRecordDialog({ appointmentId }: NewRecordDialogProps) {
             >
               Otkaži
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Čuvanje...' : 'Sačuvaj'}
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Čuvanje...' : 'Sačuvaj'}
             </Button>
           </div>
         </form>

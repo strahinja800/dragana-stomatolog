@@ -228,36 +228,81 @@ export function MyView({ preloadedData }: MyViewProps) {
 
 Referentni primer: `app/(admin)/admin/o-nama/page.tsx` + `module/admin/about/views/about-admin-view.tsx`
 
-**Mutations** - za izmenu podataka (sa callback-ovima):
+**Suspense sa useQuery komponentama**
+
+Kada komponenta koristi `useQuery` (a ne `usePreloadedQuery`), MORA biti upakovana u `<Suspense>` sa odgovarajućim fallback-om:
+
+```tsx
+// Parent komponenta
+import { Suspense } from 'react';
+
+function ParentView() {
+  return (
+    <div>
+      {/* Komponenta sa preloaded data - BEZ Suspense */}
+      <WorkingHoursTab preloadedData={preloadedWorkingHours} />
+
+      {/* Komponenta sa useQuery - SA Suspense */}
+      <Suspense fallback={<TabSkeleton />}>
+        <NonWorkingDaysTab />
+      </Suspense>
+    </div>
+  );
+}
+```
+
+**Pravila:**
+
+- `usePreloadedQuery` → Podaci su već učitani na serveru, **bez Suspense**
+- `useQuery` → Podaci se učitavaju na klijentu, **sa Suspense i fallback**
+
+Referentni primer: `module/admin/podesavanja/views/settings-view.tsx`
+
+**Mutations** - za izmenu podataka (TanStack Query integracija):
+
+Koristimo `@convex-dev/react-query` za integraciju sa TanStack Query. Ovo omogućava `onSuccess`, `onError` callback-ove i `isPending` state direktno iz hook-a.
 
 ```tsx
 'use client';
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-export default function MyComponent() {
-  const [isEditing, setIsEditing] = useState(false);
+import { api } from '@/convex/_generated/api';
 
-  const updateData = useMutation({
-    ...api.myModule.myMutation,
+export default function MyComponent() {
+  // 1. Definiši mutationFn kao posebnu konstantu
+  const updateDataFn = useConvexMutation(api.myModule.myMutation);
+
+  // 2. Koristi je u useMutation hook-u
+  const { mutate: updateData, isPending } = useMutation({
+    mutationFn: updateDataFn,
     onSuccess: () => {
       toast.success('Uspešno sačuvano');
     },
-    onError: (error: any) => {
-      toast.error('Greška pri čuvanju');
-      console.error(error);
-    },
-    onSettled: () => {
-      setIsEditing(false);
+    onError: (error) => {
+      toast.error('Greška pri čuvanju', {
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
+      });
     },
   });
 
-  const handleSubmit = async () => {
-    await updateData({ field: 'value' });
+  const handleSubmit = () => {
+    updateData({ field: 'value' });
   };
+
+  return (
+    <Button onClick={handleSubmit} disabled={isPending}>
+      {isPending ? 'Čuvanje...' : 'Sačuvaj'}
+    </Button>
+  );
 }
 ```
+
+**Napomena**: `QueryClientProvider` je već konfigurisan u `components/providers/convex-provider.tsx`.
+
+Referentni primer: `module/admin/podesavanja/components/working-hours-tab.tsx`
 
 **Convex functions** (`convex/*.ts`):
 
