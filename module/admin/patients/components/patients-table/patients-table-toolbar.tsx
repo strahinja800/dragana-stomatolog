@@ -55,7 +55,7 @@ export function PatientsTableToolbar({
             placeholder="Pretraži pacijente..."
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            className="pl-8"
+            className="bg-white pl-8"
           />
         </div>
         <Select
@@ -68,7 +68,7 @@ export function PatientsTableToolbar({
               ?.setFilterValue(value === 'all' ? undefined : value)
           }
         >
-          <SelectTrigger className="w-[130px]">
+          <SelectTrigger className="w-[130px] bg-white">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -93,7 +93,7 @@ export function PatientsTableToolbar({
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="ml-auto">
+          <Button variant="outline" size="sm" className="ml-auto bg-white">
             <SlidersHorizontal className="mr-2 h-4 w-4" />
             Kolone
           </Button>

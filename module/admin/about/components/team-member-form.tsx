@@ -57,10 +57,6 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const createMember = useMutation(api.teamMembers.createTeamMember);
-  const updateMember = useMutation(api.teamMembers.updateTeamMember);
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
-
   const imageUrl = useQuery(
     api.files.getFileUrl,
     uploadedImageId ? { storageId: uploadedImageId } : 'skip'
@@ -86,40 +82,73 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
     reset,
   } = form;
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      if (member) {
-        await updateMember({
-          id: member._id,
-          name: data.name,
-          role: data.role,
-          specialty: data.specialty || undefined,
-          bio: data.bio || undefined,
-          imageStorageId: uploadedImageId || undefined,
-          imageAlt: data.imageAlt || undefined,
-          sortOrder: data.sortOrder,
-          isActive: data.isActive,
-        });
-        toast.success('Član tima uspešno ažuriran');
-      } else {
-        await createMember({
-          name: data.name,
-          role: data.role,
-          specialty: data.specialty || undefined,
-          bio: data.bio || undefined,
-          imageStorageId: uploadedImageId || undefined,
-          imageAlt: data.imageAlt || undefined,
-          sortOrder: data.sortOrder,
-          isActive: data.isActive,
-        });
-        toast.success('Član tima uspešno kreiran');
-      }
-      reset();
-      setUploadedImageId(null);
-      onClose();
-    } catch (error) {
-      toast.error('Greška pri čuvanju člana tima');
+  const handleReset = () => {
+    reset();
+    setUploadedImageId(null);
+    onClose();
+  };
+
+  const createMember = useMutation({
+    ...api.teamMembers.createTeamMember,
+    onSuccess: () => {
+      toast.success('Član tima uspešno kreiran');
+    },
+    onError: (error: any) => {
+      toast.error('Greška pri kreiranju člana tima');
       console.error(error);
+    },
+    onSettled: handleReset,
+  });
+  const updateMember = useMutation({
+    ...api.teamMembers.updateTeamMember,
+    onSuccess: () => {
+      toast.success('Član tima uspešno ažuriran');
+    },
+    onError: (error: any) => {
+      toast.error('Greška pri ažuriranju člana tima');
+      console.error(error);
+    },
+    onSettled: handleReset,
+  });
+  const generateUploadUrl = useMutation({
+    ...api.files.generateUploadUrl,
+    onSuccess: () => {
+      toast.success('Slika uspešno uploadovana');
+    },
+    onError: (error: any) => {
+      toast.error('Greška pri uploadu slike');
+      console.error(error);
+    },
+    onSettled: () => {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    },
+  });
+
+  const onSubmit = async (data: FormData) => {
+    if (member) {
+      await updateMember({
+        id: member._id,
+        name: data.name,
+        role: data.role,
+        specialty: data.specialty || undefined,
+        bio: data.bio || undefined,
+        imageStorageId: uploadedImageId || undefined,
+        imageAlt: data.imageAlt || undefined,
+        sortOrder: data.sortOrder,
+        isActive: data.isActive,
+      });
+    } else {
+      await createMember({
+        name: data.name,
+        role: data.role,
+        specialty: data.specialty || undefined,
+        bio: data.bio || undefined,
+        imageStorageId: uploadedImageId || undefined,
+        imageAlt: data.imageAlt || undefined,
+        sortOrder: data.sortOrder,
+        isActive: data.isActive,
+      });
     }
   };
 

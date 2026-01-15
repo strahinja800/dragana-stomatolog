@@ -40,8 +40,32 @@ interface AboutValuesTableProps {
 export function AboutValuesTable({ values }: AboutValuesTableProps) {
   const [editingValue, setEditingValue] = useState<AboutValue | null>(null);
   const [deletingId, setDeletingId] = useState<Id<'aboutValues'> | null>(null);
-  const updateValue = useMutation(api.aboutValues.updateAboutValue);
-  const deleteValue = useMutation(api.aboutValues.deleteAboutValue);
+  const updateValue = useMutation({
+    ...api.aboutValues.updateAboutValue,
+    onSuccess: () => {
+      toast.success('Vrednost uspešno ažurirana');
+    },
+    onError: (error: any) => {
+      toast.error('Greška pri ažuriranju vrednosti');
+      console.error(error);
+    },
+    onSettled: () => {
+      setEditingValue(null);
+    },
+  });
+  const deleteValue = useMutation({
+    ...api.aboutValues.deleteAboutValue,
+    onSuccess: () => {
+      toast.success('Vrednost uspešno obrisana');
+    },
+    onError: (error: any) => {
+      toast.error('Greška pri brisanju vrednosti');
+      console.error(error);
+    },
+    onSettled: () => {
+      setDeletingId(null);
+    },
+  });
 
   const handleToggleActive = async (
     id: Id<'aboutValues'>,
@@ -52,14 +76,7 @@ export function AboutValuesTable({ values }: AboutValuesTableProps) {
 
   const handleDelete = async () => {
     if (!deletingId) return;
-    try {
-      await deleteValue({ id: deletingId });
-      toast.success('Vrednost uspešno obrisana');
-      setDeletingId(null);
-    } catch (error) {
-      toast.error('Greška pri brisanju vrednosti');
-      console.error(error);
-    }
+    await deleteValue({ id: deletingId });
   };
 
   return (
