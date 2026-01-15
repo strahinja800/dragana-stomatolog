@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -47,42 +48,46 @@ export function NewPatientDrawer() {
   const [selectedGender, setSelectedGender] = useState<
     'MALE' | 'FEMALE' | undefined
   >();
-  const createPatient = useMutation(api.patients.createPatient);
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<PatientFormData>();
 
-  const onSubmit = async (data: PatientFormData) => {
-    try {
-      const dateOfBirth = data.dateOfBirth
-        ? new Date(data.dateOfBirth).getTime()
-        : undefined;
-
-      await createPatient({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email || undefined,
-        phone: data.phone || undefined,
-        dateOfBirth,
-        gender: selectedGender,
-        isMain: true,
-      });
-
+  const createPatientFn = useConvexMutation(api.patients.createPatient);
+  const { mutate: createPatient, isPending: isSubmitting } = useMutation({
+    mutationFn: createPatientFn,
+    onSuccess: () => {
       reset();
       setSelectedGender(undefined);
       setOpen(false);
       toast.success('Pacijent je uspešno kreiran');
-    } catch (error) {
+    },
+    onError: (error) => {
       const message =
         error instanceof Error
           ? error.message
           : 'Greška pri kreiranju pacijenta';
       toast.error(message);
-    }
+    },
+  });
+
+  const onSubmit = (data: PatientFormData) => {
+    const dateOfBirth = data.dateOfBirth
+      ? new Date(data.dateOfBirth).getTime()
+      : undefined;
+
+    createPatient({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email || undefined,
+      phone: data.phone || undefined,
+      dateOfBirth,
+      gender: selectedGender,
+      isMain: true,
+    });
   };
 
   return (

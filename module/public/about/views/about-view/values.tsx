@@ -1,6 +1,11 @@
-import { VALUES } from '@/constants/about-page';
+import type { Doc } from '@/convex/_generated/dataModel';
+import { getIcon } from '@/module/public/about/lib/icon-map';
 
-export default function AboutValues() {
+interface AboutValuesProps {
+  values: Doc<'aboutValues'>[];
+}
+
+export default function AboutValues({ values }: AboutValuesProps) {
   return (
     <section className="py-24 bg-background">
       <div className="container mx-auto px-4">
@@ -14,22 +19,25 @@ export default function AboutValues() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {VALUES.map((value, index) => (
-            <div
-              key={index}
-              className="p-6 rounded-2xl bg-card border border-border shadow-card text-center"
-            >
-              <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center mx-auto mb-5">
-                <value.icon className="w-7 h-7 text-primary-foreground" />
+          {values.map((value) => {
+            const IconComponent = getIcon(value.icon);
+            return (
+              <div
+                key={value._id}
+                className="p-6 rounded-2xl bg-card border border-border shadow-card text-center"
+              >
+                <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center mx-auto mb-5">
+                  <IconComponent className="w-7 h-7 text-primary-foreground" />
+                </div>
+                <h3 className="text-lg font-heading font-semibold text-foreground mb-3">
+                  {value.title}
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {value.description}
+                </p>
               </div>
-              <h3 className="text-lg font-heading font-semibold text-foreground mb-3">
-                {value.title}
-              </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                {value.description}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

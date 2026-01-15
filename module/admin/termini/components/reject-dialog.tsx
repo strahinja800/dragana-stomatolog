@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import { AlertTriangle, Loader2, X } from 'lucide-react';
@@ -36,38 +37,37 @@ interface RejectDialogProps {
 
 export function RejectDialog({ appointment, onClose }: RejectDialogProps) {
   const [reason, setReason] = useState('');
-  const [isPending, setIsPending] = useState(false);
-
-  const rejectAppointmentMutation = useMutation(
-    api.appointments.rejectAppointment
-  );
 
   const handleClose = () => {
     setReason('');
     onClose();
   };
 
-  const handleReject = async () => {
-    if (!appointment || !reason.trim()) return;
-
-    setIsPending(true);
-    try {
-      await rejectAppointmentMutation({
-        id: appointment._id,
-        reason: reason.trim(),
-      });
+  const rejectAppointmentFn = useConvexMutation(
+    api.appointments.rejectAppointment
+  );
+  const { mutate: rejectAppointment, isPending } = useMutation({
+    mutationFn: rejectAppointmentFn,
+    onSuccess: () => {
       toast.success('Termin odbijen', {
         description: 'Pacijent će biti obavešten o odbijanju termina',
       });
       handleClose();
-    } catch (error) {
+    },
+    onError: (error) => {
       toast.error('Greška pri odbijanju', {
         description:
           error instanceof Error ? error.message : 'Nepoznata greška',
       });
-    } finally {
-      setIsPending(false);
-    }
+    },
+  });
+
+  const handleReject = () => {
+    if (!appointment || !reason.trim()) return;
+    rejectAppointment({
+      id: appointment._id,
+      reason: reason.trim(),
+    });
   };
 
   const patientName = appointment?.patient

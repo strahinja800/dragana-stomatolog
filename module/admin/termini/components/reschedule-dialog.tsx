@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 
-import { useMutation } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import { CalendarDays, Clock, Loader2, RefreshCw } from 'lucide-react';
@@ -48,11 +49,6 @@ export function RescheduleDialog({
   const [newDate, setNewDate] = useState<Date | undefined>();
   const [newTime, setNewTime] = useState('');
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [isPending, setIsPending] = useState(false);
-
-  const rescheduleAppointmentMutation = useMutation(
-    api.appointments.rescheduleAppointment
-  );
 
   const handleClose = () => {
     setNewDate(undefined);
@@ -60,28 +56,32 @@ export function RescheduleDialog({
     onClose();
   };
 
-  const handleReschedule = async () => {
-    if (!appointment || !newDate || !newTime) return;
-
-    setIsPending(true);
-    try {
-      await rescheduleAppointmentMutation({
-        id: appointment._id,
-        newDate: newDate.getTime(),
-        newTime,
-      });
+  const rescheduleAppointmentFn = useConvexMutation(
+    api.appointments.rescheduleAppointment
+  );
+  const { mutate: rescheduleAppointment, isPending } = useMutation({
+    mutationFn: rescheduleAppointmentFn,
+    onSuccess: () => {
       toast.success('Termin promenjen', {
         description: 'Pacijent će biti obavešten o novom vremenu',
       });
       handleClose();
-    } catch (error) {
+    },
+    onError: (error) => {
       toast.error('Greška pri promeni termina', {
         description:
           error instanceof Error ? error.message : 'Nepoznata greška',
       });
-    } finally {
-      setIsPending(false);
-    }
+    },
+  });
+
+  const handleReschedule = () => {
+    if (!appointment || !newDate || !newTime) return;
+    rescheduleAppointment({
+      id: appointment._id,
+      newDate: newDate.getTime(),
+      newTime,
+    });
   };
 
   const patientName = appointment?.patient

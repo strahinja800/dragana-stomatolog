@@ -1,7 +1,11 @@
-import { MILESTONES } from '@/constants/about-page';
+import type { Doc } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
 
-export default function AboutTimeline() {
+interface AboutTimelineProps {
+  milestones: Doc<'milestones'>[];
+}
+
+export default function AboutTimeline({ milestones }: AboutTimelineProps) {
   return (
     <section className="py-24 bg-background">
       <div className="container mx-auto px-4">
@@ -19,7 +23,7 @@ export default function AboutTimeline() {
             {/* Timeline line */}
             <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-primary/20 -translate-x-1/2" />
 
-            {MILESTONES.map((milestone, index) => (
+            {milestones.map((milestone, index) => (
               <div
                 key={index}
                 className={cn(

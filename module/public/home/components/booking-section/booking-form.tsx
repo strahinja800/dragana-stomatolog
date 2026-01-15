@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
+import { useConvexMutation } from '@convex-dev/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery } from 'convex/react';
+import { useMutation } from '@tanstack/react-query';
+import { useQuery } from 'convex/react';
 import { ArrowRight, CheckCircle, Loader2, Phone, User } from 'lucide-react';
 import * as z from 'zod';
 
@@ -63,11 +65,20 @@ export default function BookingForm() {
 
   const selectedTime = form.watch('time');
 
-  const createAppointmentMutation = useMutation(
+  const createAppointmentFn = useConvexMutation(
     api.appointments.createAppointment
   );
+  const { mutate: createAppointment, isPending: isCreating } = useMutation({
+    mutationFn: createAppointmentFn,
+    onSuccess: () => {
+      setIsSuccess(true);
+    },
+    onError: (error) => {
+      console.error('Failed to create appointment:', error);
+    },
+  });
 
-  const isPending = form.formState.isSubmitting;
+  const isPending = form.formState.isSubmitting || isCreating;
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
@@ -79,21 +90,16 @@ export default function BookingForm() {
     form.setValue('time', time, { shouldValidate: true });
   };
 
-  const onSubmit = async (data: BookingFormInput) => {
+  const onSubmit = (data: BookingFormInput) => {
     if (!data.date) return;
 
-    try {
-      await createAppointmentMutation({
-        name: data.name,
-        phone: data.phone,
-        date: data.date.getTime(),
-        time: data.time,
-        symptoms: data.symptoms || undefined,
-      });
-      setIsSuccess(true);
-    } catch (error) {
-      console.error('Failed to create appointment:', error);
-    }
+    createAppointment({
+      name: data.name,
+      phone: data.phone,
+      date: data.date.getTime(),
+      time: data.time,
+      symptoms: data.symptoms || undefined,
+    });
   };
 
   // Show success state after form submission

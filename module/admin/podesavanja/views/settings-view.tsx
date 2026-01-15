@@ -1,31 +1,25 @@
 'use client';
 
-import { Suspense } from 'react';
-
 import { type Preloaded } from 'convex/react';
 import { Calendar, Clock, Stethoscope } from 'lucide-react';
 
-import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { type api } from '@/convex/_generated/api';
 import { NonWorkingDaysTab } from '@/module/admin/podesavanja/components/non-working-days-tab';
 import { ServiceTypesTab } from '@/module/admin/podesavanja/components/service-types-tab';
 import { WorkingHoursTab } from '@/module/admin/podesavanja/components/working-hours-tab';
 
-function TabSkeleton() {
-  return (
-    <div className="space-y-4">
-      <Skeleton className="h-10 w-full" />
-      <Skeleton className="h-64 w-full" />
-    </div>
-  );
-}
-
 interface SettingsViewProps {
   preloadedWorkingHours: Preloaded<typeof api.settings.getWorkingHours>;
+  preloadedNonWorkingDays: Preloaded<typeof api.settings.getNonWorkingDays>;
+  preloadedServiceTypes: Preloaded<typeof api.settings.getServiceTypes>;
 }
 
-export function SettingsView({ preloadedWorkingHours }: SettingsViewProps) {
+export function SettingsView({
+  preloadedWorkingHours,
+  preloadedNonWorkingDays,
+  preloadedServiceTypes,
+}: SettingsViewProps) {
   return (
     <div className="space-y-8">
       {/* Header with gradient accent */}
@@ -75,15 +69,11 @@ export function SettingsView({ preloadedWorkingHours }: SettingsViewProps) {
         </TabsContent>
 
         <TabsContent value="non-working-days" className="mt-6">
-          <Suspense fallback={<TabSkeleton />}>
-            <NonWorkingDaysTab />
-          </Suspense>
+          <NonWorkingDaysTab preloadedData={preloadedNonWorkingDays} />
         </TabsContent>
 
         <TabsContent value="service-types" className="mt-6">
-          <Suspense fallback={<TabSkeleton />}>
-            <ServiceTypesTab />
-          </Suspense>
+          <ServiceTypesTab preloadedData={preloadedServiceTypes} />
         </TabsContent>
       </Tabs>
     </div>

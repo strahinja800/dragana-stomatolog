@@ -6,8 +6,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { useConvexMutation } from '@convex-dev/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from 'convex/react';
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import logo from '@/assets/logo-negativ.jpg';
@@ -55,7 +56,10 @@ export function RegisterForm() {
 
   const isPending = form.formState.isSubmitting;
 
-  const createPatient = useMutation(api.patients.createPatient);
+  const createPatientFn = useConvexMutation(api.patients.createPatient);
+  const { mutateAsync: createPatient } = useMutation({
+    mutationFn: createPatientFn,
+  });
 
   const onSubmit = async (data: RegisterFormSchemaInputs) => {
     setServerError(null);

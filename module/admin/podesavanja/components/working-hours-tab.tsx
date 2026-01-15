@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 
-import { type Preloaded, useMutation, usePreloadedQuery } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { type Preloaded, usePreloadedQuery } from 'convex/react';
 import { Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -46,11 +48,27 @@ interface WorkingHoursTabProps {
 
 export function WorkingHoursTab({ preloadedData }: WorkingHoursTabProps) {
   const workingHours = usePreloadedQuery(preloadedData);
-  const upsertWorkingHours = useMutation(api.settings.upsertWorkingHours);
 
   const [hours, setHours] = useState<WorkingHour[] | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+
+  const upsertWorkingHoursFn = useConvexMutation(
+    api.settings.upsertWorkingHours
+  );
+  const { mutate: upsertWorkingHours, isPending } = useMutation({
+    mutationFn: upsertWorkingHoursFn,
+    onSuccess: () => {
+      toast.success('Radno vreme sačuvano');
+      setHasChanges(false);
+      setHours(null);
+    },
+    onError: (error) => {
+      toast.error('Greška pri čuvanju', {
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    },
+  });
 
   // Initialize state from server data when it loads
   const displayHours =
@@ -86,23 +104,9 @@ export function WorkingHoursTab({ preloadedData }: WorkingHoursTabProps) {
     setHasChanges(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!hours) return;
-
-    setIsPending(true);
-    try {
-      await upsertWorkingHours({ hours });
-      toast.success('Radno vreme sačuvano');
-      setHasChanges(false);
-      setHours(null); // Reset to use server data
-    } catch (error) {
-      toast.error('Greška pri čuvanju', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-    } finally {
-      setIsPending(false);
-    }
+    upsertWorkingHours({ hours });
   };
 
   // Reorder to start from Monday (1) instead of Sunday (0)

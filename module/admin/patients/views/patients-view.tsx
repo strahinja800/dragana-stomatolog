@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 
-import { type Preloaded, useMutation, usePreloadedQuery } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { type Preloaded, usePreloadedQuery } from 'convex/react';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
@@ -20,22 +22,26 @@ export function PatientsView({ preloadedPatientsQuery }: PatientsViewProps) {
   const [patientToDelete, setPatientToDelete] = useState<Id<'patients'> | null>(
     null
   );
-  const deletePatient = useMutation(api.patients.deletePatient);
 
-  const confirmDelete = async () => {
-    if (!patientToDelete) return;
-
-    try {
-      await deletePatient({ patientId: patientToDelete });
+  const deletePatientFn = useConvexMutation(api.patients.deletePatient);
+  const { mutate: deletePatient } = useMutation({
+    mutationFn: deletePatientFn,
+    onSuccess: () => {
       setPatientToDelete(null);
       toast.success('Pacijent je uspešno obrisan');
-    } catch (error) {
+    },
+    onError: (error) => {
       const message =
         error instanceof Error
           ? error.message
           : 'Greška pri brisanju pacijenta';
       toast.error(message);
-    }
+    },
+  });
+
+  const confirmDelete = () => {
+    if (!patientToDelete) return;
+    deletePatient({ patientId: patientToDelete });
   };
 
   return (

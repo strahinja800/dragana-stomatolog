@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as aboutValues from "../aboutValues.js";
 import type * as appointments from "../appointments.js";
 import type * as attachments from "../attachments.js";
 import type * as auth from "../auth.js";
@@ -15,8 +16,10 @@ import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as lib_timezone from "../lib/timezone.js";
 import type * as medicalRecords from "../medicalRecords.js";
+import type * as milestones from "../milestones.js";
 import type * as patients from "../patients.js";
 import type * as settings from "../settings.js";
+import type * as teamMembers from "../teamMembers.js";
 import type * as users from "../users.js";
 
 import type {
@@ -26,6 +29,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  aboutValues: typeof aboutValues;
   appointments: typeof appointments;
   attachments: typeof attachments;
   auth: typeof auth;
@@ -33,8 +37,10 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "lib/timezone": typeof lib_timezone;
   medicalRecords: typeof medicalRecords;
+  milestones: typeof milestones;
   patients: typeof patients;
   settings: typeof settings;
+  teamMembers: typeof teamMembers;
   users: typeof users;
 }>;
 

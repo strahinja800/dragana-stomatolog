@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 
-import { useMutation, useQuery } from 'convex/react';
+import { useConvexMutation } from '@convex-dev/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { type Preloaded, usePreloadedQuery } from 'convex/react';
 import { Clock, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -39,7 +41,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/convex/_generated/api';
+import { api, type api as ApiType } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
 
@@ -58,18 +60,16 @@ const defaultForm: ServiceTypeForm = {
   isActive: true,
 };
 
-export function ServiceTypesTab() {
-  const serviceTypes = useQuery(api.settings.getServiceTypes, {});
-  const createServiceType = useMutation(api.settings.createServiceType);
-  const updateServiceType = useMutation(api.settings.updateServiceType);
-  const deleteServiceType = useMutation(api.settings.deleteServiceType);
+interface ServiceTypesTabProps {
+  preloadedData: Preloaded<typeof ApiType.settings.getServiceTypes>;
+}
+
+export function ServiceTypesTab({ preloadedData }: ServiceTypesTabProps) {
+  const serviceTypes = usePreloadedQuery(preloadedData);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<Id<'serviceTypes'> | null>(null);
   const [form, setForm] = useState<ServiceTypeForm>(defaultForm);
-  const [isCreating, setIsCreating] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const isEditing = !!form.id;
 
@@ -77,6 +77,53 @@ export function ServiceTypesTab() {
     setIsDialogOpen(false);
     setForm(defaultForm);
   };
+
+  const createServiceTypeFn = useConvexMutation(api.settings.createServiceType);
+  const { mutate: createServiceType, isPending: isCreating } = useMutation({
+    mutationFn: createServiceTypeFn,
+    onSuccess: () => {
+      toast.success('Usluga kreirana');
+      closeDialog();
+    },
+    onError: (error) => {
+      toast.error('Greška', {
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    },
+  });
+
+  const updateServiceTypeFn = useConvexMutation(api.settings.updateServiceType);
+  const { mutate: updateServiceType, isPending: isUpdating } = useMutation({
+    mutationFn: updateServiceTypeFn,
+    onSuccess: () => {
+      toast.success('Usluga ažurirana');
+      if (isDialogOpen) {
+        closeDialog();
+      }
+    },
+    onError: (error) => {
+      toast.error('Greška', {
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    },
+  });
+
+  const deleteServiceTypeFn = useConvexMutation(api.settings.deleteServiceType);
+  const { mutate: deleteServiceType, isPending: isDeleting } = useMutation({
+    mutationFn: deleteServiceTypeFn,
+    onSuccess: () => {
+      toast.success('Usluga obrisana');
+      setDeleteId(null);
+    },
+    onError: (error) => {
+      toast.error('Greška', {
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greška',
+      });
+    },
+  });
 
   const openCreate = () => {
     setForm(defaultForm);
@@ -94,100 +141,42 @@ export function ServiceTypesTab() {
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!form.name.trim()) {
       toast.error('Naziv je obavezan');
       return;
     }
 
     if (isEditing) {
-      setIsUpdating(true);
-      try {
-        await updateServiceType({
-          id: form.id!,
-          name: form.name,
-          durationMinutes: form.durationMinutes,
-          description: form.description || undefined,
-          isActive: form.isActive,
-        });
-        toast.success('Usluga ažurirana');
-        closeDialog();
-      } catch (error) {
-        toast.error('Greška', {
-          description:
-            error instanceof Error ? error.message : 'Nepoznata greška',
-        });
-      } finally {
-        setIsUpdating(false);
-      }
+      updateServiceType({
+        id: form.id!,
+        name: form.name,
+        durationMinutes: form.durationMinutes,
+        description: form.description || undefined,
+        isActive: form.isActive,
+      });
     } else {
-      setIsCreating(true);
-      try {
-        await createServiceType({
-          name: form.name,
-          durationMinutes: form.durationMinutes,
-          description: form.description || undefined,
-          isActive: form.isActive,
-        });
-        toast.success('Usluga kreirana');
-        closeDialog();
-      } catch (error) {
-        toast.error('Greška', {
-          description:
-            error instanceof Error ? error.message : 'Nepoznata greška',
-        });
-      } finally {
-        setIsCreating(false);
-      }
+      createServiceType({
+        name: form.name,
+        durationMinutes: form.durationMinutes,
+        description: form.description || undefined,
+        isActive: form.isActive,
+      });
     }
   };
 
-  const toggleActive = async (
-    service: NonNullable<typeof serviceTypes>[number]
-  ) => {
-    setIsUpdating(true);
-    try {
-      await updateServiceType({
-        id: service._id,
-        isActive: !service.isActive,
-      });
-    } catch (error) {
-      toast.error('Greška', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-    } finally {
-      setIsUpdating(false);
-    }
+  const toggleActive = (service: NonNullable<typeof serviceTypes>[number]) => {
+    updateServiceType({
+      id: service._id,
+      isActive: !service.isActive,
+    });
   };
 
-  const handleDelete = async (id: Id<'serviceTypes'>) => {
-    setIsDeleting(true);
-    try {
-      await deleteServiceType({ id });
-      toast.success('Usluga obrisana');
-      setDeleteId(null);
-    } catch (error) {
-      toast.error('Greška', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-    } finally {
-      setIsDeleting(false);
-    }
+  const handleDelete = (id: Id<'serviceTypes'>) => {
+    deleteServiceType({ id });
   };
 
   const isPending = isCreating || isUpdating;
-
-  if (!serviceTypes) {
-    return (
-      <Card className="overflow-hidden border-border/50 shadow-sm">
-        <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="size-6 animate-spin text-muted-foreground" />
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <>
