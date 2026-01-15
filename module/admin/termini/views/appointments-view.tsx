@@ -8,7 +8,7 @@ import { CalendarClock, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { type api } from '@/convex/_generated/api';
-import { AppointmentTable } from '@/module/admin/termini/components/appointment-table';
+import { AppointmentTable } from '@/module/admin/termini/components/appointment-table/appointment-table';
 
 type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
 type StatusFilter = 'ALL' | AppointmentStatus;
