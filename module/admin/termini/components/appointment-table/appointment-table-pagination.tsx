@@ -18,17 +18,17 @@ import {
 } from '@/components/ui/select';
 import { ROWS_PER_PAGE } from '@/constants/table';
 
-interface PatientsTablePaginationProps<TData> {
+interface AppointmentTablePaginationProps<TData> {
   table: Table<TData>;
 }
 
-export function PatientsTablePagination<TData>({
+export function AppointmentTablePagination<TData>({
   table,
-}: PatientsTablePaginationProps<TData>) {
+}: AppointmentTablePaginationProps<TData>) {
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
-        Ukupno pacijenata: {table.getFilteredRowModel().rows.length}
+        Ukupno termina: {table.getFilteredRowModel().rows.length}
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
