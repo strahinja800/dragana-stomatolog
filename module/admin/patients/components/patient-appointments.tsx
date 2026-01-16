@@ -12,13 +12,16 @@ import {
 import { type Doc, type Id } from '@/convex/_generated/dataModel';
 
 import { AppointmentsTable } from './appointments-table';
+import { NewAppointmentDrawer } from './new-appointment-drawer';
 
 interface PatientAppointmentsProps {
+  patient: Doc<'patients'>;
   appointments: Doc<'appointments'>[];
   allMedicalRecords: Doc<'medicalRecords'>[];
 }
 
 export function PatientAppointments({
+  patient,
   appointments,
   allMedicalRecords,
 }: PatientAppointmentsProps) {
@@ -26,7 +29,6 @@ export function PatientAppointments({
     Set<Id<'appointments'>>
   >(new Set());
 
-  // Grupiši medical records po appointmentId
   const recordsByAppointment = allMedicalRecords.reduce(
     (acc, record) => {
       if (!acc[record.appointmentId]) {
@@ -53,10 +55,19 @@ export function PatientAppointments({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Termini</CardTitle>
-        <CardDescription>
-          Zakazani i prošli termini pacijenta ({appointments.length})
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Termini</CardTitle>
+            <CardDescription>
+              Zakazani i prošli termini pacijenta ({appointments.length})
+            </CardDescription>
+          </div>
+          <NewAppointmentDrawer
+            patientId={patient._id}
+            patientName={`${patient.firstName} ${patient.lastName}`}
+            patientPhone={patient.phone || ''}
+          />
+        </div>
       </CardHeader>
       <CardContent>
         {appointments.length === 0 ? (

@@ -67,6 +67,7 @@ export function PatientDetailsView({
       <PatientBasicInfo patient={patient} />
       <PatientSystemInfo patient={patient} />
       <PatientAppointments
+        patient={patient}
         appointments={appointments}
         allMedicalRecords={allMedicalRecords}
       />

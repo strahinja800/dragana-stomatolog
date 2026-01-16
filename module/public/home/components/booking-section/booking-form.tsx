@@ -14,6 +14,7 @@ import { AppointmentCalendar } from '@/components/ui/appointment-calendar';
 import { FloatingInput } from '@/components/ui/floating-input';
 import { Textarea } from '@/components/ui/textarea';
 import { api } from '@/convex/_generated/api';
+import { type Id } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
 
 const bookingFormSchema = z.object({
@@ -34,7 +35,21 @@ type BookingFormInput = {
   symptoms: string;
 };
 
-export default function BookingForm() {
+interface BookingFormProps {
+  patientId?: Id<'patients'>;
+  defaultName?: string;
+  defaultPhone?: string;
+  onSuccess?: () => void;
+  hideHeader?: boolean;
+}
+
+export default function BookingForm({
+  patientId,
+  defaultName = '',
+  defaultPhone = '',
+  onSuccess: onSuccessCallback,
+  hideHeader = false,
+}: BookingFormProps = {}) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     new Date()
@@ -55,8 +70,8 @@ export default function BookingForm() {
   const form = useForm<BookingFormInput>({
     resolver: zodResolver(bookingFormSchema) as never,
     defaultValues: {
-      name: '',
-      phone: '',
+      name: defaultName,
+      phone: defaultPhone,
       date: undefined,
       time: '',
       symptoms: '',
@@ -66,12 +81,18 @@ export default function BookingForm() {
   const selectedTime = form.watch('time');
 
   const createAppointmentFn = useConvexMutation(
-    api.appointments.createAppointment
+    patientId
+      ? api.appointments.createAppointmentForPatient
+      : api.appointments.createAppointment
   );
   const { mutate: createAppointment, isPending: isCreating } = useMutation({
     mutationFn: createAppointmentFn,
     onSuccess: () => {
-      setIsSuccess(true);
+      if (patientId && onSuccessCallback) {
+        onSuccessCallback();
+      } else {
+        setIsSuccess(true);
+      }
     },
     onError: (error) => {
       console.error('Failed to create appointment:', error);
@@ -93,13 +114,24 @@ export default function BookingForm() {
   const onSubmit = (data: BookingFormInput) => {
     if (!data.date) return;
 
-    createAppointment({
-      name: data.name,
-      phone: data.phone,
-      date: data.date.getTime(),
-      time: data.time,
-      symptoms: data.symptoms || undefined,
-    });
+    if (patientId) {
+      // Admin mode - koristi createAppointmentForPatient
+      createAppointment({
+        patientId,
+        date: data.date.getTime(),
+        time: data.time,
+        symptoms: data.symptoms || undefined,
+      });
+    } else {
+      // Public mode - koristi createAppointment
+      createAppointment({
+        name: data.name,
+        phone: data.phone,
+        date: data.date.getTime(),
+        time: data.time,
+        symptoms: data.symptoms || undefined,
+      });
+    }
   };
 
   // Show success state after form submission
@@ -141,14 +173,16 @@ export default function BookingForm() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-primary/[0.04]" />
 
       <div className="relative z-10">
-        <div className="animate-fade-up mb-6 text-center">
-          <h3 className="mb-2 font-heading text-2xl font-bold text-foreground md:text-3xl">
-            Brzo zakazivanje
-          </h3>
-          <p className="text-sm text-muted-foreground md:text-base">
-            Popunite formu i javićemo vam se u roku od 30 minuta
-          </p>
-        </div>
+        {!hideHeader && (
+          <div className="animate-fade-up mb-6 text-center">
+            <h3 className="mb-2 font-heading text-2xl font-bold text-foreground md:text-3xl">
+              Brzo zakazivanje
+            </h3>
+            <p className="text-sm text-muted-foreground md:text-base">
+              Popunite formu i javićemo vam se u roku od 30 minuta
+            </p>
+          </div>
+        )}
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <Controller
@@ -166,7 +200,7 @@ export default function BookingForm() {
                 step={1}
                 isInvalid={fieldState.invalid}
                 errorMessage={fieldState.error?.message}
-                disabled={isPending}
+                disabled={!!patientId}
                 placeholder="Vaše ime i prezime"
               />
             )}

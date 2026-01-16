@@ -227,6 +227,89 @@ export const createAppointment = mutation({
   },
 });
 
+/**
+ * Kreira novi termin za postojećeg pacijenta (admin funkcija)
+ */
+export const createAppointmentForPatient = mutation({
+  args: {
+    patientId: v.id('patients'),
+    date: v.number(), // Unix timestamp
+    time: v.string(),
+    symptoms: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Calculate start and end time
+    const startTime = parseLocalTime(args.date, args.time);
+    const endTime = startTime + DEFAULT_SLOT_DURATION * 60 * 1000;
+
+    // Check if slot is still available
+    const existingAppointment = await ctx.db
+      .query('appointments')
+      .withIndex('by_startTime')
+      .filter((q) =>
+        q.and(
+          q.gte(q.field('startTime'), startTime),
+          q.lt(q.field('startTime'), endTime),
+          q.or(
+            q.eq(q.field('status'), 'CONFIRMED'),
+            q.eq(q.field('status'), 'PENDING')
+          )
+        )
+      )
+      .first();
+
+    if (existingAppointment) {
+      throw new Error('Ovaj termin je već zauzet');
+    }
+
+    // Get patient info
+    const patient = await ctx.db.get(args.patientId);
+    if (!patient) {
+      throw new Error('Pacijent ne postoji');
+    }
+
+    // Create appointment
+    const appointmentId = await ctx.db.insert('appointments', {
+      patientId: patient._id,
+      startTime,
+      endTime,
+      phone: patient.phone,
+      symptoms: args.symptoms,
+      status: 'CONFIRMED', // Admin direktno potvrđuje termine
+      isExternal: false, // Internal booking by admin
+      reminderSent: false,
+    });
+
+    return await ctx.db.get(appointmentId);
+  },
+});
+
+export const deleteAppointment = mutation({
+  args: {
+    appointmentId: v.id('appointments'),
+  },
+  handler: async (ctx, args) => {
+    const appointment = await ctx.db.get(args.appointmentId);
+    if (!appointment) {
+      throw new Error('Termin ne postoji');
+    }
+
+    const medicalRecords = await ctx.db
+      .query('medicalRecords')
+      .withIndex('by_appointmentId', (q) =>
+        q.eq('appointmentId', args.appointmentId)
+      )
+      .collect();
+
+    for (const record of medicalRecords) {
+      await ctx.db.delete(record._id);
+    }
+    await ctx.db.delete(args.appointmentId);
+
+    return { success: true };
+  },
+});
+
 // ============================================
 // ADMIN QUERIES
 // ============================================
