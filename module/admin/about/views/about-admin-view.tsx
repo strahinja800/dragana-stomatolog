@@ -11,11 +11,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { api } from '@/convex/_generated/api';
 import { AboutValueForm } from '@/module/admin/about/components/about-value-form';
-import { AboutValuesTable } from '@/module/admin/about/components/about-values-table';
 import { MilestoneForm } from '@/module/admin/about/components/milestone-form';
-import { MilestonesTable } from '@/module/admin/about/components/milestones-table';
+import { MilestonesTable } from '@/module/admin/about/components/milestones-table/milestones-table';
+import type { Milestone } from '@/module/admin/about/components/milestones-table/milestones-table-columns';
 import { TeamMemberForm } from '@/module/admin/about/components/team-member-form';
-import { TeamMembersTable } from '@/module/admin/about/components/team-members-table';
+import { TeamTable } from '@/module/admin/about/components/team-table/team-table';
+import type { TeamMember } from '@/module/admin/about/components/team-table/team-table-columns';
+import { ValuesTable } from '@/module/admin/about/components/values-table/values-table';
+import type { Value } from '@/module/admin/about/components/values-table/values-table-columns';
 
 interface AboutAdminViewProps {
   preloadedValues: Preloaded<typeof api.aboutValues.getAllAboutValues>;
@@ -31,9 +34,17 @@ export function AboutAdminView({
   const values = usePreloadedQuery(preloadedValues);
   const milestones = usePreloadedQuery(preloadedMilestones);
   const teamMembers = usePreloadedQuery(preloadedTeamMembers);
+
   const [isValueFormOpen, setIsValueFormOpen] = useState(false);
+  const [editingValue, setEditingValue] = useState<Value | null>(null);
+
   const [isMilestoneFormOpen, setIsMilestoneFormOpen] = useState(false);
+  const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(
+    null
+  );
+
   const [isTeamMemberFormOpen, setIsTeamMemberFormOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
 
   return (
     <div className="space-y-6">
@@ -70,7 +81,7 @@ export function AboutAdminView({
               <CardTitle>Sve vrednosti</CardTitle>
             </CardHeader>
             <CardContent>
-              <AboutValuesTable values={values} />
+              <ValuesTable data={values} onEditValue={setEditingValue} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -85,16 +96,19 @@ export function AboutAdminView({
             </div>
             <Button onClick={() => setIsMilestoneFormOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Dodaj milestone
+              Dodaj postignuće
             </Button>
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Svi milestones</CardTitle>
+              <CardTitle>Sva postignuća</CardTitle>
             </CardHeader>
             <CardContent>
-              <MilestonesTable milestones={milestones} />
+              <MilestonesTable
+                data={milestones}
+                onEditMilestone={setEditingMilestone}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -118,25 +132,37 @@ export function AboutAdminView({
               <CardTitle>Svi članovi tima</CardTitle>
             </CardHeader>
             <CardContent>
-              <TeamMembersTable members={teamMembers} />
+              <TeamTable data={teamMembers} onEditMember={setEditingMember} />
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
       <AboutValueForm
-        open={isValueFormOpen}
-        onClose={() => setIsValueFormOpen(false)}
+        open={isValueFormOpen || !!editingValue}
+        onClose={() => {
+          setIsValueFormOpen(false);
+          setEditingValue(null);
+        }}
+        value={editingValue ?? undefined}
       />
 
       <MilestoneForm
-        open={isMilestoneFormOpen}
-        onClose={() => setIsMilestoneFormOpen(false)}
+        open={isMilestoneFormOpen || !!editingMilestone}
+        onClose={() => {
+          setIsMilestoneFormOpen(false);
+          setEditingMilestone(null);
+        }}
+        milestone={editingMilestone ?? undefined}
       />
 
       <TeamMemberForm
-        open={isTeamMemberFormOpen}
-        onClose={() => setIsTeamMemberFormOpen(false)}
+        open={isTeamMemberFormOpen || !!editingMember}
+        onClose={() => {
+          setIsTeamMemberFormOpen(false);
+          setEditingMember(null);
+        }}
+        member={editingMember ?? undefined}
       />
     </div>
   );
