@@ -130,7 +130,7 @@ export function MilestonesTable({
                   colSpan={columns.length}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  Nema postignuća koji odgovaraju pretrazi.
+                  Nema postignuća koja odgovaraju pretrazi.
                 </TableCell>
               </TableRow>
             )}

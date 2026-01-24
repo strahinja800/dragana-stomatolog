@@ -35,10 +35,10 @@ export function MilestonesTableRowActions({
   const { mutate: updateMilestone } = useMutation({
     mutationFn: updateMilestoneFn,
     onSuccess: () => {
-      toast.success('Milestone uspešno ažuriran');
+      toast.success('Postignuće uspešno ažurirano');
     },
     onError: (error) => {
-      toast.error('Greška pri ažuriranju milestone-a');
+      toast.error('Greška pri ažuriranju postignuća');
       console.error(error);
     },
   });
@@ -47,11 +47,11 @@ export function MilestonesTableRowActions({
   const { mutate: deleteMilestone } = useMutation({
     mutationFn: deleteMilestoneFn,
     onSuccess: () => {
-      toast.success('Milestone uspešno obrisan');
+      toast.success('Postignuće uspešno obrisano');
       setShowDeleteDialog(false);
     },
     onError: (error) => {
-      toast.error('Greška pri brisanju milestone-a');
+      toast.error('Greška pri brisanju postignuća');
       console.error(error);
     },
   });
@@ -107,7 +107,7 @@ export function MilestonesTableRowActions({
         onOpenChange={setShowDeleteDialog}
         onConfirm={handleDelete}
         title="Da li ste sigurni?"
-        description="Ova akcija ne može biti poništena. Milestone će biti trajno obrisan."
+        description="Ova akcija ne može biti poništena. Postignuće će biti trajno obrisano."
         confirmText="Obriši"
         cancelText="Otkaži"
         variant="destructive"
