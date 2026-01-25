@@ -1,3 +1,5 @@
+import type { inferRouterOutputs } from '@trpc/server';
+
 import { aboutRouter } from '@/module/about/server/about-router';
 import { appointmentRouter } from '@/module/appointment/server/appointment-router';
 import { attachmentRouter } from '@/module/attachment/server/attachment-router';
@@ -16,5 +18,6 @@ export const appRouter = createTRPCRouter({
   about: aboutRouter,
   upload: uploadRouter,
 });
-// export type definition of API
+
 export type AppRouter = typeof appRouter;
+export type RouterOutputs = inferRouterOutputs<AppRouter>;

@@ -9,11 +9,13 @@ A dental clinic website ("DentalCare") built with Next.js 16, React 19, and Tail
 ## Commands
 
 ```bash
-npm run dev      # Start development server (http://localhost:3000)
-npm run convex   # Start Convex dev server (run in separate terminal)
-npm run build    # Build for production
-npm run lint     # Run ESLint
-tsc --noEmit     # Type-check without emitting files
+npm run dev            # Start development server (http://localhost:3000)
+npm run build          # Build for production
+npm run lint           # Run ESLint
+tsc --noEmit           # Type-check without emitting files
+npx prisma generate    # Generate Prisma client
+npx prisma db push     # Push schema changes to database
+npx prisma studio      # Open Prisma Studio (database GUI)
 ```
 
 ## Stack
@@ -23,9 +25,15 @@ tsc --noEmit     # Type-check without emitting files
 - TypeScript 5
 - Tailwind CSS 4 with `@tailwindcss/postcss`
 - shadcn/ui (radix-vega style, RSC-compatible)
-- Convex (serverless backend with real-time sync)
-- Better Auth (authentication with Convex adapter)
+- tRPC 11.8.1 (type-safe API layer)
+- Prisma 7.3.0 (ORM)
+- PostgreSQL (database via @prisma/adapter-pg)
+- Better Auth (authentication with Prisma adapter)
+- TanStack Query v5 (data fetching and caching)
+- SuperJSON (serialization for tRPC)
+- MinIO (S3-compatible file storage)
 - react-hook-form for forms
+- Zod for validation
 - @tanstack/react-table for tables
 - date-fns for date utilities
 - lucide-react for icons
@@ -44,30 +52,37 @@ app/                    # Next.js App Router
       loading.tsx       # Loading state
       termini/page.tsx  # Appointments management
       patients/page.tsx # Patients list
-      podesavanja/page.tsx # Settings (working hours, services)
+      settings/           # Settings (route-based tabs)
+        layout.tsx        # Shared header + navigation
+        page.tsx          # Redirect to /working-hours
+        working-hours/    # Working hours settings
+        non-working-days/ # Non-working days settings
+        service-types/    # Service types settings
       blog/page.tsx     # Blog management (under construction)
-  api/auth/             # Better Auth API routes
+  api/
+    auth/[...all]/route.ts  # Better Auth API routes
+    trpc/[trpc]/route.ts    # tRPC API endpoint
   layout.tsx            # Root layout (fonts, metadata)
   globals.css           # Tailwind + shadcn theme (OKLCH colors)
 
-convex/                 # Convex backend
-  _generated/           # Auto-generated Convex types
-  betterAuth/           # Better Auth component
-    schema.ts           # Better Auth database tables
-    auth.ts             # Auth configuration for CLI
-    adapter.ts          # Database adapter API
-    convex.config.ts    # Component definition
-  lib/
-    timezone.ts         # Serbia timezone utilities (Europe/Belgrade)
-  schema.ts             # Database schema (workingHours, appointments, patients, etc.)
-  settings.ts           # Clinic settings (working hours, services, non-working days)
-  appointments.ts       # Appointment booking and management
-  patients.ts           # Patient management
-  users.ts              # User roles and management
-  auth.ts               # Auth component integration
-  http.ts               # HTTP routes for auth endpoints
-  convex.config.ts      # App configuration with Better Auth
-  auth.config.ts        # Auth providers configuration
+trpc/                   # tRPC configuration
+  init.ts               # Context, procedures (public/protected/admin)
+  server.tsx            # RSC integration (prefetch, HydrateClient)
+  client.tsx            # Client provider (TRPCReactProvider, useTRPC)
+  query-client.ts       # React Query configuration
+  root-router.ts        # Root router aggregation
+
+prisma/
+  schema.prisma         # Database schema (all models)
+
+lib/
+  prisma.ts             # Prisma client singleton
+  auth-server.ts        # Better Auth with Prisma adapter
+  auth-client.ts        # Better Auth client configuration
+  minio.ts              # S3-compatible storage client
+  timezone.ts           # Serbia timezone utilities (Europe/Belgrade)
+  utils.ts              # Utility functions (cn helper)
+  generated/prisma/     # Generated Prisma client
 
 module/                 # Feature modules (domain-driven structure)
   public/
@@ -78,19 +93,32 @@ module/                 # Feature modules (domain-driven structure)
     dashboard/          # Dashboard view and stats components
     termini/            # Appointment table, dialogs (confirm, reject, reschedule)
     patients/           # Patients view and table
-    podesavanja/        # Settings tabs (working hours, non-working days, services)
+    podesavanja/        # Settings components and skeletons
+      components/       # Tab components (working-hours/, non-working-days-tab, service-types-tab)
+      views/            # Shared views (settings-header, settings-nav)
+    about/              # About page CMS management
     types/              # Zod schemas for settings
   auth/
     components/         # Auth forms (login, register)
+  appointment/
+    server/appointment-router.ts  # Appointment tRPC router
+  patient/
+    server/patient-router.ts      # Patient tRPC router
+  settings/
+    server/settings-router.ts     # Settings tRPC router
+  about/
+    server/about-router.ts        # About CMS tRPC router
+  upload/
+    server/upload-router.ts       # File upload tRPC router
+  attachment/
+    server/attachment-router.ts   # Attachment tRPC router
+  medical-record/
+    server/medical-record-router.ts # Medical record tRPC router
 
 components/
   ui/                   # shadcn/ui components (radix-vega style)
-  providers/            # React context providers (Convex, Theme)
-
-lib/
-  utils.ts              # Utility functions (cn helper)
-  auth-client.ts        # Better Auth client configuration
-  auth-server.ts        # Better Auth server configuration
+  providers/            # React context providers (tRPC, Theme)
+  shared/               # Shared components (ConfirmDialog, etc.)
 
 constants/              # App-wide constants (navigation links)
 data/                   # Static data exports (services, team, testimonials)
@@ -113,48 +141,256 @@ hooks/                  # Custom React hooks
 4. **Error handling**: Include error handling, error boundaries, and edge cases.
 5. **Import order**: Write usage first, then import (prevents auto-removal of unused imports).
 
-## III. Backend (Convex)
+## III. Backend (tRPC + Prisma)
 
-- **Schema**: Define tables in `convex/schema.ts` using `defineTable` and validators from `convex/values`
-- **Queries**: Use `query()` for read operations (real-time by default)
-- **Mutations**: Use `mutation()` for write operations
-- **Backend-first logic**: All data transformation/normalization happens in Convex functions, not frontend
-- **HTTP routes**: Define API endpoints in `convex/http.ts` for auth and external integrations
-- **Timezone handling**: Use `convex/lib/timezone.ts` for Serbia timezone (Europe/Belgrade)
-- **Auth**: Better Auth component in `convex/betterAuth/` with admin plugin
+### Schema
 
-### Backend-first Logic Examples
+Define models in `prisma/schema.prisma`. After changes, run:
 
-Sva transformacija, normalizacija i priprema podataka mora biti u Convex funkcijama, a ne na frontendu. Frontend komponente treba da dobiju podatke "spremne za upotrebu" bez dodatne obrade.
+```bash
+npx prisma db push     # Push to database
+npx prisma generate    # Regenerate client
+```
 
-Loš primer (FE logika):
+### Router Structure
+
+Create routers in `module/{domain}/server/{domain}-router.ts`:
+
+```ts
+import { TRPCError } from '@trpc/server';
+import { z } from 'zod';
+
+import {
+  adminProcedure,
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from '@/trpc/init';
+
+export const patientRouter = createTRPCRouter({
+  // Query - read operations
+  getAll: adminProcedure
+    .input(z.object({ query: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.prisma.patient.findMany({
+        where: input.query
+          ? { firstName: { contains: input.query, mode: 'insensitive' } }
+          : {},
+      });
+    }),
+
+  // Mutation - write operations
+  create: adminProcedure
+    .input(z.object({ firstName: z.string(), lastName: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.prisma.patient.create({ data: input });
+    }),
+});
+```
+
+### Procedures
+
+Three authorization levels from `@/trpc/init`:
+
+- `publicProcedure` - No authentication required
+- `protectedProcedure` - Requires valid session (`ctx.session`)
+- `adminProcedure` - Requires admin role
+
+### Context
+
+Available in all procedures via `ctx`:
+
+- `ctx.prisma` - Prisma client for database operations
+- `ctx.session` - User session (null for public, guaranteed for protected/admin)
+- `ctx.headers` - Request headers
+
+### Error Handling
+
+Use `TRPCError` for standardized errors:
+
+```ts
+import { TRPCError } from '@trpc/server';
+
+if (!patient) {
+  throw new TRPCError({
+    code: 'NOT_FOUND',
+    message: 'Pacijent nije pronaden',
+  });
+}
+```
+
+Common codes: `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `BAD_REQUEST`, `PRECONDITION_FAILED`
+
+### Register Routers
+
+Add new routers to `trpc/root-router.ts`:
+
+```ts
+import { patientRouter } from '@/module/patient/server/patient-router';
+
+export const appRouter = createTRPCRouter({
+  patient: patientRouter,
+  // ... other routers
+});
+```
+
+Referentni primer: `module/patient/server/patient-router.ts`
+
+### Data Fetching Pattern (Prefetch + Suspense)
+
+Preporuceni pattern za data fetching koristi server-side prefetch sa Suspense i skeleton loaderima.
+
+**1. Server Component (Page) - prefetch + HydrateClient:**
 
 ```tsx
-// ❌ NE RADI OVO - logika na frontendu
-const workingHours = useQuery(api.settings.getWorkingHours);
+// app/(admin)/admin/settings/working-hours/page.tsx
+import { WorkingHoursSkeleton } from '@/module/admin/podesavanja/components/working-hours/working-hours-skeleton';
+import { WorkingHoursTab } from '@/module/admin/podesavanja/components/working-hours/working-hours-tab';
+import { HydrateClient } from '@/trpc/hydrate-client';
+import { prefetch, trpc } from '@/trpc/server';
 
-useEffect(() => {
-  const fullWeek = Array.from({ length: 7 }, (_, i) => {
-    const existing = workingHours?.find((h) => h.dayOfWeek === i);
-    return {
-      dayOfWeek: i,
-      startTime: existing?.startTime ?? '08:00',
-      isOpen: existing?.isOpen ?? true,
-    };
-  });
-  setHours(fullWeek);
-}, [workingHours]);
+export default function WorkingHoursPage() {
+  void prefetch(trpc.settings.getWorkingHours.queryOptions());
+
+  return (
+    <HydrateClient loadingFallback={<WorkingHoursSkeleton />}>
+      <WorkingHoursTab />
+    </HydrateClient>
+  );
+}
+```
+
+**2. Client Component - useSuspenseQuery:**
+
+```tsx
+// module/admin/podesavanja/components/working-hours/working-hours-tab.tsx
+'use client';
+
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
+import { toast } from 'sonner';
+
+import { useTRPC } from '@/trpc/client';
+
+export function WorkingHoursTab() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  // useSuspenseQuery - suspenduje dok se podaci ne ucitaju
+  // HydrateClient prikazuje skeleton tokom suspense-a
+  const { data: workingHours } = useSuspenseQuery(
+    trpc.settings.getWorkingHours.queryOptions()
+  );
+
+  // Mutations ostaju iste
+  const { mutate: upsertWorkingHours, isPending } = useMutation(
+    trpc.settings.upsertWorkingHours.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [['settings']] });
+        toast.success('Radno vreme sacuvano');
+      },
+      onError: (error) => {
+        toast.error('Greska pri cuvanju', {
+          description:
+            error instanceof Error ? error.message : 'Nepoznata greska',
+        });
+      },
+    })
+  );
+
+  // workingHours je uvek definisan (nije undefined) zahvaljujuci Suspense-u
+  return <div>{/* render workingHours */}</div>;
+}
+```
+
+**3. Skeleton Component:**
+
+```tsx
+// module/admin/podesavanja/components/working-hours/working-hours-skeleton.tsx
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+
+export function WorkingHoursSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Radno vreme po danima</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4 py-4">
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-9 w-[100px]" />
+            <Skeleton className="h-9 w-[100px]" />
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+Referentni primer: `app/(admin)/admin/settings/working-hours/page.tsx`
+
+### Prednosti ovog patterna
+
+- **Instant loading state**: Skeleton se prikazuje odmah dok se podaci ucitavaju
+- **No loading checks**: `useSuspenseQuery` garantuje da su podaci uvek dostupni (nije potrebno `if (isLoading)`)
+- **Server prefetch**: Podaci se prefetch-uju na serveru, hydrate-uju na klijentu
+- **Type safety**: `data` nikad nije `undefined`
+
+### Mutations
+
+Mutations ostaju iste - koriste `useMutation`:
+
+```tsx
+const { mutate, isPending } = useMutation(
+  trpc.domain.action.mutationOptions({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [['domain']] });
+      toast.success('Uspesno sacuvano');
+    },
+    onError: (error) => {
+      toast.error('Greska', {
+        description:
+          error instanceof Error ? error.message : 'Nepoznata greska',
+      });
+    },
+  })
+);
+```
+
+### Backend-first Logic
+
+Sva transformacija i normalizacija podataka mora biti u tRPC routerima, ne na frontendu.
+
+Los primer (FE logika):
+
+```tsx
+// NE RADI OVO - logika na frontendu
+const { data: workingHours } = useQuery(
+  trpc.settings.getWorkingHours.queryOptions()
+);
+
+const fullWeek = workingHours?.map((h) => ({
+  ...h,
+  dayName: DAY_NAMES[h.dayOfWeek],
+}));
 ```
 
 Dobar primer (BE logika):
 
 ```ts
-// ✅ RADI OVO - logika u Convex query-ju
-// convex/settings.ts
-export const getWorkingHours = query({
-  args: {},
-  handler: async (ctx) => {
-    const hours = await ctx.db.query('workingHours').collect();
+// RADI OVO - logika u tRPC routeru
+// module/settings/server/settings-router.ts
+export const settingsRouter = createTRPCRouter({
+  getWorkingHours: publicProcedure.query(async ({ ctx }) => {
+    const hours = await ctx.prisma.workingHour.findMany({
+      orderBy: { dayOfWeek: 'asc' },
+    });
 
     // Normalizacija na BE - vrati kompletnu nedelju
     return Array.from({ length: 7 }, (_, dayOfWeek) => {
@@ -168,168 +404,13 @@ export const getWorkingHours = query({
         }
       );
     });
-  },
+  }),
 });
 ```
-
-```tsx
-// Frontend komponenta - jednostavna, bez transformacije
-const workingHours = useQuery(api.settings.getWorkingHours);
-// `workingHours` je već spreman za renderovanje
-```
-
-### Data Fetching Examples
-
-**Queries** - za čitanje podataka (real-time by default):
-
-```tsx
-'use client';
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-
-export default function MyComponent() {
-  const data = useQuery(api.myModule.myQuery);
-
-  if (data === undefined) return <Loading />;
-  // data is ready
-}
-```
-
-**Preloaded Queries** - prefetch na serveru (preferirano kada je moguće):
-
-Server Component (Page):
-
-```tsx
-import { preloadQuery } from 'convex/nextjs';
-import { api } from '@/convex/_generated/api';
-
-export default async function Page() {
-  const preloadedData = await preloadQuery(api.myModule.myQuery);
-  return <MyView preloadedData={preloadedData} />;
-}
-```
-
-Client Component (View):
-
-```tsx
-'use client';
-import { usePreloadedQuery, type Preloaded } from 'convex/react';
-import type { api } from '@/convex/_generated/api';
-
-interface MyViewProps {
-  preloadedData: Preloaded<typeof api.myModule.myQuery>;
-}
-
-export function MyView({ preloadedData }: MyViewProps) {
-  const data = usePreloadedQuery(preloadedData);
-  // data is ready, no loading state needed
-}
-```
-
-Referentni primer: `app/(admin)/admin/o-nama/page.tsx` + `module/admin/about/views/about-admin-view.tsx`
-
-**Suspense sa useQuery komponentama**
-
-Kada komponenta koristi `useQuery` (a ne `usePreloadedQuery`), MORA biti upakovana u `<Suspense>` sa odgovarajućim fallback-om:
-
-```tsx
-// Parent komponenta
-import { Suspense } from 'react';
-
-function ParentView() {
-  return (
-    <div>
-      {/* Komponenta sa preloaded data - BEZ Suspense */}
-      <WorkingHoursTab preloadedData={preloadedWorkingHours} />
-
-      {/* Komponenta sa useQuery - SA Suspense */}
-      <Suspense fallback={<TabSkeleton />}>
-        <NonWorkingDaysTab />
-      </Suspense>
-    </div>
-  );
-}
-```
-
-**Pravila:**
-
-- `usePreloadedQuery` → Podaci su već učitani na serveru, **bez Suspense**
-- `useQuery` → Podaci se učitavaju na klijentu, **sa Suspense i fallback**
-
-Referentni primer: `module/admin/podesavanja/views/settings-view.tsx`
-
-**Mutations** - za izmenu podataka (TanStack Query integracija):
-
-Koristimo `@convex-dev/react-query` za integraciju sa TanStack Query. Ovo omogućava `onSuccess`, `onError` callback-ove i `isPending` state direktno iz hook-a.
-
-```tsx
-'use client';
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
-import { toast } from 'sonner';
-
-import { api } from '@/convex/_generated/api';
-
-export default function MyComponent() {
-  // 1. Definiši mutationFn kao posebnu konstantu
-  const updateDataFn = useConvexMutation(api.myModule.myMutation);
-
-  // 2. Koristi je u useMutation hook-u
-  const { mutate: updateData, isPending } = useMutation({
-    mutationFn: updateDataFn,
-    onSuccess: () => {
-      toast.success('Uspešno sačuvano');
-    },
-    onError: (error) => {
-      toast.error('Greška pri čuvanju', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-    },
-  });
-
-  const handleSubmit = () => {
-    updateData({ field: 'value' });
-  };
-
-  return (
-    <Button onClick={handleSubmit} disabled={isPending}>
-      {isPending ? 'Čuvanje...' : 'Sačuvaj'}
-    </Button>
-  );
-}
-```
-
-**Napomena**: `QueryClientProvider` je već konfigurisan u `components/providers/convex-provider.tsx`.
-
-Referentni primer: `module/admin/podesavanja/components/working-hours-tab.tsx`
-
-**Convex functions** (`convex/*.ts`):
-
-```ts
-import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
-
-export const myQuery = query({
-  args: { id: v.id('myTable') },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
-  },
-});
-
-export const myMutation = mutation({
-  args: { field: v.string() },
-  handler: async (ctx, args) => {
-    return await ctx.db.insert('myTable', { field: args.field });
-  },
-});
-```
-
-Referentni primer: `module/public/home/components/hero/booking-form.tsx`
 
 ### TanStack Table
 
-Za sve tabele u aplikaciji koristi TanStack Table sa sledećom strukturom:
+Za sve tabele u aplikaciji koristi TanStack Table sa sledecom strukturom:
 
 ```
 module/{area}/{domain}/components/{domain}-table/
@@ -381,31 +462,114 @@ export function DomainTable({ data }: { data: Item[] }) {
 
 Referentni primer: `module/admin/patients/components/patients-table/`
 
-## IV. Figma Integration
+### Forms (Field + react-hook-form)
+
+Za forme koristi `Field` komponentu sa `react-hook-form` i `Controller`:
+
+```tsx
+'use client';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { Button } from '@/components/ui/button';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+
+const schema = z.object({
+  name: z.string().min(2, 'Naziv mora imati najmanje 2 karaktera'),
+});
+
+export function ExampleForm() {
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: { name: '' },
+  });
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <FieldGroup>
+        <Controller
+          name="name"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Naziv</FieldLabel>
+              <Input {...field} aria-invalid={fieldState.invalid} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </FieldGroup>
+      <Button type="submit">Sacuvaj</Button>
+    </form>
+  );
+}
+```
+
+**Komponente:**
+
+- `Field` - wrapper sa `data-invalid` za error styling
+- `FieldGroup` - grupise vise polja
+- `FieldLabel` - label za polje
+- `FieldError` - prikazuje greske
+- `FieldDescription` - opis polja (opciono)
+
+## IV. File Storage (MinIO)
+
+Za upload fajlova koristi MinIO S3-kompatibilni storage:
+
+```ts
+// Upload flow:
+// 1. Get presigned URL from upload router
+const { mutate: getUploadUrl } = useMutation(
+  trpc.upload.getUploadUrl.mutationOptions()
+);
+
+// 2. Upload directly to MinIO using presigned URL
+await fetch(presignedUrl, {
+  method: 'PUT',
+  body: file,
+  headers: { 'Content-Type': file.type },
+});
+
+// 3. Save file reference in database
+```
+
+Referentni primer: `module/upload/server/upload-router.ts`
+
+## V. Figma Integration
 
 When importing assets via Figma MCP:
 
 - **Never** retain generated hash/random filenames
 - Always rename to descriptive, semantic names (e.g., `hero-bg.png` instead of `vector_12ab.svg`)
 
-## V. Communication
+## VI. Communication
 
 1. **Tone**: Natural, friendly but professional. Simple, direct language.
 2. **Language**: Serbian for UI text and user-facing content. English for code and comments.
 3. **Clarity**: Ask clarifying questions if anything is unclear before implementation.
 
-## VI. Project Conventions
+## VII. Project Conventions
 
 - Use `@/` path alias for all imports
 - Styling with `cn()` utility from `@/lib/utils`
-- Forms with `react-hook-form`
+- Forms with `Field` component + `react-hook-form` + Zod validation
 - Icons from `lucide-react`
 - Images in `assets/`, exported through `data/data.ts`
 - Navigation defined in `constants/navigations.ts`
 - Feature components go in `module/` organized by domain
-- Convex functions organized by domain in `convex/` folder
+- tRPC routers organized by domain in `module/{domain}/server/`
+- Zod schemas in `module/{domain}/types/`
 
-## VII. Admin Module
+## VIII. Admin Module
 
 - **Views**: Main page content in `module/admin/{domain}/views/`
 - **Components**: Feature components in `module/admin/{domain}/components/`
@@ -413,10 +577,11 @@ When importing assets via Figma MCP:
 - **Protection**: All admin pages use `requireAdmin()` from `@/module/auth/lib/auth-utils`
 - **Navigation**: Defined in `constants/admin-navigation.ts`
 
-Admin interfejs (`/admin`) omogućava upravljanje klinikom:
+Admin interfejs (`/admin`) omogucava upravljanje klinikom:
 
 - **Kontrolna tabla** - Dashboard sa statistikama
 - **Termini** - Pregled i upravljanje zakazanim terminima (potvrda, odbijanje, pomeranje)
 - **Pacijenti** - Lista registrovanih pacijenata
-- **Podešavanja** - Radno vreme, neradni dani, vrste usluga
-- **Blog** - Upravljanje blog sadržajem (u izradi)
+- **Podesavanja** (`/admin/settings/*`) - Radno vreme, neradni dani, vrste usluga (route-based tabs)
+- **O nama** - CMS za About stranicu (vrednosti, milestones, tim)
+- **Blog** - Upravljanje blog sadrzajem (u izradi)

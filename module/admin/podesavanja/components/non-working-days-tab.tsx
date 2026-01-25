@@ -2,7 +2,11 @@
 
 import { useState } from 'react';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import { CalendarPlus, Loader2, Trash2 } from 'lucide-react';
@@ -29,7 +33,7 @@ export function NonWorkingDaysTab() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const { data: nonWorkingDays = [] } = useQuery(
+  const { data: nonWorkingDays } = useSuspenseQuery(
     trpc.settings.getNonWorkingDays.queryOptions({
       year: new Date().getFullYear(),
     })
@@ -43,7 +47,7 @@ export function NonWorkingDaysTab() {
   const { mutate: createNonWorkingDay, isPending: isCreating } = useMutation(
     trpc.settings.createNonWorkingDay.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['settings'] });
+        queryClient.invalidateQueries({ queryKey: [['settings']] });
         toast.success('Neradni dan dodat');
         setIsDialogOpen(false);
         setSelectedDate(undefined);
@@ -61,7 +65,7 @@ export function NonWorkingDaysTab() {
   const { mutate: deleteNonWorkingDay, isPending: isDeleting } = useMutation(
     trpc.settings.deleteNonWorkingDay.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['settings'] });
+        queryClient.invalidateQueries({ queryKey: [['settings']] });
         toast.success('Neradni dan obrisan');
         setDeletingId(null);
       },

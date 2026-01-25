@@ -18,23 +18,28 @@ export const settingsRouter = createTRPCRouter({
   // ============================================
 
   /**
-   * Vraća radno vreme za sve dane u nedelji
+   * Vraća radno vreme za sve dane u nedelji, sortirano od ponedeljka
    */
   getWorkingHours: adminProcedure.query(async ({ ctx }) => {
     const workingHours = await ctx.prisma.workingHour.findMany({
-      orderBy: { dayOfWeek: 'asc' },
+      select: {
+        dayOfWeek: true,
+        startTime: true,
+        endTime: true,
+        isOpen: true,
+      },
     });
 
-    // Always return all 7 days with defaults for missing days
-    return Array.from({ length: 7 }, (_, dayOfWeek) => {
+    // Return all 7 days with defaults, ordered Monday-Sunday (1,2,3,4,5,6,0)
+    return Array.from({ length: 7 }, (_, i) => {
+      const dayOfWeek = i === 6 ? 0 : i + 1;
       const existing = workingHours.find((h) => h.dayOfWeek === dayOfWeek);
       return (
         existing ?? {
-          id: `default-${dayOfWeek}`,
           dayOfWeek,
           startTime: '08:00',
           endTime: '17:00',
-          isOpen: dayOfWeek !== 0 && dayOfWeek !== 6, // closed on weekends by default
+          isOpen: dayOfWeek !== 0 && dayOfWeek !== 6,
         }
       );
     });

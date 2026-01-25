@@ -2,7 +2,11 @@
 
 import { useState } from 'react';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 import { Clock, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -61,7 +65,7 @@ export function ServiceTypesTab() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const { data: serviceTypes = [] } = useQuery(
+  const { data: serviceTypes } = useSuspenseQuery(
     trpc.settings.getServiceTypes.queryOptions()
   );
 
@@ -79,7 +83,7 @@ export function ServiceTypesTab() {
   const { mutate: createServiceType, isPending: isCreating } = useMutation(
     trpc.settings.createServiceType.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['settings'] });
+        queryClient.invalidateQueries({ queryKey: [['settings']] });
         toast.success('Usluga kreirana');
         closeDialog();
       },
@@ -95,7 +99,7 @@ export function ServiceTypesTab() {
   const { mutate: updateServiceType, isPending: isUpdating } = useMutation(
     trpc.settings.updateServiceType.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['settings'] });
+        queryClient.invalidateQueries({ queryKey: [['settings']] });
         toast.success('Usluga ažurirana');
         if (isDialogOpen) {
           closeDialog();
@@ -113,7 +117,7 @@ export function ServiceTypesTab() {
   const { mutate: deleteServiceType, isPending: isDeleting } = useMutation(
     trpc.settings.deleteServiceType.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['settings'] });
+        queryClient.invalidateQueries({ queryKey: [['settings']] });
         toast.success('Usluga obrisana');
         setDeleteId(null);
       },
