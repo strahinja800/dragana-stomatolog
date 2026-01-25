@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { admin } from 'better-auth/plugins';
+import { nextCookies } from 'better-auth/next-js';
+import { admin } from 'better-auth/plugins/admin';
 
 import { prisma } from './prisma';
 
@@ -20,6 +21,7 @@ export const auth = betterAuth({
       defaultRole: 'patient',
       adminRoles: ['admin'],
     }),
+    nextCookies(),
   ],
   user: {
     additionalFields: {

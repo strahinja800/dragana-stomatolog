@@ -38,7 +38,6 @@ export const createCallerFactory = t.createCallerFactory;
 export const publicProcedure = t.procedure;
 
 export const protectedProcedure = publicProcedure.use(({ ctx, next }) => {
-  console.log('PROTECTED CTX', ctx);
   if (!ctx.session) {
     throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
@@ -51,7 +50,6 @@ export const protectedProcedure = publicProcedure.use(({ ctx, next }) => {
 });
 
 export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  console.log('ADMIN CTX', ctx);
   if (ctx.session.user.role !== 'admin') {
     throw new TRPCError({ code: 'FORBIDDEN' });
   }
