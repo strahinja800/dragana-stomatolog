@@ -12,8 +12,6 @@ import { UserMenuMobile } from './user-menu-mobile';
 export default function UserMenu() {
   const { data: session, isPending } = authClient.useSession();
 
-  console.log('SESSION', session);
-
   const handleSignOut = async () => {
     await authClient.signOut();
   };

@@ -1,8 +1,5 @@
-import { Suspense } from 'react';
-
 import BlogSection from '@/module/public/home/components/blog/blog-section';
-import { BookingSectionSkeleton } from '@/module/public/home/components/booking-section/booking-form-skeleton';
-import BookingSection from '@/module/public/home/components/booking-section/booking-section';
+import BookingSection from '@/module/public/home/components/booking-section/booking-section-server';
 import CtaSection from '@/module/public/home/components/cta/cta-section';
 import HeroSection from '@/module/public/home/components/hero/home-hero-server';
 import LeadDoctorSection from '@/module/public/home/components/lead-doctor/lead-doctor-section';
@@ -16,9 +13,7 @@ export default async function HomePage() {
   return (
     <>
       <HeroSection />
-      <Suspense fallback={<BookingSectionSkeleton />}>
-        <BookingSection />
-      </Suspense>
+      <BookingSection />
       <LeadDoctorSection />
       <StatisticsSection />
       <PortfolioSection />

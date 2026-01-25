@@ -4,8 +4,13 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
+import { startOfDay } from 'date-fns';
 import { ArrowRight, CheckCircle, Loader2, Phone, User } from 'lucide-react';
 import * as z from 'zod';
 
@@ -41,6 +46,7 @@ interface BookingFormProps {
   hideHeader?: boolean;
 }
 
+const today = startOfDay(new Date());
 export default function BookingForm({
   patientId,
   defaultName = '',
@@ -50,11 +56,32 @@ export default function BookingForm({
 }: BookingFormProps = {}) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date()
+    () => today
   );
 
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const {
+    data: nonWorkingDays,
+    isLoading: isLoadingNonWorkingDays,
+    isPending: isPendingNonWorkingDays,
+  } = useSuspenseQuery(trpc.appointment.getNonWorkingDays.queryOptions());
+  const {
+    data: timeSlots,
+    isLoading: isLoadingTimeSlots,
+    isPending: isPendingTimeSlots,
+  } = useSuspenseQuery(
+    trpc.appointment.getTimeSlotsForDate.queryOptions({
+      date: today,
+    })
+  );
+
+  const isPending =
+    isPendingNonWorkingDays ||
+    isPendingTimeSlots ||
+    isLoadingNonWorkingDays ||
+    isLoadingTimeSlots;
 
   // Real-time subscription for settings updates
   useSubscription(
@@ -71,19 +98,10 @@ export default function BookingForm({
     })
   );
 
-  const { data: nonWorkingDays } = useQuery(
-    trpc.appointment.getNonWorkingDays.queryOptions()
-  );
   const { closedDaysOfWeek, disabledDates } = nonWorkingDays ?? {
     closedDaysOfWeek: [],
     disabledDates: [],
   };
-
-  const { data: timeSlots, isLoading: isLoadingSlots } = useQuery(
-    trpc.appointment.getTimeSlotsForDate.queryOptions({
-      date: selectedDate ?? new Date(),
-    })
-  );
 
   const form = useForm<BookingFormInput>({
     resolver: zodResolver(bookingFormSchema) as never,
@@ -134,7 +152,7 @@ export default function BookingForm({
 
   const isCreating = isCreatingPublic || isCreatingPatient;
 
-  const isPending = form.formState.isSubmitting || isCreating;
+  const isPendingForm = form.formState.isSubmitting || isCreating;
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
@@ -284,7 +302,7 @@ export default function BookingForm({
               disabledDates={disabledDates}
               disabledDaysOfWeek={closedDaysOfWeek}
               disabled={isPending}
-              isLoadingSlots={isLoadingSlots}
+              isLoadingSlots={isLoadingTimeSlots}
             />
 
             {(form.formState.errors.date || form.formState.errors.time) && (

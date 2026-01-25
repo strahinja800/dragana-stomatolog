@@ -1,6 +1,11 @@
+import { startOfDay } from 'date-fns';
 import { CalendarCheck, Clock, MessageCircle, Stethoscope } from 'lucide-react';
 
+import { HydrateClient } from '@/trpc/hydrate-client';
+import { prefetch, trpc } from '@/trpc/server';
+
 import BookingForm from './booking-form';
+import { BookingSectionSkeleton } from './booking-form-skeleton';
 
 const features = [
   {
@@ -21,7 +26,16 @@ const features = [
   },
 ];
 
-export default function BookingSection() {
+export default async function BookingSectionServer() {
+  const today = startOfDay(new Date());
+
+  void prefetch(trpc.appointment.getNonWorkingDays.queryOptions());
+  void prefetch(
+    trpc.appointment.getTimeSlotsForDate.queryOptions({
+      date: today,
+    })
+  );
+
   return (
     <section className="relative py-16 md:py-24 overflow-hidden">
       {/* Subtle gradient background */}
@@ -64,7 +78,9 @@ export default function BookingSection() {
 
           {/* Right side - booking form */}
           <div className="lg:col-span-3">
-            <BookingForm />
+            <HydrateClient loadingFallback={<BookingSectionSkeleton />}>
+              <BookingForm />
+            </HydrateClient>
           </div>
         </div>
       </div>
