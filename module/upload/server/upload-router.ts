@@ -10,7 +10,7 @@ import {
   getDownloadUrlSchema,
   getUploadUrlSchema,
 } from '@/module/upload/types/upload-schemas';
-import { createTRPCRouter,protectedProcedure } from '@/trpc/init';
+import { createTRPCRouter, protectedProcedure } from '@/trpc/init';
 
 function getPublicFileUrl(key: string): string {
   const endpoint = process.env.MINIO_ENDPOINT || 'localhost';

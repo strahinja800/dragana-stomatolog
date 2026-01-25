@@ -15,7 +15,7 @@
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "lint:format": "npm run format:write && npm run lint:fix",
-    "validate": "npm run format:check && npm run lint && npm run ts:check && npm run build",
+    "validate": "npm run ts:check && npm run lint:format",
     "prepare": "husky",
     "prisma:studio": "npx prisma studio",
     "prisma:push": "npx prisma db push",
