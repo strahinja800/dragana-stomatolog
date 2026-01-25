@@ -103,6 +103,7 @@ Register in `trpc/root-router.ts`. **Ref:** `module/patient/server/patient-route
 ### Procedures & Context
 
 Three levels from `@/trpc/init`:
+
 - `publicProcedure` - No auth
 - `protectedProcedure` - Requires session
 - `adminProcedure` - Requires admin role
@@ -120,6 +121,7 @@ Codes: `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `BAD_REQUEST`, `PRECONDITION_FA
 ### Data Fetching (Prefetch + Suspense)
 
 **Server Component (Page):**
+
 ```tsx
 export default function Page() {
   void prefetch(trpc.domain.getAll.queryOptions());
@@ -132,6 +134,7 @@ export default function Page() {
 ```
 
 **Client Component:**
+
 ```tsx
 'use client';
 const { data } = useSuspenseQuery(trpc.domain.getAll.queryOptions());
@@ -168,6 +171,7 @@ Real-time updates via tRPC subscriptions:
 ### TanStack Table
 
 Structure for tables:
+
 ```
 module/{area}/{domain}/components/{domain}-table/
   {domain}-table.tsx              # Main component
@@ -182,6 +186,7 @@ module/{area}/{domain}/components/{domain}-table/
 ### Forms (Field + react-hook-form)
 
 Components from `@/components/ui/field`:
+
 - `Field` - Wrapper with `data-invalid` for error styling
 - `FieldGroup`, `FieldLabel`, `FieldError`, `FieldDescription`
 
