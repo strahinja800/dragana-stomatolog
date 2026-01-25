@@ -9,15 +9,19 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { type Doc, type Id } from '@/convex/_generated/dataModel';
+import type {
+  AppointmentWithRelations,
+  MedicalRecordWithRelations,
+  PatientData,
+} from '@/module/admin/patients/types/patient-types';
 
 import { AppointmentsTable } from './appointments-table';
 import { NewAppointmentDrawer } from './new-appointment-drawer';
 
 interface PatientAppointmentsProps {
-  patient: Doc<'patients'>;
-  appointments: Doc<'appointments'>[];
-  allMedicalRecords: Doc<'medicalRecords'>[];
+  patient: PatientData;
+  appointments: AppointmentWithRelations[];
+  allMedicalRecords: MedicalRecordWithRelations[];
 }
 
 export function PatientAppointments({
@@ -25,9 +29,9 @@ export function PatientAppointments({
   appointments,
   allMedicalRecords,
 }: PatientAppointmentsProps) {
-  const [expandedAppointments, setExpandedAppointments] = useState<
-    Set<Id<'appointments'>>
-  >(new Set());
+  const [expandedAppointments, setExpandedAppointments] = useState<Set<string>>(
+    new Set()
+  );
 
   const recordsByAppointment = allMedicalRecords.reduce(
     (acc, record) => {
@@ -37,10 +41,10 @@ export function PatientAppointments({
       acc[record.appointmentId].push(record);
       return acc;
     },
-    {} as Record<Id<'appointments'>, Doc<'medicalRecords'>[]>
+    {} as Record<string, MedicalRecordWithRelations[]>
   );
 
-  const toggleAppointment = (appointmentId: Id<'appointments'>) => {
+  const toggleAppointment = (appointmentId: string) => {
     setExpandedAppointments((prev) => {
       const next = new Set(prev);
       if (next.has(appointmentId)) {
@@ -63,7 +67,7 @@ export function PatientAppointments({
             </CardDescription>
           </div>
           <NewAppointmentDrawer
-            patientId={patient._id}
+            patientId={patient.id}
             patientName={`${patient.firstName} ${patient.lastName}`}
             patientPhone={patient.phone || ''}
           />

@@ -3,18 +3,15 @@
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { useConvexMutation } from '@convex-dev/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
-import { useQuery } from 'convex/react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, CheckCircle, Loader2, Phone, User } from 'lucide-react';
 import * as z from 'zod';
 
 import { AppointmentCalendar } from '@/components/ui/appointment-calendar';
 import { FloatingInput } from '@/components/ui/floating-input';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
+import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
 
 const bookingFormSchema = z.object({
@@ -36,7 +33,7 @@ type BookingFormInput = {
 };
 
 interface BookingFormProps {
-  patientId?: Id<'patients'>;
+  patientId?: string;
   defaultName?: string;
   defaultPhone?: string;
   onSuccess?: () => void;
@@ -55,17 +52,22 @@ export default function BookingForm({
     new Date()
   );
 
-  const nonWorkingDays = useQuery(api.appointments.getNonWorkingDays);
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  const { data: nonWorkingDays } = useQuery(
+    trpc.appointment.getNonWorkingDays.queryOptions()
+  );
   const { closedDaysOfWeek, disabledDates } = nonWorkingDays ?? {
     closedDaysOfWeek: [],
     disabledDates: [],
   };
 
-  const timeSlots = useQuery(api.appointments.getTimeSlotsForDate, {
-    date: selectedDate?.getTime() ?? new Date().getTime(),
-  });
-
-  console.log('timeSlots', timeSlots);
+  const { data: timeSlots, isLoading: isLoadingSlots } = useQuery(
+    trpc.appointment.getTimeSlotsForDate.queryOptions({
+      date: selectedDate ?? new Date(),
+    })
+  );
 
   const form = useForm<BookingFormInput>({
     resolver: zodResolver(bookingFormSchema) as never,
@@ -80,24 +82,41 @@ export default function BookingForm({
 
   const selectedTime = form.watch('time');
 
-  const createAppointmentFn = useConvexMutation(
-    patientId
-      ? api.appointments.createAppointmentForPatient
-      : api.appointments.createAppointment
-  );
-  const { mutate: createAppointment, isPending: isCreating } = useMutation({
-    mutationFn: createAppointmentFn,
-    onSuccess: () => {
-      if (patientId && onSuccessCallback) {
-        onSuccessCallback();
-      } else {
-        setIsSuccess(true);
-      }
-    },
-    onError: (error) => {
-      console.error('Failed to create appointment:', error);
-    },
-  });
+  // Public appointment creation (without patientId)
+  const { mutate: createPublicAppointment, isPending: isCreatingPublic } =
+    useMutation(
+      trpc.appointment.create.mutationOptions({
+        onSuccess: async () => {
+          queryClient.invalidateQueries({ queryKey: ['appointment'] });
+          setIsSuccess(true);
+          await queryClient.invalidateQueries({
+            queryKey: trpc.appointment.getTimeSlotsForDate.queryKey(),
+          });
+        },
+        onError: (error) => {
+          console.error('Failed to create appointment:', error);
+        },
+      })
+    );
+
+  // Admin appointment creation (with patientId)
+  const { mutate: createPatientAppointment, isPending: isCreatingPatient } =
+    useMutation(
+      trpc.appointment.createForPatient.mutationOptions({
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['appointment'] });
+          queryClient.invalidateQueries({ queryKey: ['patient'] });
+          if (onSuccessCallback) {
+            onSuccessCallback();
+          }
+        },
+        onError: (error) => {
+          console.error('Failed to create appointment:', error);
+        },
+      })
+    );
+
+  const isCreating = isCreatingPublic || isCreatingPatient;
 
   const isPending = form.formState.isSubmitting || isCreating;
 
@@ -115,19 +134,19 @@ export default function BookingForm({
     if (!data.date) return;
 
     if (patientId) {
-      // Admin mode - koristi createAppointmentForPatient
-      createAppointment({
+      // Admin mode - create for existing patient
+      createPatientAppointment({
         patientId,
-        date: data.date.getTime(),
+        date: data.date,
         time: data.time,
         symptoms: data.symptoms || undefined,
       });
     } else {
-      // Public mode - koristi createAppointment
-      createAppointment({
+      // Public mode - create new booking
+      createPublicAppointment({
         name: data.name,
         phone: data.phone,
-        date: data.date.getTime(),
+        date: data.date,
         time: data.time,
         symptoms: data.symptoms || undefined,
       });
@@ -249,7 +268,7 @@ export default function BookingForm({
               disabledDates={disabledDates}
               disabledDaysOfWeek={closedDaysOfWeek}
               disabled={isPending}
-              isLoadingSlots={timeSlots === undefined}
+              isLoadingSlots={isLoadingSlots}
             />
 
             {(form.formState.errors.date || form.formState.errors.time) && (

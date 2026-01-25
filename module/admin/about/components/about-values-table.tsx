@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Edit, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -18,20 +17,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
+import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
 import { AboutValueForm } from '@/module/admin/about/components/about-value-form';
 
 interface AboutValue {
-  _id: Id<'aboutValues'>;
+  id: string;
   icon: string;
   title: string;
   description: string;
   sortOrder: number;
   isActive: boolean;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface AboutValuesTableProps {
@@ -40,34 +38,39 @@ interface AboutValuesTableProps {
 
 export function AboutValuesTable({ values }: AboutValuesTableProps) {
   const [editingValue, setEditingValue] = useState<AboutValue | null>(null);
-  const [deletingId, setDeletingId] = useState<Id<'aboutValues'> | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const updateValueFn = useConvexMutation(api.aboutValues.updateAboutValue);
-  const { mutate: updateValue } = useMutation({
-    mutationFn: updateValueFn,
-    onSuccess: () => {
-      toast.success('Vrednost uspešno ažurirana');
-    },
-    onError: (error) => {
-      toast.error('Greška pri ažuriranju vrednosti');
-      console.error(error);
-    },
-  });
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-  const deleteValueFn = useConvexMutation(api.aboutValues.deleteAboutValue);
-  const { mutate: deleteValue } = useMutation({
-    mutationFn: deleteValueFn,
-    onSuccess: () => {
-      toast.success('Vrednost uspešno obrisana');
-      setDeletingId(null);
-    },
-    onError: (error) => {
-      toast.error('Greška pri brisanju vrednosti');
-      console.error(error);
-    },
-  });
+  const { mutate: updateValue } = useMutation(
+    trpc.about.updateAboutValue.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+        toast.success('Vrednost uspešno ažurirana');
+      },
+      onError: (error) => {
+        toast.error('Greška pri ažuriranju vrednosti');
+        console.error(error);
+      },
+    })
+  );
 
-  const handleToggleActive = (id: Id<'aboutValues'>, currentState: boolean) => {
+  const { mutate: deleteValue } = useMutation(
+    trpc.about.deleteAboutValue.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+        toast.success('Vrednost uspešno obrisana');
+        setDeletingId(null);
+      },
+      onError: (error) => {
+        toast.error('Greška pri brisanju vrednosti');
+        console.error(error);
+      },
+    })
+  );
+
+  const handleToggleActive = (id: string, currentState: boolean) => {
     updateValue({ id, isActive: !currentState });
   };
 
@@ -102,7 +105,7 @@ export function AboutValuesTable({ values }: AboutValuesTableProps) {
           ) : (
             values.map((value) => (
               <TableRow
-                key={value._id}
+                key={value.id}
                 className={cn(!value.isActive && 'opacity-50')}
               >
                 <TableCell className="font-medium">{value.sortOrder}</TableCell>
@@ -126,7 +129,7 @@ export function AboutValuesTable({ values }: AboutValuesTableProps) {
                       size="icon"
                       variant="ghost"
                       onClick={() =>
-                        handleToggleActive(value._id, value.isActive)
+                        handleToggleActive(value.id, value.isActive)
                       }
                       title={value.isActive ? 'Deaktiviraj' : 'Aktiviraj'}
                     >
@@ -146,7 +149,7 @@ export function AboutValuesTable({ values }: AboutValuesTableProps) {
                     <Button
                       size="icon"
                       variant="ghost"
-                      onClick={() => setDeletingId(value._id)}
+                      onClick={() => setDeletingId(value.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

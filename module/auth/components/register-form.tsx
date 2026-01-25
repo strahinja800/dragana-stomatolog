@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { useConvexMutation } from '@convex-dev/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -28,8 +27,8 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { api } from '@/convex/_generated/api';
 import { authClient } from '@/lib/auth-client';
+import { useTRPC } from '@/lib/trpc';
 import { parseAuthError } from '@/module/auth/lib/auth-error-handler';
 import {
   type RegisterFormSchemaInputs,
@@ -56,10 +55,10 @@ export function RegisterForm() {
 
   const isPending = form.formState.isSubmitting;
 
-  const createPatientFn = useConvexMutation(api.patients.createPatient);
-  const { mutateAsync: createPatient } = useMutation({
-    mutationFn: createPatientFn,
-  });
+  const trpc = useTRPC();
+  const { mutateAsync: createPatient } = useMutation(
+    trpc.patient.createForSelf.mutationOptions()
+  );
 
   const onSubmit = async (data: RegisterFormSchemaInputs) => {
     setServerError(null);
@@ -81,7 +80,7 @@ export function RegisterForm() {
               firstName: data.firstName,
               lastName: data.lastName,
               email: data.email,
-              authId: response.data.user.id,
+              userId: response.data.user.id,
             });
             router.push('/');
           } catch (error) {

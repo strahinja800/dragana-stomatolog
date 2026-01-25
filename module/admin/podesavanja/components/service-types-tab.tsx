@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
-import { type Preloaded, usePreloadedQuery } from 'convex/react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Clock, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -41,12 +39,11 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { api, type api as ApiType } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
+import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
 
 interface ServiceTypeForm {
-  id?: Id<'serviceTypes'>;
+  id?: string;
   name: string;
   durationMinutes: number;
   description: string;
@@ -60,15 +57,16 @@ const defaultForm: ServiceTypeForm = {
   isActive: true,
 };
 
-interface ServiceTypesTabProps {
-  preloadedData: Preloaded<typeof ApiType.settings.getServiceTypes>;
-}
+export function ServiceTypesTab() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-export function ServiceTypesTab({ preloadedData }: ServiceTypesTabProps) {
-  const serviceTypes = usePreloadedQuery(preloadedData);
+  const { data: serviceTypes = [] } = useQuery(
+    trpc.settings.getServiceTypes.queryOptions()
+  );
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<Id<'serviceTypes'> | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState<ServiceTypeForm>(defaultForm);
 
   const isEditing = !!form.id;
@@ -78,52 +76,55 @@ export function ServiceTypesTab({ preloadedData }: ServiceTypesTabProps) {
     setForm(defaultForm);
   };
 
-  const createServiceTypeFn = useConvexMutation(api.settings.createServiceType);
-  const { mutate: createServiceType, isPending: isCreating } = useMutation({
-    mutationFn: createServiceTypeFn,
-    onSuccess: () => {
-      toast.success('Usluga kreirana');
-      closeDialog();
-    },
-    onError: (error) => {
-      toast.error('Greška', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-    },
-  });
-
-  const updateServiceTypeFn = useConvexMutation(api.settings.updateServiceType);
-  const { mutate: updateServiceType, isPending: isUpdating } = useMutation({
-    mutationFn: updateServiceTypeFn,
-    onSuccess: () => {
-      toast.success('Usluga ažurirana');
-      if (isDialogOpen) {
+  const { mutate: createServiceType, isPending: isCreating } = useMutation(
+    trpc.settings.createServiceType.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['settings'] });
+        toast.success('Usluga kreirana');
         closeDialog();
-      }
-    },
-    onError: (error) => {
-      toast.error('Greška', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-    },
-  });
+      },
+      onError: (error) => {
+        toast.error('Greška', {
+          description:
+            error instanceof Error ? error.message : 'Nepoznata greška',
+        });
+      },
+    })
+  );
 
-  const deleteServiceTypeFn = useConvexMutation(api.settings.deleteServiceType);
-  const { mutate: deleteServiceType, isPending: isDeleting } = useMutation({
-    mutationFn: deleteServiceTypeFn,
-    onSuccess: () => {
-      toast.success('Usluga obrisana');
-      setDeleteId(null);
-    },
-    onError: (error) => {
-      toast.error('Greška', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-    },
-  });
+  const { mutate: updateServiceType, isPending: isUpdating } = useMutation(
+    trpc.settings.updateServiceType.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['settings'] });
+        toast.success('Usluga ažurirana');
+        if (isDialogOpen) {
+          closeDialog();
+        }
+      },
+      onError: (error) => {
+        toast.error('Greška', {
+          description:
+            error instanceof Error ? error.message : 'Nepoznata greška',
+        });
+      },
+    })
+  );
+
+  const { mutate: deleteServiceType, isPending: isDeleting } = useMutation(
+    trpc.settings.deleteServiceType.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['settings'] });
+        toast.success('Usluga obrisana');
+        setDeleteId(null);
+      },
+      onError: (error) => {
+        toast.error('Greška', {
+          description:
+            error instanceof Error ? error.message : 'Nepoznata greška',
+        });
+      },
+    })
+  );
 
   const openCreate = () => {
     setForm(defaultForm);
@@ -132,7 +133,7 @@ export function ServiceTypesTab({ preloadedData }: ServiceTypesTabProps) {
 
   const openEdit = (service: NonNullable<typeof serviceTypes>[number]) => {
     setForm({
-      id: service._id,
+      id: service.id,
       name: service.name,
       durationMinutes: service.durationMinutes,
       description: service.description ?? '',
@@ -167,12 +168,12 @@ export function ServiceTypesTab({ preloadedData }: ServiceTypesTabProps) {
 
   const toggleActive = (service: NonNullable<typeof serviceTypes>[number]) => {
     updateServiceType({
-      id: service._id,
+      id: service.id,
       isActive: !service.isActive,
     });
   };
 
-  const handleDelete = (id: Id<'serviceTypes'>) => {
+  const handleDelete = (id: string) => {
     deleteServiceType({ id });
   };
 
@@ -220,7 +221,7 @@ export function ServiceTypesTab({ preloadedData }: ServiceTypesTabProps) {
               <TableBody>
                 {serviceTypes.map((service) => (
                   <TableRow
-                    key={service._id}
+                    key={service.id}
                     className={cn(!service.isActive && 'opacity-60')}
                   >
                     <TableCell className="font-medium">
@@ -262,7 +263,7 @@ export function ServiceTypesTab({ preloadedData }: ServiceTypesTabProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => setDeleteId(service._id)}
+                          onClick={() => setDeleteId(service.id)}
                           className="size-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                         >
                           <Trash2 className="size-4" />

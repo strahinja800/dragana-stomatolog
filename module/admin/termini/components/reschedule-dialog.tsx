@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import { CalendarDays, Clock, Loader2, RefreshCw } from 'lucide-react';
@@ -26,14 +25,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
+import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
 
 interface RescheduleDialogProps {
   appointment: {
-    _id: Id<'appointments'>;
-    startTime: number;
+    id: string;
+    startTime: Date;
     patient: {
       firstName: string;
       lastName: string;
@@ -50,36 +48,38 @@ export function RescheduleDialog({
   const [newTime, setNewTime] = useState('');
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
   const handleClose = () => {
     setNewDate(undefined);
     setNewTime('');
     onClose();
   };
 
-  const rescheduleAppointmentFn = useConvexMutation(
-    api.appointments.rescheduleAppointment
+  const { mutate: rescheduleAppointment, isPending } = useMutation(
+    trpc.appointment.reschedule.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['appointment'] });
+        toast.success('Termin promenjen', {
+          description: 'Pacijent će biti obavešten o novom vremenu',
+        });
+        handleClose();
+      },
+      onError: (error) => {
+        toast.error('Greška pri promeni termina', {
+          description:
+            error instanceof Error ? error.message : 'Nepoznata greška',
+        });
+      },
+    })
   );
-  const { mutate: rescheduleAppointment, isPending } = useMutation({
-    mutationFn: rescheduleAppointmentFn,
-    onSuccess: () => {
-      toast.success('Termin promenjen', {
-        description: 'Pacijent će biti obavešten o novom vremenu',
-      });
-      handleClose();
-    },
-    onError: (error) => {
-      toast.error('Greška pri promeni termina', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-    },
-  });
 
   const handleReschedule = () => {
     if (!appointment || !newDate || !newTime) return;
     rescheduleAppointment({
-      id: appointment._id,
-      newDate: newDate.getTime(),
+      id: appointment.id,
+      newDate,
       newTime,
     });
   };

@@ -7,11 +7,10 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { type Id } from '@/convex/_generated/dataModel';
 import BookingForm from '@/module/public/home/components/booking-section/booking-form';
 
 interface NewAppointmentDrawerProps {
-  patientId: Id<'patients'>;
+  patientId: string;
   patientName: string;
   patientPhone: string;
 }

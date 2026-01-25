@@ -2,8 +2,7 @@
 
 import { Fragment, useState } from 'react';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -17,16 +16,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { api } from '@/convex/_generated/api';
-import { type Doc, type Id } from '@/convex/_generated/dataModel';
+import { useTRPC } from '@/lib/trpc';
+import type {
+  AppointmentWithRelations,
+  MedicalRecordWithRelations,
+} from '@/module/admin/patients/types/patient-types';
 
 import { MedicalRecordsList } from './medical-records-list';
 
 interface AppointmentsTableProps {
-  appointments: Doc<'appointments'>[];
-  recordsByAppointment: Record<Id<'appointments'>, Doc<'medicalRecords'>[]>;
-  expandedAppointments: Set<Id<'appointments'>>;
-  onToggleAppointment: (appointmentId: Id<'appointments'>) => void;
+  appointments: AppointmentWithRelations[];
+  recordsByAppointment: Record<string, MedicalRecordWithRelations[]>;
+  expandedAppointments: Set<string>;
+  onToggleAppointment: (appointmentId: string) => void;
 }
 
 export function AppointmentsTable({
@@ -36,30 +38,32 @@ export function AppointmentsTable({
   onToggleAppointment,
 }: AppointmentsTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [appointmentToDelete, setAppointmentToDelete] =
-    useState<Id<'appointments'> | null>(null);
-
-  const deleteAppointmentFn = useConvexMutation(
-    api.appointments.deleteAppointment
+  const [appointmentToDelete, setAppointmentToDelete] = useState<string | null>(
+    null
   );
-  const { mutate: deleteAppointment, isPending: isDeleting } = useMutation({
-    mutationFn: deleteAppointmentFn,
-    onSuccess: () => {
-      toast.success('Termin je uspešno obrisan');
-      setDeleteDialogOpen(false);
-      setAppointmentToDelete(null);
-    },
-    onError: (error) => {
-      const message =
-        error instanceof Error ? error.message : 'Greška pri brisanju termina';
-      toast.error(message);
-    },
-  });
 
-  const handleDeleteClick = (
-    appointmentId: Id<'appointments'>,
-    e: React.MouseEvent
-  ) => {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  const { mutate: deleteAppointment, isPending: isDeleting } = useMutation(
+    trpc.appointment.delete.mutationOptions({
+      onSuccess: () => {
+        toast.success('Termin je uspešno obrisan');
+        setDeleteDialogOpen(false);
+        setAppointmentToDelete(null);
+        queryClient.invalidateQueries({ queryKey: ['patient'] });
+      },
+      onError: (error) => {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Greška pri brisanju termina';
+        toast.error(message);
+      },
+    })
+  );
+
+  const handleDeleteClick = (appointmentId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setAppointmentToDelete(appointmentId);
     setDeleteDialogOpen(true);
@@ -67,7 +71,7 @@ export function AppointmentsTable({
 
   const handleConfirmDelete = () => {
     if (appointmentToDelete) {
-      deleteAppointment({ appointmentId: appointmentToDelete });
+      deleteAppointment({ id: appointmentToDelete });
     }
   };
 
@@ -87,14 +91,14 @@ export function AppointmentsTable({
         <TableBody>
           {appointments.map((appointment) => {
             const startDate = new Date(appointment.startTime);
-            const records = recordsByAppointment[appointment._id] || [];
-            const isExpanded = expandedAppointments.has(appointment._id);
+            const records = recordsByAppointment[appointment.id] || [];
+            const isExpanded = expandedAppointments.has(appointment.id);
 
             return (
-              <Fragment key={appointment._id}>
+              <Fragment key={appointment.id}>
                 <TableRow
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => onToggleAppointment(appointment._id)}
+                  onClick={() => onToggleAppointment(appointment.id)}
                 >
                   <TableCell>
                     {records.length > 0 &&
@@ -119,7 +123,7 @@ export function AppointmentsTable({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={(e) => handleDeleteClick(appointment._id, e)}
+                      onClick={(e) => handleDeleteClick(appointment.id, e)}
                       disabled={isDeleting}
                       className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                     >
@@ -133,7 +137,8 @@ export function AppointmentsTable({
                   <TableRow>
                     <TableCell colSpan={6} className="bg-muted/30 p-0">
                       <MedicalRecordsList
-                        appointmentId={appointment._id}
+                        appointmentId={appointment.id}
+                        patientId={appointment.patientId}
                         records={records}
                       />
                     </TableCell>

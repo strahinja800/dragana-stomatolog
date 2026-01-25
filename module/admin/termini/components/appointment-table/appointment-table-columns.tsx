@@ -7,7 +7,6 @@ import { CalendarClock, Clock, Phone, User } from 'lucide-react';
 
 import { SortableHeader } from '@/components/shared/table/sortable-header';
 import { Badge } from '@/components/ui/badge';
-import { type Id } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
 
 import { AppointmentTableRowActions } from './appointment-table-row-actions';
@@ -51,21 +50,21 @@ export const STATUS_CONFIG: Record<
 };
 
 export type Appointment = {
-  _id: Id<'appointments'>;
-  startTime: number;
-  endTime: number;
+  id: string;
+  startTime: Date;
+  endTime: Date;
   phone?: string | null;
   symptoms?: string | null;
   status: AppointmentStatus;
   rejectionReason?: string | null;
   patient: {
-    _id: Id<'patients'>;
+    id: string;
     firstName: string;
     lastName: string;
     phone?: string | null;
   } | null;
   serviceType: {
-    _id: Id<'serviceTypes'>;
+    id: string;
     name: string;
     durationMinutes: number;
   } | null;

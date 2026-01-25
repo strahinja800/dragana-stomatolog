@@ -5,11 +5,11 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { SortableHeader } from '@/components/shared/table/sortable-header';
 import { TableCellText } from '@/components/shared/table/table-cell-text';
 import { Badge } from '@/components/ui/badge';
-import { type Doc } from '@/convex/_generated/dataModel';
+import type { PatientData } from '@/module/admin/patients/types/patient-types';
 
 import { PatientsTableRowActions } from './patients-table-row-actions';
 
-export type Patient = Doc<'patients'>;
+export type Patient = PatientData;
 
 export const columns: ColumnDef<Patient>[] = [
   {

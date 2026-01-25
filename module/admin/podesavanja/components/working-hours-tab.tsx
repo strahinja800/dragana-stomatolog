@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
-import { type Preloaded, usePreloadedQuery } from 'convex/react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -12,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { api } from '@/convex/_generated/api';
+import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
 
 const DAY_NAMES = [
@@ -42,33 +40,33 @@ interface WorkingHour {
   isOpen: boolean;
 }
 
-interface WorkingHoursTabProps {
-  preloadedData: Preloaded<typeof api.settings.getWorkingHours>;
-}
+export function WorkingHoursTab() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-export function WorkingHoursTab({ preloadedData }: WorkingHoursTabProps) {
-  const workingHours = usePreloadedQuery(preloadedData);
+  const { data: workingHours } = useQuery(
+    trpc.settings.getWorkingHours.queryOptions()
+  );
 
   const [hours, setHours] = useState<WorkingHour[] | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
 
-  const upsertWorkingHoursFn = useConvexMutation(
-    api.settings.upsertWorkingHours
+  const { mutate: upsertWorkingHours, isPending } = useMutation(
+    trpc.settings.upsertWorkingHours.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['settings'] });
+        toast.success('Radno vreme sačuvano');
+        setHasChanges(false);
+        setHours(null);
+      },
+      onError: (error) => {
+        toast.error('Greška pri čuvanju', {
+          description:
+            error instanceof Error ? error.message : 'Nepoznata greška',
+        });
+      },
+    })
   );
-  const { mutate: upsertWorkingHours, isPending } = useMutation({
-    mutationFn: upsertWorkingHoursFn,
-    onSuccess: () => {
-      toast.success('Radno vreme sačuvano');
-      setHasChanges(false);
-      setHours(null);
-    },
-    onError: (error) => {
-      toast.error('Greška pri čuvanju', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-    },
-  });
 
   // Initialize state from server data when it loads
   const displayHours =
@@ -110,7 +108,8 @@ export function WorkingHoursTab({ preloadedData }: WorkingHoursTabProps) {
   };
 
   // Reorder to start from Monday (1) instead of Sunday (0)
-  const orderedHours = [...displayHours.slice(1), displayHours[0]];
+  const orderedHours =
+    displayHours.length > 0 ? [...displayHours.slice(1), displayHours[0]] : [];
 
   return (
     <Card className="overflow-hidden border-border/50 shadow-sm">

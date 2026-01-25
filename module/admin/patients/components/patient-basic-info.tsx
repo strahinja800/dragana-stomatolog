@@ -5,10 +5,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { type Doc } from '@/convex/_generated/dataModel';
+import type { PatientData } from '@/module/admin/patients/types/patient-types';
 
 interface PatientBasicInfoProps {
-  patient: Doc<'patients'>;
+  patient: PatientData;
 }
 
 export function PatientBasicInfo({ patient }: PatientBasicInfoProps) {
