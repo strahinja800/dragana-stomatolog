@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { LogOut, Stethoscope } from 'lucide-react';
+import { ExternalLink, LogOut, Stethoscope } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -87,7 +87,17 @@ export function AdminSidebarMobile({
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-border/50 p-4">
+        <div className="border-t border-border/50 p-4 space-y-1">
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground"
+            asChild
+          >
+            <Link href="/" onClick={onClose}>
+              <ExternalLink className="size-5" />
+              {ADMIN_ACTIONS.backToSite}
+            </Link>
+          </Button>
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive"
