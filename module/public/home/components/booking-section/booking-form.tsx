@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSubscription } from '@trpc/tanstack-react-query';
 import { ArrowRight, CheckCircle, Loader2, Phone, User } from 'lucide-react';
 import * as z from 'zod';
 
@@ -54,6 +55,21 @@ export default function BookingForm({
 
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  // Real-time subscription for settings updates
+  useSubscription(
+    trpc.subscriptions.onSettingsUpdate.subscriptionOptions(undefined, {
+      onData: (event) => {
+        console.log('[BookingForm] Settings update received:', event);
+        queryClient.invalidateQueries({
+          queryKey: trpc.appointment.getNonWorkingDays.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.appointment.getTimeSlotsForDate.queryKey(),
+        });
+      },
+    })
+  );
 
   const { data: nonWorkingDays } = useQuery(
     trpc.appointment.getNonWorkingDays.queryOptions()

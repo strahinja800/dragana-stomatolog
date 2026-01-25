@@ -1,6 +1,7 @@
 import { endOfYear, startOfYear } from 'date-fns';
 import { z } from 'zod';
 
+import { emitSettingsUpdate, SETTINGS_EVENT_TYPES } from '@/lib/events';
 import {
   createNonWorkingDaySchema,
   createServiceTypeSchema,
@@ -65,6 +66,8 @@ export const settingsRouter = createTRPCRouter({
         )
       );
 
+      emitSettingsUpdate(SETTINGS_EVENT_TYPES.WORKING_HOURS_UPDATED);
+
       return results;
     }),
 
@@ -108,6 +111,8 @@ export const settingsRouter = createTRPCRouter({
         },
       });
 
+      emitSettingsUpdate(SETTINGS_EVENT_TYPES.NON_WORKING_DAY_CREATED);
+
       return nonWorkingDay;
     }),
 
@@ -120,6 +125,8 @@ export const settingsRouter = createTRPCRouter({
       await ctx.prisma.nonWorkingDay.delete({
         where: { id: input.id },
       });
+
+      emitSettingsUpdate(SETTINGS_EVENT_TYPES.NON_WORKING_DAY_DELETED);
 
       return { success: true };
     }),
