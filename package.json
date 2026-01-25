@@ -7,8 +7,9 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
+    "postinstall": "prisma generate",
     "ts:check": "tsc --noEmit",
     "lint": "eslint \"{app,module,components,lib,hooks,constants,data}/**/*.{js,jsx,ts,tsx}\" \"*.{js,jsx,ts,tsx,mjs,cjs}\"",
     "lint:fix": "eslint \"{app,module,components,lib,hooks,constants,data}/**/*.{js,jsx,ts,tsx}\" \"*.{js,jsx,ts,tsx,mjs,cjs}\" --fix",
