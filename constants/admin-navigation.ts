@@ -48,4 +48,5 @@ export const ADMIN_BRAND = {
 
 export const ADMIN_ACTIONS = {
   signOut: 'Odjavi se',
+  backToSite: 'Povratak na sajt',
 };
