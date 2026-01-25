@@ -1,0 +1,328 @@
+// Prisma Schema for Dental Clinic Application
+// Migrated from Convex to PostgreSQL (Neon)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// BETTER AUTH TABLES
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  role          UserRole  @default(patient)
+
+  banned     Boolean   @default(false)
+  banReason  String?
+  banExpires DateTime?
+
+  sessions Session[]
+  accounts Account[]
+  patient  Patient?
+  dentist  Dentist?
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id           String    @id @default(cuid())
+  accountId    String
+  providerId   String
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken  String?
+  refreshToken String?
+  idToken      String?
+  expiresAt    DateTime?
+  password     String?
+
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  patient
+  dentist
+  admin
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+// ============================================
+// CLINIC SETTINGS
+// ============================================
+
+model WorkingHour {
+  id        String  @id @default(cuid())
+  dayOfWeek Int // 0=Sunday ... 6=Saturday
+  startTime String // "08:00"
+  endTime   String // "17:00"
+  isOpen    Boolean @default(true)
+
+  @@unique([dayOfWeek])
+}
+
+model NonWorkingDay {
+  id     String   @id @default(cuid())
+  date   DateTime
+  reason String?
+
+  @@index([date])
+}
+
+model ServiceType {
+  id              String        @id @default(cuid())
+  name            String
+  durationMinutes Int
+  description     String?
+  isActive        Boolean       @default(true)
+  sortOrder       Int           @default(0)
+  appointments    Appointment[]
+
+  @@index([sortOrder])
+}
+
+// ============================================
+// USERS & STAFF
+// ============================================
+
+model Dentist {
+  id             String        @id @default(cuid())
+  userId         String?       @unique
+  user           User?         @relation(fields: [userId], references: [id])
+  firstName      String
+  lastName       String
+  email          String        @unique
+  phone          String?
+  specialization String?
+  bio            String?
+  imageUrl       String?
+  isActive       Boolean       @default(true)
+  appointments   Appointment[]
+
+  @@index([email])
+}
+
+model Patient {
+  id          String    @id @default(cuid())
+  userId      String?   @unique
+  user        User?     @relation(fields: [userId], references: [id])
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  dateOfBirth DateTime?
+  gender      Gender?
+  allergies   String?
+  medications String?
+  notes       String?
+  isMain      Boolean   @default(false)
+
+  appointments   Appointment[]
+  invoices       Invoice[]
+  medicalRecords MedicalRecord[]
+
+  @@index([phone])
+  @@index([email])
+}
+
+// ============================================
+// APPOINTMENTS
+// ============================================
+
+model Appointment {
+  id                 String            @id @default(cuid())
+  patientId          String
+  patient            Patient           @relation(fields: [patientId], references: [id])
+  dentistId          String?
+  dentist            Dentist?          @relation(fields: [dentistId], references: [id])
+  serviceTypeId      String?
+  serviceType        ServiceType?      @relation(fields: [serviceTypeId], references: [id])
+  isExternal         Boolean           @default(true)
+  serviceDescription String?
+  status             AppointmentStatus @default(PENDING)
+  startTime          DateTime
+  endTime            DateTime
+  notes              String?
+  phone              String?
+  symptoms           String?
+  rejectionReason    String?
+  reminderSent       Boolean           @default(false)
+  reminderSentAt     DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  medicalRecords MedicalRecord[]
+
+  @@index([patientId])
+  @@index([dentistId])
+  @@index([serviceTypeId])
+  @@index([status])
+  @@index([startTime])
+  @@index([status, startTime])
+}
+
+// ============================================
+// MEDICAL RECORDS
+// ============================================
+
+model MedicalRecord {
+  id            String      @id @default(cuid())
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  patientId     String
+  patient       Patient     @relation(fields: [patientId], references: [id])
+  tooth         String?
+  diagnosis     String?
+  treatment     String
+  notes         String?
+  invoiceId     String?
+  invoice       Invoice?    @relation(fields: [invoiceId], references: [id])
+  createdAt     DateTime    @default(now())
+
+  attachments Attachment[]
+
+  @@index([appointmentId])
+  @@index([patientId])
+}
+
+model Attachment {
+  id              String        @id @default(cuid())
+  medicalRecordId String
+  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
+  fileUrl         String // URL from MinIO storage
+  fileName        String
+  fileType        String
+  fileSize        Int?
+  description     String?
+  uploadedAt      DateTime      @default(now())
+
+  @@index([medicalRecordId])
+}
+
+// ============================================
+// BILLING
+// ============================================
+
+model Invoice {
+  id          String        @id @default(cuid())
+  patientId   String
+  patient     Patient       @relation(fields: [patientId], references: [id])
+  totalAmount Int // Store as smallest unit (dinari)
+  status      InvoiceStatus @default(PENDING)
+  paidAt      DateTime?
+  notes       String?
+  createdAt   DateTime      @default(now())
+
+  medicalRecords MedicalRecord[]
+
+  @@index([patientId])
+  @@index([status])
+}
+
+// ============================================
+// CMS CONTENT
+// ============================================
+
+model AboutValue {
+  id          String   @id @default(cuid())
+  icon        String
+  title       String
+  description String
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sortOrder])
+  @@index([isActive, sortOrder])
+}
+
+model Milestone {
+  id          String   @id @default(cuid())
+  year        String
+  title       String
+  description String
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sortOrder])
+  @@index([isActive, sortOrder])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  name      String
+  role      String
+  specialty String?
+  bio       String?
+  imageUrl  String?
+  imageAlt  String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
+  @@index([isActive, sortOrder])
+}

@@ -2,35 +2,33 @@
 
 import { useState } from 'react';
 
-import type { Preloaded } from 'convex/react';
-import { usePreloadedQuery } from 'convex/react';
+import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import type { api } from '@/convex/_generated/api';
 import { AboutValueForm } from '@/module/admin/about/components/about-value-form';
 import { AboutValuesTable } from '@/module/admin/about/components/about-values-table';
 import { MilestoneForm } from '@/module/admin/about/components/milestone-form';
 import { MilestonesTable } from '@/module/admin/about/components/milestones-table';
 import { TeamMemberForm } from '@/module/admin/about/components/team-member-form';
 import { TeamMembersTable } from '@/module/admin/about/components/team-members-table';
+import { useTRPC } from '@/trpc/client';
 
-interface AboutAdminViewProps {
-  preloadedValues: Preloaded<typeof api.aboutValues.getAllAboutValues>;
-  preloadedMilestones: Preloaded<typeof api.milestones.getAllMilestones>;
-  preloadedTeamMembers: Preloaded<typeof api.teamMembers.getAllTeamMembers>;
-}
+export function AboutAdminView() {
+  const trpc = useTRPC();
 
-export function AboutAdminView({
-  preloadedValues,
-  preloadedMilestones,
-  preloadedTeamMembers,
-}: AboutAdminViewProps) {
-  const values = usePreloadedQuery(preloadedValues);
-  const milestones = usePreloadedQuery(preloadedMilestones);
-  const teamMembers = usePreloadedQuery(preloadedTeamMembers);
+  const { data: values = [] } = useQuery(
+    trpc.about.getAllAboutValues.queryOptions()
+  );
+  const { data: milestones = [] } = useQuery(
+    trpc.about.getAllMilestones.queryOptions()
+  );
+  const { data: teamMembers = [] } = useQuery(
+    trpc.about.getAllTeamMembers.queryOptions()
+  );
+
   const [isValueFormOpen, setIsValueFormOpen] = useState(false);
   const [isMilestoneFormOpen, setIsMilestoneFormOpen] = useState(false);
   const [isTeamMemberFormOpen, setIsTeamMemberFormOpen] = useState(false);

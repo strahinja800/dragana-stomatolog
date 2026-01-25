@@ -2,47 +2,45 @@
 
 import { useState } from 'react';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
-import { type Preloaded, usePreloadedQuery } from 'convex/react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
-import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
 import { NewPatientDrawer } from '@/module/admin/patients/components/new-patient-drawer';
 import { PatientsTable } from '@/module/admin/patients/components/patients-table/patients-table';
+import { useTRPC } from '@/trpc/client';
 
-interface PatientsViewProps {
-  preloadedPatientsQuery: Preloaded<typeof api.patients.getAllPatients>;
-}
+export function PatientsView() {
+  const trpc = useTRPC();
+  const [patientToDelete, setPatientToDelete] = useState<string | null>(null);
 
-export function PatientsView({ preloadedPatientsQuery }: PatientsViewProps) {
-  const patients = usePreloadedQuery(preloadedPatientsQuery);
-  const [patientToDelete, setPatientToDelete] = useState<Id<'patients'> | null>(
-    null
+  const { data: patientsData, refetch } = useQuery(
+    trpc.patient.getAll.queryOptions({})
   );
 
-  const deletePatientFn = useConvexMutation(api.patients.deletePatient);
-  const { mutate: deletePatient } = useMutation({
-    mutationFn: deletePatientFn,
-    onSuccess: () => {
-      setPatientToDelete(null);
-      toast.success('Pacijent je uspešno obrisan');
-    },
-    onError: (error) => {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Greška pri brisanju pacijenta';
-      toast.error(message);
-    },
-  });
+  const deletePatientMutation = useMutation(
+    trpc.patient.delete.mutationOptions({
+      onSuccess: () => {
+        setPatientToDelete(null);
+        toast.success('Pacijent je uspešno obrisan');
+        refetch();
+      },
+      onError: (error) => {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Greška pri brisanju pacijenta';
+        toast.error(message);
+      },
+    })
+  );
 
   const confirmDelete = () => {
     if (!patientToDelete) return;
-    deletePatient({ patientId: patientToDelete });
+    deletePatientMutation.mutate({ id: patientToDelete });
   };
+
+  const patients = patientsData?.patients ?? [];
 
   return (
     <div className="space-y-8">

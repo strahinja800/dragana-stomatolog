@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -29,7 +28,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/convex/_generated/api';
+import { useTRPC } from '@/trpc/client';
 
 interface PatientFormData {
   firstName: string;
@@ -56,27 +55,31 @@ export function NewPatientDrawer() {
     formState: { errors },
   } = useForm<PatientFormData>();
 
-  const createPatientFn = useConvexMutation(api.patients.createPatient);
-  const { mutate: createPatient, isPending: isSubmitting } = useMutation({
-    mutationFn: createPatientFn,
-    onSuccess: () => {
-      reset();
-      setSelectedGender(undefined);
-      setOpen(false);
-      toast.success('Pacijent je uspešno kreiran');
-    },
-    onError: (error) => {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Greška pri kreiranju pacijenta';
-      toast.error(message);
-    },
-  });
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  const { mutate: createPatient, isPending: isSubmitting } = useMutation(
+    trpc.patient.create.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['patient'] });
+        reset();
+        setSelectedGender(undefined);
+        setOpen(false);
+        toast.success('Pacijent je uspešno kreiran');
+      },
+      onError: (error) => {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Greška pri kreiranju pacijenta';
+        toast.error(message);
+      },
+    })
+  );
 
   const onSubmit = (data: PatientFormData) => {
     const dateOfBirth = data.dateOfBirth
-      ? new Date(data.dateOfBirth).getTime()
+      ? new Date(data.dateOfBirth)
       : undefined;
 
     createPatient({
@@ -86,7 +89,6 @@ export function NewPatientDrawer() {
       phone: data.phone || undefined,
       dateOfBirth,
       gender: selectedGender,
-      isMain: true,
     });
   };
 

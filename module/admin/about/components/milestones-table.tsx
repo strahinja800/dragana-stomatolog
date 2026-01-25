@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Edit, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -18,21 +17,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
+import { useTRPC } from '@/trpc/client';
 
 import { MilestoneForm } from './milestone-form';
 
 interface Milestone {
-  _id: Id<'milestones'>;
+  id: string;
   year: string;
   title: string;
   description: string;
   sortOrder: number;
   isActive: boolean;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface MilestonesTableProps {
@@ -43,31 +41,38 @@ export function MilestonesTable({ milestones }: MilestonesTableProps) {
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(
     null
   );
-  const [deletingId, setDeletingId] = useState<Id<'milestones'> | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const updateMilestoneFn = useConvexMutation(api.milestones.updateMilestone);
-  const { mutate: updateMilestone } = useMutation({
-    mutationFn: updateMilestoneFn,
-    onError: (error) => {
-      toast.error('Greška pri ažuriranju milestone-a');
-      console.error(error);
-    },
-  });
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-  const deleteMilestoneFn = useConvexMutation(api.milestones.deleteMilestone);
-  const { mutate: deleteMilestone } = useMutation({
-    mutationFn: deleteMilestoneFn,
-    onSuccess: () => {
-      toast.success('Milestone uspešno obrisan');
-      setDeletingId(null);
-    },
-    onError: (error) => {
-      toast.error('Greška pri brisanju milestone-a');
-      console.error(error);
-    },
-  });
+  const { mutate: updateMilestone } = useMutation(
+    trpc.about.updateMilestone.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+      },
+      onError: (error) => {
+        toast.error('Greška pri ažuriranju milestone-a');
+        console.error(error);
+      },
+    })
+  );
 
-  const handleToggleActive = (id: Id<'milestones'>, currentState: boolean) => {
+  const { mutate: deleteMilestone } = useMutation(
+    trpc.about.deleteMilestone.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+        toast.success('Milestone uspešno obrisan');
+        setDeletingId(null);
+      },
+      onError: (error) => {
+        toast.error('Greška pri brisanju milestone-a');
+        console.error(error);
+      },
+    })
+  );
+
+  const handleToggleActive = (id: string, currentState: boolean) => {
     updateMilestone({ id, isActive: !currentState });
   };
 
@@ -102,7 +107,7 @@ export function MilestonesTable({ milestones }: MilestonesTableProps) {
           ) : (
             milestones.map((milestone) => (
               <TableRow
-                key={milestone._id}
+                key={milestone.id}
                 className={cn(!milestone.isActive && 'opacity-50')}
               >
                 <TableCell className="font-medium">
@@ -126,7 +131,7 @@ export function MilestonesTable({ milestones }: MilestonesTableProps) {
                       size="icon"
                       variant="ghost"
                       onClick={() =>
-                        handleToggleActive(milestone._id, milestone.isActive)
+                        handleToggleActive(milestone.id, milestone.isActive)
                       }
                       title={milestone.isActive ? 'Deaktiviraj' : 'Aktiviraj'}
                     >
@@ -146,7 +151,7 @@ export function MilestonesTable({ milestones }: MilestonesTableProps) {
                     <Button
                       size="icon"
                       variant="ghost"
-                      onClick={() => setDeletingId(milestone._id)}
+                      onClick={() => setDeletingId(milestone.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

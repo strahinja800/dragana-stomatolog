@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
-import { type Preloaded, usePreloadedQuery } from 'convex/react';
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import { CalendarPlus, Loader2, Trash2 } from 'lucide-react';
@@ -24,70 +26,68 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { api, type api as ApiType } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
+import { useTRPC } from '@/trpc/client';
 
-interface NonWorkingDaysTabProps {
-  preloadedData: Preloaded<typeof ApiType.settings.getNonWorkingDays>;
-}
+export function NonWorkingDaysTab() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-export function NonWorkingDaysTab({ preloadedData }: NonWorkingDaysTabProps) {
-  const nonWorkingDays = usePreloadedQuery(preloadedData);
+  const { data: nonWorkingDays } = useSuspenseQuery(
+    trpc.settings.getNonWorkingDays.queryOptions({
+      year: new Date().getFullYear(),
+    })
+  );
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [reason, setReason] = useState('');
-  const [deletingId, setDeletingId] = useState<Id<'nonWorkingDays'> | null>(
-    null
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const { mutate: createNonWorkingDay, isPending: isCreating } = useMutation(
+    trpc.settings.createNonWorkingDay.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [['settings']] });
+        toast.success('Neradni dan dodat');
+        setIsDialogOpen(false);
+        setSelectedDate(undefined);
+        setReason('');
+      },
+      onError: (error) => {
+        toast.error('Greška', {
+          description:
+            error instanceof Error ? error.message : 'Nepoznata greška',
+        });
+      },
+    })
   );
 
-  const createNonWorkingDayFn = useConvexMutation(
-    api.settings.createNonWorkingDay
+  const { mutate: deleteNonWorkingDay, isPending: isDeleting } = useMutation(
+    trpc.settings.deleteNonWorkingDay.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [['settings']] });
+        toast.success('Neradni dan obrisan');
+        setDeletingId(null);
+      },
+      onError: (error) => {
+        toast.error('Greška', {
+          description:
+            error instanceof Error ? error.message : 'Nepoznata greška',
+        });
+        setDeletingId(null);
+      },
+    })
   );
-  const { mutate: createNonWorkingDay, isPending: isCreating } = useMutation({
-    mutationFn: createNonWorkingDayFn,
-    onSuccess: () => {
-      toast.success('Neradni dan dodat');
-      setIsDialogOpen(false);
-      setSelectedDate(undefined);
-      setReason('');
-    },
-    onError: (error) => {
-      toast.error('Greška', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-    },
-  });
-
-  const deleteNonWorkingDayFn = useConvexMutation(
-    api.settings.deleteNonWorkingDay
-  );
-  const { mutate: deleteNonWorkingDay, isPending: isDeleting } = useMutation({
-    mutationFn: deleteNonWorkingDayFn,
-    onSuccess: () => {
-      toast.success('Neradni dan obrisan');
-      setDeletingId(null);
-    },
-    onError: (error) => {
-      toast.error('Greška', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-      setDeletingId(null);
-    },
-  });
 
   const handleCreate = () => {
     if (!selectedDate) return;
     createNonWorkingDay({
-      date: selectedDate.getTime(),
+      date: selectedDate,
       reason: reason || undefined,
     });
   };
 
-  const handleDelete = (id: Id<'nonWorkingDays'>) => {
+  const handleDelete = (id: string) => {
     setDeletingId(id);
     deleteNonWorkingDay({ id });
   };
@@ -182,7 +182,7 @@ export function NonWorkingDaysTab({ preloadedData }: NonWorkingDaysTabProps) {
           <div className="divide-y divide-border/50">
             {nonWorkingDays.map((day) => (
               <div
-                key={day._id}
+                key={day.id}
                 className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-muted/30"
               >
                 <div className="flex items-center gap-4">
@@ -213,14 +213,14 @@ export function NonWorkingDaysTab({ preloadedData }: NonWorkingDaysTabProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => handleDelete(day._id)}
-                  disabled={deletingId === day._id}
+                  onClick={() => handleDelete(day.id)}
+                  disabled={deletingId === day.id}
                   className={cn(
                     'text-muted-foreground hover:text-destructive',
                     'hover:bg-destructive/10'
                   )}
                 >
-                  {deletingId === day._id ? (
+                  {deletingId === day.id ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
                     <Trash2 className="size-4" />

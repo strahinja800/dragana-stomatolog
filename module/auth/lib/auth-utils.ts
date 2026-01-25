@@ -1,33 +1,39 @@
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { api } from '@/convex/_generated/api';
-import { fetchAuthQuery, isAuthenticated } from '@/lib/auth-server';
+import { auth } from '@/lib/auth-server';
 import { USER_ROLES } from '@/module/auth/types/auth-types';
 
 export const requireAuth = async (currentPath: string) => {
-  const user = await fetchAuthQuery(api.auth.getCurrentUser);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!user) {
+  if (!session) {
     redirect(`/login?redirect=${currentPath}`);
   }
 
-  return user;
+  return session.user;
 };
 
 export const requireAdmin = async (currentPath: string) => {
-  const user = await fetchAuthQuery(api.auth.getCurrentUser);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!user || user.role !== USER_ROLES.ADMIN) {
+  if (!session || session.user.role !== USER_ROLES.ADMIN) {
     redirect(`/login?redirect=${currentPath}`);
   }
 
-  return user;
+  return session.user;
 };
 
 export const requireUnAuth = async () => {
-  const authenticated = await isAuthenticated();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (authenticated) {
+  if (session) {
     redirect('/');
   }
 

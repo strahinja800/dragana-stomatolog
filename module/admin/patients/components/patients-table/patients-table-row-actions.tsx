@@ -34,7 +34,7 @@ export function PatientsTableRowActions({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Link href={`/admin/patients/${patient._id}`}>
+          <Link href={`/admin/patients/${patient.id}`}>
             <Eye className="mr-2 h-4 w-4" />
             Pogledaj
           </Link>
@@ -42,7 +42,7 @@ export function PatientsTableRowActions({
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="text-destructive"
-          onClick={() => onDelete?.(patient._id)}
+          onClick={() => onDelete?.(patient.id)}
         >
           <Trash2 className="mr-2 h-4 w-4" />
           Obriši

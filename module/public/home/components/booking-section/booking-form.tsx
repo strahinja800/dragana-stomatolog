@@ -3,18 +3,17 @@
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { useConvexMutation } from '@convex-dev/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
-import { useQuery } from 'convex/react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSubscription } from '@trpc/tanstack-react-query';
 import { ArrowRight, CheckCircle, Loader2, Phone, User } from 'lucide-react';
 import * as z from 'zod';
 
 import { AppointmentCalendar } from '@/components/ui/appointment-calendar';
 import { FloatingInput } from '@/components/ui/floating-input';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/convex/_generated/api';
 import { cn } from '@/lib/utils';
+import { useTRPC } from '@/trpc/client';
 
 const bookingFormSchema = z.object({
   name: z.string().min(1, 'Ime je obavezno'),
@@ -34,29 +33,63 @@ type BookingFormInput = {
   symptoms: string;
 };
 
-export default function BookingForm() {
+interface BookingFormProps {
+  patientId?: string;
+  defaultName?: string;
+  defaultPhone?: string;
+  onSuccess?: () => void;
+  hideHeader?: boolean;
+}
+
+export default function BookingForm({
+  patientId,
+  defaultName = '',
+  defaultPhone = '',
+  onSuccess: onSuccessCallback,
+  hideHeader = false,
+}: BookingFormProps = {}) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     new Date()
   );
 
-  const nonWorkingDays = useQuery(api.appointments.getNonWorkingDays);
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  // Real-time subscription for settings updates
+  useSubscription(
+    trpc.subscriptions.onSettingsUpdate.subscriptionOptions(undefined, {
+      onData: (event) => {
+        console.log('[BookingForm] Settings update received:', event);
+        queryClient.invalidateQueries({
+          queryKey: trpc.appointment.getNonWorkingDays.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.appointment.getTimeSlotsForDate.queryKey(),
+        });
+      },
+    })
+  );
+
+  const { data: nonWorkingDays } = useQuery(
+    trpc.appointment.getNonWorkingDays.queryOptions()
+  );
   const { closedDaysOfWeek, disabledDates } = nonWorkingDays ?? {
     closedDaysOfWeek: [],
     disabledDates: [],
   };
 
-  const timeSlots = useQuery(api.appointments.getTimeSlotsForDate, {
-    date: selectedDate?.getTime() ?? new Date().getTime(),
-  });
-
-  console.log('timeSlots', timeSlots);
+  const { data: timeSlots, isLoading: isLoadingSlots } = useQuery(
+    trpc.appointment.getTimeSlotsForDate.queryOptions({
+      date: selectedDate ?? new Date(),
+    })
+  );
 
   const form = useForm<BookingFormInput>({
     resolver: zodResolver(bookingFormSchema) as never,
     defaultValues: {
-      name: '',
-      phone: '',
+      name: defaultName,
+      phone: defaultPhone,
       date: undefined,
       time: '',
       symptoms: '',
@@ -65,18 +98,41 @@ export default function BookingForm() {
 
   const selectedTime = form.watch('time');
 
-  const createAppointmentFn = useConvexMutation(
-    api.appointments.createAppointment
-  );
-  const { mutate: createAppointment, isPending: isCreating } = useMutation({
-    mutationFn: createAppointmentFn,
-    onSuccess: () => {
-      setIsSuccess(true);
-    },
-    onError: (error) => {
-      console.error('Failed to create appointment:', error);
-    },
-  });
+  // Public appointment creation (without patientId)
+  const { mutate: createPublicAppointment, isPending: isCreatingPublic } =
+    useMutation(
+      trpc.appointment.create.mutationOptions({
+        onSuccess: async () => {
+          queryClient.invalidateQueries({ queryKey: ['appointment'] });
+          setIsSuccess(true);
+          await queryClient.invalidateQueries({
+            queryKey: trpc.appointment.getTimeSlotsForDate.queryKey(),
+          });
+        },
+        onError: (error) => {
+          console.error('Failed to create appointment:', error);
+        },
+      })
+    );
+
+  // Admin appointment creation (with patientId)
+  const { mutate: createPatientAppointment, isPending: isCreatingPatient } =
+    useMutation(
+      trpc.appointment.createForPatient.mutationOptions({
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['appointment'] });
+          queryClient.invalidateQueries({ queryKey: ['patient'] });
+          if (onSuccessCallback) {
+            onSuccessCallback();
+          }
+        },
+        onError: (error) => {
+          console.error('Failed to create appointment:', error);
+        },
+      })
+    );
+
+  const isCreating = isCreatingPublic || isCreatingPatient;
 
   const isPending = form.formState.isSubmitting || isCreating;
 
@@ -93,13 +149,24 @@ export default function BookingForm() {
   const onSubmit = (data: BookingFormInput) => {
     if (!data.date) return;
 
-    createAppointment({
-      name: data.name,
-      phone: data.phone,
-      date: data.date.getTime(),
-      time: data.time,
-      symptoms: data.symptoms || undefined,
-    });
+    if (patientId) {
+      // Admin mode - create for existing patient
+      createPatientAppointment({
+        patientId,
+        date: data.date,
+        time: data.time,
+        symptoms: data.symptoms || undefined,
+      });
+    } else {
+      // Public mode - create new booking
+      createPublicAppointment({
+        name: data.name,
+        phone: data.phone,
+        date: data.date,
+        time: data.time,
+        symptoms: data.symptoms || undefined,
+      });
+    }
   };
 
   // Show success state after form submission
@@ -141,14 +208,16 @@ export default function BookingForm() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-primary/[0.04]" />
 
       <div className="relative z-10">
-        <div className="animate-fade-up mb-6 text-center">
-          <h3 className="mb-2 font-heading text-2xl font-bold text-foreground md:text-3xl">
-            Brzo zakazivanje
-          </h3>
-          <p className="text-sm text-muted-foreground md:text-base">
-            Popunite formu i javićemo vam se u roku od 30 minuta
-          </p>
-        </div>
+        {!hideHeader && (
+          <div className="animate-fade-up mb-6 text-center">
+            <h3 className="mb-2 font-heading text-2xl font-bold text-foreground md:text-3xl">
+              Brzo zakazivanje
+            </h3>
+            <p className="text-sm text-muted-foreground md:text-base">
+              Popunite formu i javićemo vam se u roku od 30 minuta
+            </p>
+          </div>
+        )}
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <Controller
@@ -166,7 +235,7 @@ export default function BookingForm() {
                 step={1}
                 isInvalid={fieldState.invalid}
                 errorMessage={fieldState.error?.message}
-                disabled={isPending}
+                disabled={!!patientId}
                 placeholder="Vaše ime i prezime"
               />
             )}
@@ -215,7 +284,7 @@ export default function BookingForm() {
               disabledDates={disabledDates}
               disabledDaysOfWeek={closedDaysOfWeek}
               disabled={isPending}
-              isLoadingSlots={timeSlots === undefined}
+              isLoadingSlots={isLoadingSlots}
             />
 
             {(form.formState.errors.date || form.formState.errors.time) && (

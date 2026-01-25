@@ -3,10 +3,10 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { type Doc } from '@/convex/_generated/dataModel';
+import type { PatientData } from '@/module/admin/patients/types/patient-types';
 
 interface PatientDetailsHeaderProps {
-  patient: Doc<'patients'>;
+  patient: PatientData;
 }
 
 export function PatientDetailsHeader({ patient }: PatientDetailsHeaderProps) {

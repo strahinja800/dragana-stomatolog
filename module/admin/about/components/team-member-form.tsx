@@ -4,9 +4,7 @@ import { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
-import { useQuery } from 'convex/react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ImageIcon, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -21,17 +19,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
+import { useTRPC } from '@/trpc/client';
 
 interface TeamMember {
-  _id: Id<'teamMembers'>;
+  id: string;
   name: string;
   role: string;
-  specialty?: string;
-  bio?: string;
-  imageStorageId?: Id<'_storage'>;
-  imageAlt?: string;
+  specialty?: string | null;
+  bio?: string | null;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
   sortOrder: number;
   isActive: boolean;
 }
@@ -53,16 +50,14 @@ interface FormData {
 }
 
 export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
-  const [uploadedImageId, setUploadedImageId] = useState<Id<'_storage'> | null>(
-    member?.imageStorageId || null
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(
+    member?.imageUrl || null
   );
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const imageUrl = useQuery(
-    api.files.getFileUrl,
-    uploadedImageId ? { storageId: uploadedImageId } : 'skip'
-  );
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
   const form = useForm<FormData>({
     defaultValues: {
@@ -86,52 +81,53 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
 
   const handleReset = () => {
     reset();
-    setUploadedImageId(null);
+    setUploadedImageUrl(null);
     onClose();
   };
 
-  const createMemberFn = useConvexMutation(api.teamMembers.createTeamMember);
-  const { mutate: createMember, isPending: isCreating } = useMutation({
-    mutationFn: createMemberFn,
-    onSuccess: () => {
-      toast.success('Član tima uspešno kreiran');
-      handleReset();
-    },
-    onError: (error) => {
-      toast.error('Greška pri kreiranju člana tima');
-      console.error(error);
-    },
-  });
+  const { mutate: createMember, isPending: isCreating } = useMutation(
+    trpc.about.createTeamMember.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+        toast.success('Član tima uspešno kreiran');
+        handleReset();
+      },
+      onError: (error) => {
+        toast.error('Greška pri kreiranju člana tima');
+        console.error(error);
+      },
+    })
+  );
 
-  const updateMemberFn = useConvexMutation(api.teamMembers.updateTeamMember);
-  const { mutate: updateMember, isPending: isUpdating } = useMutation({
-    mutationFn: updateMemberFn,
-    onSuccess: () => {
-      toast.success('Član tima uspešno ažuriran');
-      handleReset();
-    },
-    onError: (error) => {
-      toast.error('Greška pri ažuriranju člana tima');
-      console.error(error);
-    },
-  });
+  const { mutate: updateMember, isPending: isUpdating } = useMutation(
+    trpc.about.updateTeamMember.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+        toast.success('Član tima uspešno ažuriran');
+        handleReset();
+      },
+      onError: (error) => {
+        toast.error('Greška pri ažuriranju člana tima');
+        console.error(error);
+      },
+    })
+  );
 
-  const generateUploadUrlFn = useConvexMutation(api.files.generateUploadUrl);
-  const { mutateAsync: generateUploadUrl } = useMutation({
-    mutationFn: generateUploadUrlFn,
-  });
+  const { mutateAsync: getUploadUrl } = useMutation(
+    trpc.about.getTeamMemberImageUploadUrl.mutationOptions()
+  );
 
   const isSubmitting = isCreating || isUpdating;
 
   const onSubmit = (data: FormData) => {
     if (member) {
       updateMember({
-        id: member._id,
+        id: member.id,
         name: data.name,
         role: data.role,
         specialty: data.specialty || undefined,
         bio: data.bio || undefined,
-        imageStorageId: uploadedImageId || undefined,
+        imageUrl: uploadedImageUrl || undefined,
         imageAlt: data.imageAlt || undefined,
         sortOrder: data.sortOrder,
         isActive: data.isActive,
@@ -142,7 +138,7 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
         role: data.role,
         specialty: data.specialty || undefined,
         bio: data.bio || undefined,
-        imageStorageId: uploadedImageId || undefined,
+        imageUrl: uploadedImageUrl || undefined,
         imageAlt: data.imageAlt || undefined,
         sortOrder: data.sortOrder,
         isActive: data.isActive,
@@ -162,19 +158,20 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
     try {
       setIsUploading(true);
 
-      const uploadUrl = await generateUploadUrl({});
+      const { uploadUrl, publicUrl } = await getUploadUrl({
+        fileName: file.name,
+        fileType: file.type,
+      });
 
       const res = await fetch(uploadUrl, {
-        method: 'POST',
+        method: 'PUT',
         headers: { 'Content-Type': file.type },
         body: file,
       });
 
       if (!res.ok) throw new Error('Upload nije uspeo');
 
-      const { storageId } = (await res.json()) as { storageId: Id<'_storage'> };
-
-      setUploadedImageId(storageId);
+      setUploadedImageUrl(publicUrl);
       toast.success('Slika uspešno uploadovana');
     } catch (error) {
       toast.error('Greška pri uploadu slike');
@@ -186,7 +183,7 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
   };
 
   const handleRemoveImage = () => {
-    setUploadedImageId(null);
+    setUploadedImageUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -264,11 +261,11 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
                 className="hidden"
               />
 
-              {imageUrl ? (
+              {uploadedImageUrl ? (
                 <div className="space-y-2">
                   <div className="relative w-full h-48 rounded-lg overflow-hidden border border-border">
                     <Image
-                      src={imageUrl}
+                      src={uploadedImageUrl}
                       alt="Preview"
                       fill
                       className="object-cover"

@@ -35,7 +35,7 @@ export const ADMIN_NAV_ITEMS = [
   },
   {
     label: 'Podešavanja',
-    href: '/admin/podesavanja',
+    href: '/admin/settings',
     icon: Settings,
   },
 ];

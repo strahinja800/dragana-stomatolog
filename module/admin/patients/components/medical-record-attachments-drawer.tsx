@@ -2,9 +2,7 @@
 
 import { useRef, useState } from 'react';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
-import { useQuery } from 'convex/react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Paperclip, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -19,13 +17,12 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
-import { api } from '@/convex/_generated/api';
-import { type Doc, type Id } from '@/convex/_generated/dataModel';
+import { useTRPC } from '@/trpc/client';
 
 import { AttachmentRow } from './attachment-row';
 
 interface Props {
-  medicalRecordId: Id<'medicalRecords'>;
+  medicalRecordId: string;
   triggerLabel?: string;
 }
 
@@ -36,38 +33,44 @@ export function MedicalRecordAttachmentsDrawer({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const attachments = useQuery(api.attachments.listByMedicalRecord, {
-    medicalRecordId,
-  });
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-  const generateUploadUrlFn = useConvexMutation(api.files.generateUploadUrl);
-  const { mutateAsync: generateUploadUrl } = useMutation({
-    mutationFn: generateUploadUrlFn,
-  });
-
-  const createAttachmentFn = useConvexMutation(
-    api.attachments.createAttachment
+  const { data: attachments, isLoading } = useQuery(
+    trpc.attachment.listByMedicalRecord.queryOptions({ medicalRecordId })
   );
-  const { mutateAsync: createAttachment } = useMutation({
-    mutationFn: createAttachmentFn,
-  });
 
-  const deleteAttachmentFn = useConvexMutation(
-    api.attachments.deleteAttachment
+  const { mutateAsync: getUploadUrl } = useMutation(
+    trpc.upload.getUploadUrl.mutationOptions()
   );
-  const { mutate: deleteAttachment } = useMutation({
-    mutationFn: deleteAttachmentFn,
-    onSuccess: () => {
-      toast.success('Fajl je obrisan');
-    },
-    onError: (error) => {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Greška prilikom brisanja fajla';
-      toast.error(message);
-    },
-  });
+
+  const { mutateAsync: createAttachment } = useMutation(
+    trpc.attachment.create.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [['attachment', 'listByMedicalRecord']],
+        });
+      },
+    })
+  );
+
+  const { mutate: deleteAttachment } = useMutation(
+    trpc.attachment.delete.mutationOptions({
+      onSuccess: () => {
+        toast.success('Fajl je obrisan');
+        queryClient.invalidateQueries({
+          queryKey: [['attachment', 'listByMedicalRecord']],
+        });
+      },
+      onError: (error) => {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Greška prilikom brisanja fajla';
+        toast.error(message);
+      },
+    })
+  );
 
   const onPickFile = () => inputRef.current?.click();
 
@@ -75,21 +78,23 @@ export function MedicalRecordAttachmentsDrawer({
     try {
       setIsUploading(true);
 
-      const uploadUrl = await generateUploadUrl({});
+      const { uploadUrl, fileUrl } = await getUploadUrl({
+        fileName: file.name,
+        fileType: file.type || 'application/octet-stream',
+        folder: 'attachments',
+      });
 
       const res = await fetch(uploadUrl, {
-        method: 'POST',
+        method: 'PUT',
         headers: { 'Content-Type': file.type || 'application/octet-stream' },
         body: file,
       });
 
       if (!res.ok) throw new Error('Upload nije uspeo');
 
-      const { storageId } = (await res.json()) as { storageId: Id<'_storage'> };
-
       await createAttachment({
         medicalRecordId,
-        storageId,
+        fileUrl,
         fileName: file.name,
         fileType: file.type || 'application/octet-stream',
         fileSize: file.size,
@@ -112,8 +117,8 @@ export function MedicalRecordAttachmentsDrawer({
     await onUpload(file);
   };
 
-  const onRemove = (attachmentId: Id<'attachments'>) => {
-    deleteAttachment({ attachmentId });
+  const onRemove = (attachmentId: string) => {
+    deleteAttachment({ id: attachmentId });
   };
 
   return (
@@ -159,18 +164,18 @@ export function MedicalRecordAttachmentsDrawer({
             </div>
 
             <div className="mt-4 space-y-2">
-              {attachments === undefined ? (
+              {isLoading ? (
                 <p className="text-sm text-muted-foreground">Učitavanje...</p>
-              ) : attachments.length === 0 ? (
+              ) : !attachments || attachments.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
                   Još uvek nema fajlova za ovaj record.
                 </p>
               ) : (
-                attachments.map((att: Doc<'attachments'>) => (
+                attachments.map((att) => (
                   <AttachmentRow
-                    key={att._id}
+                    key={att.id}
                     attachment={att}
-                    onDelete={() => onRemove(att._id)}
+                    onDelete={() => onRemove(att.id)}
                   />
                 ))
               )}

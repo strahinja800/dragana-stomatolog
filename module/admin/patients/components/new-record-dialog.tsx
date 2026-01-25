@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -20,8 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
+import { useTRPC } from '@/trpc/client';
 
 interface MedicalRecordFormData {
   tooth?: string;
@@ -31,10 +29,14 @@ interface MedicalRecordFormData {
 }
 
 interface NewRecordDialogProps {
-  appointmentId: Id<'appointments'>;
+  appointmentId: string;
+  patientId: string;
 }
 
-export function NewRecordDialog({ appointmentId }: NewRecordDialogProps) {
+export function NewRecordDialog({
+  appointmentId,
+  patientId,
+}: NewRecordDialogProps) {
   const [open, setOpen] = useState(false);
   const {
     register,
@@ -43,28 +45,31 @@ export function NewRecordDialog({ appointmentId }: NewRecordDialogProps) {
     formState: { errors },
   } = useForm<MedicalRecordFormData>();
 
-  const createRecordFn = useConvexMutation(
-    api.medicalRecords.createMedicalRecord
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  const { mutate: createRecord, isPending } = useMutation(
+    trpc.medicalRecord.create.mutationOptions({
+      onSuccess: () => {
+        reset();
+        setOpen(false);
+        toast.success('Medical record je uspešno sačuvan');
+        queryClient.invalidateQueries({ queryKey: ['patient'] });
+      },
+      onError: (error) => {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Greška pri čuvanju medical recorda';
+        toast.error(message);
+      },
+    })
   );
-  const { mutate: createRecord, isPending } = useMutation({
-    mutationFn: createRecordFn,
-    onSuccess: () => {
-      reset();
-      setOpen(false);
-      toast.success('Medical record je uspešno sačuvan');
-    },
-    onError: (error) => {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Greška pri čuvanju medical recorda';
-      toast.error(message);
-    },
-  });
 
   const onSubmit = (data: MedicalRecordFormData) => {
     createRecord({
       appointmentId,
+      patientId,
       treatment: data.treatment,
       tooth: data.tooth || undefined,
       diagnosis: data.diagnosis || undefined,

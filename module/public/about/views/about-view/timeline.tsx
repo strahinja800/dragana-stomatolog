@@ -1,8 +1,16 @@
-import type { Doc } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
 
+interface Milestone {
+  id: string;
+  year: string;
+  title: string;
+  description: string;
+  sortOrder: number;
+  isActive: boolean;
+}
+
 interface AboutTimelineProps {
-  milestones: Doc<'milestones'>[];
+  milestones: Milestone[];
 }
 
 export default function AboutTimeline({ milestones }: AboutTimelineProps) {
@@ -25,7 +33,7 @@ export default function AboutTimeline({ milestones }: AboutTimelineProps) {
 
             {milestones.map((milestone, index) => (
               <div
-                key={index}
+                key={milestone.id}
                 className={cn(
                   'relative flex items-start gap-8 mb-12',
                   index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'

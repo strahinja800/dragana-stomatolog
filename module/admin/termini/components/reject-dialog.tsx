@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 import { AlertTriangle, Loader2, X } from 'lucide-react';
@@ -20,13 +19,12 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
+import { useTRPC } from '@/trpc/client';
 
 interface RejectDialogProps {
   appointment: {
-    _id: Id<'appointments'>;
-    startTime: number;
+    id: string;
+    startTime: Date;
     patient: {
       firstName: string;
       lastName: string;
@@ -38,34 +36,36 @@ interface RejectDialogProps {
 export function RejectDialog({ appointment, onClose }: RejectDialogProps) {
   const [reason, setReason] = useState('');
 
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
   const handleClose = () => {
     setReason('');
     onClose();
   };
 
-  const rejectAppointmentFn = useConvexMutation(
-    api.appointments.rejectAppointment
+  const { mutate: rejectAppointment, isPending } = useMutation(
+    trpc.appointment.reject.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['appointment'] });
+        toast.success('Termin odbijen', {
+          description: 'Pacijent će biti obavešten o odbijanju termina',
+        });
+        handleClose();
+      },
+      onError: (error) => {
+        toast.error('Greška pri odbijanju', {
+          description:
+            error instanceof Error ? error.message : 'Nepoznata greška',
+        });
+      },
+    })
   );
-  const { mutate: rejectAppointment, isPending } = useMutation({
-    mutationFn: rejectAppointmentFn,
-    onSuccess: () => {
-      toast.success('Termin odbijen', {
-        description: 'Pacijent će biti obavešten o odbijanju termina',
-      });
-      handleClose();
-    },
-    onError: (error) => {
-      toast.error('Greška pri odbijanju', {
-        description:
-          error instanceof Error ? error.message : 'Nepoznata greška',
-      });
-    },
-  });
 
   const handleReject = () => {
     if (!appointment || !reason.trim()) return;
     rejectAppointment({
-      id: appointment._id,
+      id: appointment.id,
       reason: reason.trim(),
     });
   };

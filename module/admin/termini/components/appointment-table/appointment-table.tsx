@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { type Preloaded, useQuery } from 'convex/react';
+import { useQuery } from '@tanstack/react-query';
 import {
   type ColumnFiltersState,
   flexRender,
@@ -24,12 +24,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { api, type api as ApiType } from '@/convex/_generated/api';
 import { cn } from '@/lib/utils';
+import { ConfirmDialog } from '@/module/admin/termini/components/confirm-dialog';
+import { RejectDialog } from '@/module/admin/termini/components/reject-dialog';
+import { RescheduleDialog } from '@/module/admin/termini/components/reschedule-dialog';
+import { useTRPC } from '@/trpc/client';
 
-import { ConfirmDialog } from '../confirm-dialog';
-import { RejectDialog } from '../reject-dialog';
-import { RescheduleDialog } from '../reschedule-dialog';
 import {
   type Appointment,
   type AppointmentStatus,
@@ -41,13 +41,9 @@ import { AppointmentTableToolbar } from './appointment-table-toolbar';
 
 interface AppointmentTableProps {
   statusFilter?: AppointmentStatus;
-  preloadedServiceTypes: Preloaded<typeof ApiType.settings.getServiceTypes>;
 }
 
-export function AppointmentTable({
-  statusFilter,
-  preloadedServiceTypes,
-}: AppointmentTableProps) {
+export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
   const [confirmAppointment, setConfirmAppointment] =
     useState<Appointment | null>(null);
   const [rejectAppointment, setRejectAppointment] =
@@ -60,9 +56,11 @@ export function AppointmentTable({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState('');
 
-  const data = useQuery(api.appointments.getAllAppointments, {
-    status: statusFilter,
-  });
+  const trpc = useTRPC();
+
+  const { data, isLoading } = useQuery(
+    trpc.appointment.getAll.queryOptions({ status: statusFilter })
+  );
 
   const appointments = (data?.appointments ?? []) as Appointment[];
 
@@ -103,7 +101,7 @@ export function AppointmentTable({
     } satisfies AppointmentTableMeta,
   });
 
-  if (data === undefined) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="size-6 animate-spin text-muted-foreground" />
@@ -216,7 +214,6 @@ export function AppointmentTable({
       <ConfirmDialog
         appointment={confirmAppointment}
         onClose={() => setConfirmAppointment(null)}
-        preloadedServiceTypes={preloadedServiceTypes}
       />
       <RejectDialog
         appointment={rejectAppointment}

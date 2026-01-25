@@ -1,8 +1,16 @@
-import type { Doc } from '@/convex/_generated/dataModel';
 import { getIcon } from '@/module/public/about/lib/icon-map';
 
+interface AboutValue {
+  id: string;
+  icon: string;
+  title: string;
+  description: string;
+  sortOrder: number;
+  isActive: boolean;
+}
+
 interface AboutValuesProps {
-  values: Doc<'aboutValues'>[];
+  values: AboutValue[];
 }
 
 export default function AboutValues({ values }: AboutValuesProps) {
@@ -23,7 +31,7 @@ export default function AboutValues({ values }: AboutValuesProps) {
             const IconComponent = getIcon(value.icon);
             return (
               <div
-                key={value._id}
+                key={value.id}
                 className="p-6 rounded-2xl bg-card border border-border shadow-card text-center"
               >
                 <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center mx-auto mb-5">

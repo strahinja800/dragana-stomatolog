@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 
-import { type Preloaded, usePreloadedQuery } from 'convex/react';
-import { ArrowLeft } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -12,33 +12,32 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { type api } from '@/convex/_generated/api';
 import { PatientAppointments } from '@/module/admin/patients/components/patient-appointments';
 import { PatientBasicInfo } from '@/module/admin/patients/components/patient-basic-info';
 import { PatientDetailsHeader } from '@/module/admin/patients/components/patient-details-header';
 import { PatientSystemInfo } from '@/module/admin/patients/components/patient-system-info';
+import { useTRPC } from '@/trpc/client';
 
 interface PatientDetailsViewProps {
-  preloadedPatientQuery: Preloaded<
-    typeof api.patients.getPatientWithAppointments
-  >;
-  preloadedMedicalRecordsQuery: Preloaded<
-    typeof api.medicalRecords.getMedicalRecordsByPatientId
-  >;
+  patientId: string;
 }
 
-export function PatientDetailsView({
-  preloadedPatientQuery,
-  preloadedMedicalRecordsQuery,
-}: PatientDetailsViewProps) {
-  const data = usePreloadedQuery(preloadedPatientQuery);
-  const allMedicalRecords = usePreloadedQuery(preloadedMedicalRecordsQuery);
+export function PatientDetailsView({ patientId }: PatientDetailsViewProps) {
+  const trpc = useTRPC();
 
-  if (!data) return null;
+  const { data: patientData, isLoading: patientLoading } = useQuery(
+    trpc.patient.getWithAppointments.queryOptions({ id: patientId })
+  );
 
-  const { patient, appointments } = data;
+  if (patientLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
-  if (!patient) {
+  if (!patientData) {
     return (
       <div className="space-y-8">
         <div>
@@ -61,14 +60,17 @@ export function PatientDetailsView({
     );
   }
 
+  const { appointments, medicalRecords, ...patient } = patientData;
+
   return (
     <div className="space-y-8">
       <PatientDetailsHeader patient={patient} />
       <PatientBasicInfo patient={patient} />
       <PatientSystemInfo patient={patient} />
       <PatientAppointments
+        patient={patient}
         appointments={appointments}
-        allMedicalRecords={allMedicalRecords}
+        allMedicalRecords={medicalRecords}
       />
     </div>
   );

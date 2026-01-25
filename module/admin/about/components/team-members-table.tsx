@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Edit, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -18,24 +17,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
 import { cn } from '@/lib/utils';
+import { useTRPC } from '@/trpc/client';
 
 import { TeamMemberForm } from './team-member-form';
 
 interface TeamMember {
-  _id: Id<'teamMembers'>;
+  id: string;
   name: string;
   role: string;
-  specialty?: string;
-  bio?: string;
-  imageStorageId?: Id<'_storage'>;
-  imageAlt?: string;
+  specialty?: string | null;
+  bio?: string | null;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
   sortOrder: number;
   isActive: boolean;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface TeamMembersTableProps {
@@ -44,31 +42,38 @@ interface TeamMembersTableProps {
 
 export function TeamMembersTable({ members }: TeamMembersTableProps) {
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
-  const [deletingId, setDeletingId] = useState<Id<'teamMembers'> | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const updateMemberFn = useConvexMutation(api.teamMembers.updateTeamMember);
-  const { mutate: updateMember } = useMutation({
-    mutationFn: updateMemberFn,
-    onError: (error) => {
-      toast.error('Greška pri ažuriranju člana tima');
-      console.error(error);
-    },
-  });
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-  const deleteMemberFn = useConvexMutation(api.teamMembers.deleteTeamMember);
-  const { mutate: deleteMember } = useMutation({
-    mutationFn: deleteMemberFn,
-    onSuccess: () => {
-      toast.success('Član tima uspešno obrisan');
-      setDeletingId(null);
-    },
-    onError: (error) => {
-      toast.error('Greška pri brisanju člana tima');
-      console.error(error);
-    },
-  });
+  const { mutate: updateMember } = useMutation(
+    trpc.about.updateTeamMember.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+      },
+      onError: (error) => {
+        toast.error('Greška pri ažuriranju člana tima');
+        console.error(error);
+      },
+    })
+  );
 
-  const handleToggleActive = (id: Id<'teamMembers'>, currentState: boolean) => {
+  const { mutate: deleteMember } = useMutation(
+    trpc.about.deleteTeamMember.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+        toast.success('Član tima uspešno obrisan');
+        setDeletingId(null);
+      },
+      onError: (error) => {
+        toast.error('Greška pri brisanju člana tima');
+        console.error(error);
+      },
+    })
+  );
+
+  const handleToggleActive = (id: string, currentState: boolean) => {
     updateMember({ id, isActive: !currentState });
   };
 
@@ -103,7 +108,7 @@ export function TeamMembersTable({ members }: TeamMembersTableProps) {
           ) : (
             members.map((member) => (
               <TableRow
-                key={member._id}
+                key={member.id}
                 className={cn(!member.isActive && 'opacity-50')}
               >
                 <TableCell className="font-medium">
@@ -125,7 +130,7 @@ export function TeamMembersTable({ members }: TeamMembersTableProps) {
                       size="icon"
                       variant="ghost"
                       onClick={() =>
-                        handleToggleActive(member._id, member.isActive)
+                        handleToggleActive(member.id, member.isActive)
                       }
                       title={member.isActive ? 'Deaktiviraj' : 'Aktiviraj'}
                     >
@@ -145,7 +150,7 @@ export function TeamMembersTable({ members }: TeamMembersTableProps) {
                     <Button
                       size="icon"
                       variant="ghost"
-                      onClick={() => setDeletingId(member._id)}
+                      onClick={() => setDeletingId(member.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

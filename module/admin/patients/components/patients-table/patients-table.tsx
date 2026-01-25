@@ -22,7 +22,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { type Id } from '@/convex/_generated/dataModel';
 
 import { columns, type Patient } from './patients-table-columns';
 import { PatientsTablePagination } from './patients-table-pagination';
@@ -30,7 +29,7 @@ import { PatientsTableToolbar } from './patients-table-toolbar';
 
 interface PatientsTableProps {
   data: Patient[];
-  onDeletePatient: (patientId: Id<'patients'>) => void;
+  onDeletePatient: (patientId: string) => void;
 }
 
 export function PatientsTable({ data, onDeletePatient }: PatientsTableProps) {
@@ -73,7 +72,7 @@ export function PatientsTable({ data, onDeletePatient }: PatientsTableProps) {
       globalFilter,
     },
     meta: {
-      onDelete: (id: string) => onDeletePatient(id as Id<'patients'>),
+      onDelete: (id: string) => onDeletePatient(id),
     },
   });
 

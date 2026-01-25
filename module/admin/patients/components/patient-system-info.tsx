@@ -5,10 +5,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { type Doc } from '@/convex/_generated/dataModel';
+import type { PatientData } from '@/module/admin/patients/types/patient-types';
 
 interface PatientSystemInfoProps {
-  patient: Doc<'patients'>;
+  patient: PatientData;
 }
 
 export function PatientSystemInfo({ patient }: PatientSystemInfoProps) {
@@ -24,14 +24,14 @@ export function PatientSystemInfo({ patient }: PatientSystemInfoProps) {
             ID pacijenta
           </p>
           <p className="text-sm font-mono text-muted-foreground">
-            {patient._id}
+            {patient.id}
           </p>
         </div>
-        {patient.authId && (
+        {patient.userId && (
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Auth ID</p>
+            <p className="text-sm font-medium text-muted-foreground">User ID</p>
             <p className="text-sm font-mono text-muted-foreground">
-              {patient.authId}
+              {patient.userId}
             </p>
           </div>
         )}

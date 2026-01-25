@@ -1,22 +1,16 @@
 'use client';
 
-import { useQuery } from 'convex/react';
 import { File, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { api } from '@/convex/_generated/api';
-import { type Doc } from '@/convex/_generated/dataModel';
+import type { Attachment } from '@/lib/generated/prisma/client';
 
 interface AttachmentRowProps {
-  attachment: Doc<'attachments'>;
+  attachment: Attachment;
   onDelete: () => void;
 }
 
 export function AttachmentRow({ attachment, onDelete }: AttachmentRowProps) {
-  const url = useQuery(api.files.getFileUrl, {
-    storageId: attachment.storageId,
-  });
-
   return (
     <div className="flex items-center justify-between gap-3 rounded-md border bg-background p-3">
       <div className="flex min-w-0 items-center gap-3">
@@ -38,8 +32,8 @@ export function AttachmentRow({ attachment, onDelete }: AttachmentRowProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button asChild variant="outline" size="sm" disabled={!url}>
-          <a href={url ?? '#'} target="_blank" rel="noreferrer">
+        <Button asChild variant="outline" size="sm">
+          <a href={attachment.fileUrl} target="_blank" rel="noreferrer">
             Otvori
           </a>
         </Button>

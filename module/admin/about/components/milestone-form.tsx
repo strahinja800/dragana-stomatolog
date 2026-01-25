@@ -2,8 +2,7 @@
 
 import { Controller, useForm } from 'react-hook-form';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -17,11 +16,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
+import { useTRPC } from '@/trpc/client';
 
 interface Milestone {
-  _id: Id<'milestones'>;
+  id: string;
   year: string;
   title: string;
   description: string;
@@ -66,43 +64,48 @@ export function MilestoneForm({
     reset,
   } = form;
 
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
   const handleClose = () => {
     reset();
     onClose();
   };
 
-  const createMilestoneFn = useConvexMutation(api.milestones.createMilestone);
-  const { mutate: createMilestone, isPending: isCreating } = useMutation({
-    mutationFn: createMilestoneFn,
-    onSuccess: () => {
-      toast.success('Milestone uspešno kreiran');
-      handleClose();
-    },
-    onError: (error) => {
-      toast.error('Greška pri čuvanju milestone-a');
-      console.error(error);
-    },
-  });
+  const { mutate: createMilestone, isPending: isCreating } = useMutation(
+    trpc.about.createMilestone.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+        toast.success('Milestone uspešno kreiran');
+        handleClose();
+      },
+      onError: (error) => {
+        toast.error('Greška pri čuvanju milestone-a');
+        console.error(error);
+      },
+    })
+  );
 
-  const updateMilestoneFn = useConvexMutation(api.milestones.updateMilestone);
-  const { mutate: updateMilestone, isPending: isUpdating } = useMutation({
-    mutationFn: updateMilestoneFn,
-    onSuccess: () => {
-      toast.success('Milestone uspešno ažuriran');
-      handleClose();
-    },
-    onError: (error) => {
-      toast.error('Greška pri čuvanju milestone-a');
-      console.error(error);
-    },
-  });
+  const { mutate: updateMilestone, isPending: isUpdating } = useMutation(
+    trpc.about.updateMilestone.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+        toast.success('Milestone uspešno ažuriran');
+        handleClose();
+      },
+      onError: (error) => {
+        toast.error('Greška pri čuvanju milestone-a');
+        console.error(error);
+      },
+    })
+  );
 
   const isSubmitting = isCreating || isUpdating;
 
   const onSubmit = (data: FormData) => {
     if (milestone) {
       updateMilestone({
-        id: milestone._id,
+        id: milestone.id,
         year: data.year,
         title: data.title,
         description: data.description,

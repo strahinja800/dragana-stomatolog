@@ -1,14 +1,21 @@
 import Image from 'next/image';
 
-import type { FunctionReturnType } from 'convex/server';
 import { GraduationCap } from 'lucide-react';
 
-import type { api } from '@/convex/_generated/api';
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  specialty?: string | null;
+  bio?: string | null;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
+  sortOrder: number;
+  isActive: boolean;
+}
 
 interface AboutTeamProps {
-  teamMembers: FunctionReturnType<
-    typeof api.teamMembers.getActiveTeamMembersWithImages
-  >;
+  teamMembers: TeamMember[];
 }
 
 export default function AboutTeam({ teamMembers }: AboutTeamProps) {
@@ -25,15 +32,15 @@ export default function AboutTeam({ teamMembers }: AboutTeamProps) {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {teamMembers.map((member, index) => (
+          {teamMembers.map((member) => (
             <div
-              key={index}
+              key={member.id}
               className="p-8 rounded-2xl bg-card border border-border shadow-card hover:shadow-hover transition-all duration-300"
             >
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                 <Image
                   src={member.imageUrl || '/default-image.png'}
-                  alt={member.name}
+                  alt={member.imageAlt || member.name}
                   className="w-32 h-32 rounded-2xl object-cover shrink-0"
                   width={128}
                   height={128}
@@ -45,13 +52,17 @@ export default function AboutTeam({ teamMembers }: AboutTeamProps) {
                   <p className="text-[rgb(13,162,231)] font-medium text-sm mb-1">
                     {member.role}
                   </p>
-                  <p className="text-muted-foreground text-sm mb-4">
-                    <GraduationCap className="w-4 h-4 inline mr-1" />
-                    {member.specialty}
-                  </p>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {member.bio}
-                  </p>
+                  {member.specialty && (
+                    <p className="text-muted-foreground text-sm mb-4">
+                      <GraduationCap className="w-4 h-4 inline mr-1" />
+                      {member.specialty}
+                    </p>
+                  )}
+                  {member.bio && (
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      {member.bio}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

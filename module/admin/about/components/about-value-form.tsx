@@ -2,8 +2,7 @@
 
 import { Controller, useForm } from 'react-hook-form';
 
-import { useConvexMutation } from '@convex-dev/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -17,11 +16,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
+import { useTRPC } from '@/trpc/client';
 
 interface AboutValue {
-  _id: Id<'aboutValues'>;
+  id: string;
   icon: string;
   title: string;
   description: string;
@@ -62,43 +60,48 @@ export function AboutValueForm({ open, onClose, value }: AboutValueFormProps) {
     reset,
   } = form;
 
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
   const handleClose = () => {
     reset();
     onClose();
   };
 
-  const createValueFn = useConvexMutation(api.aboutValues.createAboutValue);
-  const { mutate: createValue, isPending: isCreating } = useMutation({
-    mutationFn: createValueFn,
-    onSuccess: () => {
-      toast.success('Vrednost uspešno kreirana');
-      handleClose();
-    },
-    onError: (error) => {
-      toast.error('Greška pri čuvanju vrednosti');
-      console.error(error);
-    },
-  });
+  const { mutate: createValue, isPending: isCreating } = useMutation(
+    trpc.about.createAboutValue.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+        toast.success('Vrednost uspešno kreirana');
+        handleClose();
+      },
+      onError: (error) => {
+        toast.error('Greška pri čuvanju vrednosti');
+        console.error(error);
+      },
+    })
+  );
 
-  const updateValueFn = useConvexMutation(api.aboutValues.updateAboutValue);
-  const { mutate: updateValue, isPending: isUpdating } = useMutation({
-    mutationFn: updateValueFn,
-    onSuccess: () => {
-      toast.success('Vrednost uspešno ažurirana');
-      handleClose();
-    },
-    onError: (error) => {
-      toast.error('Greška pri čuvanju vrednosti');
-      console.error(error);
-    },
-  });
+  const { mutate: updateValue, isPending: isUpdating } = useMutation(
+    trpc.about.updateAboutValue.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['about'] });
+        toast.success('Vrednost uspešno ažurirana');
+        handleClose();
+      },
+      onError: (error) => {
+        toast.error('Greška pri čuvanju vrednosti');
+        console.error(error);
+      },
+    })
+  );
 
   const isSubmitting = isCreating || isUpdating;
 
   const onSubmit = (data: FormData) => {
     if (value) {
       updateValue({
-        id: value._id,
+        id: value.id,
         icon: data.icon,
         title: data.title,
         description: data.description,

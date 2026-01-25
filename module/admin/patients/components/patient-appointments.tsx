@@ -9,24 +9,30 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { type Doc, type Id } from '@/convex/_generated/dataModel';
+import type {
+  AppointmentWithRelations,
+  MedicalRecordWithRelations,
+  PatientData,
+} from '@/module/admin/patients/types/patient-types';
 
 import { AppointmentsTable } from './appointments-table';
+import { NewAppointmentDrawer } from './new-appointment-drawer';
 
 interface PatientAppointmentsProps {
-  appointments: Doc<'appointments'>[];
-  allMedicalRecords: Doc<'medicalRecords'>[];
+  patient: PatientData;
+  appointments: AppointmentWithRelations[];
+  allMedicalRecords: MedicalRecordWithRelations[];
 }
 
 export function PatientAppointments({
+  patient,
   appointments,
   allMedicalRecords,
 }: PatientAppointmentsProps) {
-  const [expandedAppointments, setExpandedAppointments] = useState<
-    Set<Id<'appointments'>>
-  >(new Set());
+  const [expandedAppointments, setExpandedAppointments] = useState<Set<string>>(
+    new Set()
+  );
 
-  // Grupiši medical records po appointmentId
   const recordsByAppointment = allMedicalRecords.reduce(
     (acc, record) => {
       if (!acc[record.appointmentId]) {
@@ -35,10 +41,10 @@ export function PatientAppointments({
       acc[record.appointmentId].push(record);
       return acc;
     },
-    {} as Record<Id<'appointments'>, Doc<'medicalRecords'>[]>
+    {} as Record<string, MedicalRecordWithRelations[]>
   );
 
-  const toggleAppointment = (appointmentId: Id<'appointments'>) => {
+  const toggleAppointment = (appointmentId: string) => {
     setExpandedAppointments((prev) => {
       const next = new Set(prev);
       if (next.has(appointmentId)) {
@@ -53,10 +59,19 @@ export function PatientAppointments({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Termini</CardTitle>
-        <CardDescription>
-          Zakazani i prošli termini pacijenta ({appointments.length})
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Termini</CardTitle>
+            <CardDescription>
+              Zakazani i prošli termini pacijenta ({appointments.length})
+            </CardDescription>
+          </div>
+          <NewAppointmentDrawer
+            patientId={patient.id}
+            patientName={`${patient.firstName} ${patient.lastName}`}
+            patientPhone={patient.phone || ''}
+          />
+        </div>
       </CardHeader>
       <CardContent>
         {appointments.length === 0 ? (

@@ -1,31 +1,26 @@
 'use client';
 
-import type { Preloaded } from 'convex/react';
-import { usePreloadedQuery } from 'convex/react';
+import { useQuery } from '@tanstack/react-query';
 
-import type { api } from '@/convex/_generated/api';
 import AboutCta from '@/module/public/about/views/about-view/cta';
 import AboutHero from '@/module/public/about/views/about-view/hero';
 import AboutTeam from '@/module/public/about/views/about-view/team';
 import AboutTimeline from '@/module/public/about/views/about-view/timeline';
 import AboutValues from '@/module/public/about/views/about-view/values';
+import { useTRPC } from '@/trpc/client';
 
-interface AboutViewProps {
-  preloadedValues: Preloaded<typeof api.aboutValues.getActiveAboutValues>;
-  preloadedMilestones: Preloaded<typeof api.milestones.getActiveMilestones>;
-  preloadedTeamMembers: Preloaded<
-    typeof api.teamMembers.getActiveTeamMembersWithImages
-  >;
-}
+export function AboutView() {
+  const trpc = useTRPC();
 
-export function AboutView({
-  preloadedValues,
-  preloadedMilestones,
-  preloadedTeamMembers,
-}: AboutViewProps) {
-  const values = usePreloadedQuery(preloadedValues);
-  const milestones = usePreloadedQuery(preloadedMilestones);
-  const teamMembers = usePreloadedQuery(preloadedTeamMembers);
+  const { data: values = [] } = useQuery(
+    trpc.about.getActiveAboutValues.queryOptions()
+  );
+  const { data: milestones = [] } = useQuery(
+    trpc.about.getActiveMilestones.queryOptions()
+  );
+  const { data: teamMembers = [] } = useQuery(
+    trpc.about.getActiveTeamMembers.queryOptions()
+  );
 
   return (
     <>
