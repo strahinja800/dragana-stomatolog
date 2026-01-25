@@ -15,13 +15,9 @@ import {
   updateMilestoneSchema,
   updateTeamMemberSchema,
 } from '@/module/about/types/about-schemas';
-import {
-  adminProcedure,
-  publicProcedure,
-  router,
-} from '@/module/shared/server/trpc/init';
+import { adminProcedure, createTRPCRouter, publicProcedure } from '@/trpc/init';
 
-export const aboutRouter = router({
+export const aboutRouter = createTRPCRouter({
   // ============================================
   // ABOUT VALUES
   // ============================================

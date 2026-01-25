@@ -8,13 +8,13 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useTRPC } from '@/lib/trpc';
 import { AboutValueForm } from '@/module/admin/about/components/about-value-form';
 import { AboutValuesTable } from '@/module/admin/about/components/about-values-table';
 import { MilestoneForm } from '@/module/admin/about/components/milestone-form';
 import { MilestonesTable } from '@/module/admin/about/components/milestones-table';
 import { TeamMemberForm } from '@/module/admin/about/components/team-member-form';
 import { TeamMembersTable } from '@/module/admin/about/components/team-members-table';
+import { useTRPC } from '@/trpc/client';
 
 export function AboutAdminView() {
   const trpc = useTRPC();

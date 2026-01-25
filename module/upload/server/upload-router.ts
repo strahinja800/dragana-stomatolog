@@ -5,12 +5,12 @@ import {
   getPresignedDownloadUrl,
   getPresignedUploadUrl,
 } from '@/lib/minio';
-import { protectedProcedure, router } from '@/module/shared/server/trpc/init';
 import {
   deleteFileSchema,
   getDownloadUrlSchema,
   getUploadUrlSchema,
 } from '@/module/upload/types/upload-schemas';
+import { createTRPCRouter,protectedProcedure } from '@/trpc/init';
 
 function getPublicFileUrl(key: string): string {
   const endpoint = process.env.MINIO_ENDPOINT || 'localhost';
@@ -26,7 +26,7 @@ function getPublicFileUrl(key: string): string {
   return `${protocol}://${endpoint}:${port}/${BUCKET_NAME}/${key}`;
 }
 
-export const uploadRouter = router({
+export const uploadRouter = createTRPCRouter({
   /**
    * Generiše presigned URL za upload fajla
    */

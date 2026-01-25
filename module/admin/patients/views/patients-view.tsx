@@ -6,9 +6,9 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
-import { useTRPC } from '@/lib/trpc';
 import { NewPatientDrawer } from '@/module/admin/patients/components/new-patient-drawer';
 import { PatientsTable } from '@/module/admin/patients/components/patients-table/patients-table';
+import { useTRPC } from '@/trpc/client';
 
 export function PatientsView() {
   const trpc = useTRPC();

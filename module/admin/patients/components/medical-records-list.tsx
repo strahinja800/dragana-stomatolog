@@ -8,8 +8,8 @@ import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { Button } from '@/components/ui/button';
-import { useTRPC } from '@/lib/trpc';
 import type { MedicalRecordWithRelations } from '@/module/admin/patients/types/patient-types';
+import { useTRPC } from '@/trpc/client';
 
 import { MedicalRecordAttachmentsDrawer } from './medical-record-attachments-drawer';
 import { NewRecordDialog } from './new-record-dialog';

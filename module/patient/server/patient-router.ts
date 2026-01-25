@@ -9,12 +9,12 @@ import {
 } from '@/module/patient/types/patient-schemas';
 import {
   adminProcedure,
+  createTRPCRouter,
   protectedProcedure,
   publicProcedure,
-  router,
-} from '@/module/shared/server/trpc/init';
+} from '@/trpc/init';
 
-export const patientRouter = router({
+export const patientRouter = createTRPCRouter({
   // ============================================
   // ADMIN QUERIES
   // ============================================

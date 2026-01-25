@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useTRPC } from '@/lib/trpc';
+import { useTRPC } from '@/trpc/client';
 
 interface ConfirmDialogProps {
   appointment: {

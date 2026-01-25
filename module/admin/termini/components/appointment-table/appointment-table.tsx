@@ -24,11 +24,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
 import { ConfirmDialog } from '@/module/admin/termini/components/confirm-dialog';
 import { RejectDialog } from '@/module/admin/termini/components/reject-dialog';
 import { RescheduleDialog } from '@/module/admin/termini/components/reschedule-dialog';
+import { useTRPC } from '@/trpc/client';
 
 import {
   type Appointment,

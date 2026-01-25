@@ -829,21 +829,21 @@ const { data } = trpc.appointment.onAppointmentChange.useSubscription(
 
 ## Kritični Fajlovi za Modifikaciju
 
-| Fajl                             | Akcija                                           |
-| -------------------------------- | ------------------------------------------------ |
-| `.env`                           | Dodati DATABASE*URL, MINIO*_, ukloniti CONVEX\__ |
-| `prisma/schema.prisma`           | Kreirati (nova)                                  |
-| `lib/prisma.ts`                  | Kreirati (nova)                                  |
-| `lib/minio.ts`                   | Kreirati (nova)                                  |
-| `lib/auth-server.ts`             | Ažurirati adapter                                |
-| `lib/auth-client.ts`             | Minimalne izmene                                 |
-| `server/trpc/**`                 | Kreirati celu strukturu                          |
-| `app/api/trpc/[trpc]/route.ts`   | Kreirati                                         |
-| `app/api/auth/[...all]/route.ts` | Ažurirati                                        |
-| `components/providers/`          | Zameniti Convex sa tRPC                          |
-| `module/**/`                     | Ažurirati sve data fetching                      |
-| `convex/`                        | Obrisati ceo folder                              |
-| `package.json`                   | Ukloniti convex pakete, dodati nove              |
+| Fajl                             | Akcija                                             |
+| -------------------------------- | -------------------------------------------------- |
+| `.env`                           | Dodati DATABASE*URL, MINIO*\_, ukloniti CONVEX\_\_ |
+| `prisma/schema.prisma`           | Kreirati (nova)                                    |
+| `lib/prisma.ts`                  | Kreirati (nova)                                    |
+| `lib/minio.ts`                   | Kreirati (nova)                                    |
+| `lib/auth-server.ts`             | Ažurirati adapter                                  |
+| `lib/auth-client.ts`             | Minimalne izmene                                   |
+| `server/trpc/**`                 | Kreirati celu strukturu                            |
+| `app/api/trpc/[trpc]/route.ts`   | Kreirati                                           |
+| `app/api/auth/[...all]/route.ts` | Ažurirati                                          |
+| `components/providers/`          | Zameniti Convex sa tRPC                            |
+| `module/**/`                     | Ažurirati sve data fetching                        |
+| `convex/`                        | Obrisati ceo folder                                |
+| `package.json`                   | Ukloniti convex pakete, dodati nove                |
 
 ---
 

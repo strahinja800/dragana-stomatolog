@@ -6,9 +6,8 @@ import { patientRouter } from '@/module/patient/server/patient-router';
 import { settingsRouter } from '@/module/settings/server/settings-router';
 import { uploadRouter } from '@/module/upload/server/upload-router';
 
-import { router } from './init';
-
-export const appRouter = router({
+import { createTRPCRouter } from './init';
+export const appRouter = createTRPCRouter({
   appointment: appointmentRouter,
   attachment: attachmentRouter,
   medicalRecord: medicalRecordRouter,
@@ -17,5 +16,5 @@ export const appRouter = router({
   about: aboutRouter,
   upload: uploadRouter,
 });
-
+// export type definition of API
 export type AppRouter = typeof appRouter;

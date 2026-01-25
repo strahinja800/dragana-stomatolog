@@ -17,9 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
 import { AboutValueForm } from '@/module/admin/about/components/about-value-form';
+import { useTRPC } from '@/trpc/client';
 
 interface AboutValue {
   id: string;

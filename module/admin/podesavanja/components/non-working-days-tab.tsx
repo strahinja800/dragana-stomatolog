@@ -22,8 +22,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
+import { useTRPC } from '@/trpc/client';
 
 export function NonWorkingDaysTab() {
   const trpc = useTRPC();

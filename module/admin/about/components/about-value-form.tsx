@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { useTRPC } from '@/lib/trpc';
+import { useTRPC } from '@/trpc/client';
 
 interface AboutValue {
   id: string;

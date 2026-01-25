@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 import { deleteFile } from '@/lib/minio';
-import { adminProcedure, router } from '@/module/shared/server/trpc/init';
+import { adminProcedure, createTRPCRouter } from '@/trpc/init';
 
-export const attachmentRouter = router({
+export const attachmentRouter = createTRPCRouter({
   listByMedicalRecord: adminProcedure
     .input(z.object({ medicalRecordId: z.string() }))
     .query(async ({ ctx, input }) => {

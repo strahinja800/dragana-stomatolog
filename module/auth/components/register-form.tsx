@@ -28,12 +28,12 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth-client';
-import { useTRPC } from '@/lib/trpc';
 import { parseAuthError } from '@/module/auth/lib/auth-error-handler';
 import {
   type RegisterFormSchemaInputs,
   registerSchema,
 } from '@/module/auth/types/auth-schema';
+import { useTRPC } from '@/trpc/client';
 
 export function RegisterForm() {
   const router = useRouter();

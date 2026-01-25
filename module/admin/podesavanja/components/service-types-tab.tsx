@@ -39,8 +39,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
+import { useTRPC } from '@/trpc/client';
 
 interface ServiceTypeForm {
   id?: string;

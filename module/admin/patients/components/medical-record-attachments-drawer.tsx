@@ -17,7 +17,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
-import { useTRPC } from '@/lib/trpc';
+import { useTRPC } from '@/trpc/client';
 
 import { AttachmentRow } from './attachment-row';
 

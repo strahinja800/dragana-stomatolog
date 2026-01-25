@@ -10,9 +10,9 @@ import {
   updateServiceTypeSchema,
   upsertWorkingHoursSchema,
 } from '@/module/settings/types/settings-schemas';
-import { adminProcedure, router } from '@/module/shared/server/trpc/init';
+import { adminProcedure, createTRPCRouter } from '@/trpc/init';
 
-export const settingsRouter = router({
+export const settingsRouter = createTRPCRouter({
   // ============================================
   // WORKING HOURS
   // ============================================

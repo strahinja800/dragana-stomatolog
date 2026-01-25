@@ -25,8 +25,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
+import { useTRPC } from '@/trpc/client';
 
 interface RescheduleDialogProps {
   appointment: {

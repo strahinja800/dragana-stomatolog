@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
-import { adminProcedure, router } from '@/module/shared/server/trpc/init';
+import { adminProcedure, createTRPCRouter } from '@/trpc/init';
 
 import {
   createMedicalRecordSchema,
   updateMedicalRecordSchema,
 } from './medical-record-schemas';
 
-export const medicalRecordRouter = router({
+export const medicalRecordRouter = createTRPCRouter({
   getByAppointment: adminProcedure
     .input(z.object({ appointmentId: z.string() }))
     .query(async ({ ctx, input }) => {

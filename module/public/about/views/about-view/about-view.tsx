@@ -2,12 +2,12 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { useTRPC } from '@/lib/trpc';
 import AboutCta from '@/module/public/about/views/about-view/cta';
 import AboutHero from '@/module/public/about/views/about-view/hero';
 import AboutTeam from '@/module/public/about/views/about-view/team';
 import AboutTimeline from '@/module/public/about/views/about-view/timeline';
 import AboutValues from '@/module/public/about/views/about-view/values';
+import { useTRPC } from '@/trpc/client';
 
 export function AboutView() {
   const trpc = useTRPC();

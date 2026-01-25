@@ -16,11 +16,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useTRPC } from '@/lib/trpc';
 import type {
   AppointmentWithRelations,
   MedicalRecordWithRelations,
 } from '@/module/admin/patients/types/patient-types';
+import { useTRPC } from '@/trpc/client';
 
 import { MedicalRecordsList } from './medical-records-list';
 

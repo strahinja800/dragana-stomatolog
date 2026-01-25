@@ -17,8 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
+import { useTRPC } from '@/trpc/client';
 
 import { TeamMemberForm } from './team-member-form';
 

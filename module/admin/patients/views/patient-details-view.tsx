@@ -12,11 +12,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useTRPC } from '@/lib/trpc';
 import { PatientAppointments } from '@/module/admin/patients/components/patient-appointments';
 import { PatientBasicInfo } from '@/module/admin/patients/components/patient-basic-info';
 import { PatientDetailsHeader } from '@/module/admin/patients/components/patient-details-header';
 import { PatientSystemInfo } from '@/module/admin/patients/components/patient-system-info';
+import { useTRPC } from '@/trpc/client';
 
 interface PatientDetailsViewProps {
   patientId: string;

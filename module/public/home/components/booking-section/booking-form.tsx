@@ -11,8 +11,8 @@ import * as z from 'zod';
 import { AppointmentCalendar } from '@/components/ui/appointment-calendar';
 import { FloatingInput } from '@/components/ui/floating-input';
 import { Textarea } from '@/components/ui/textarea';
-import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
+import { useTRPC } from '@/trpc/client';
 
 const bookingFormSchema = z.object({
   name: z.string().min(1, 'Ime je obavezno'),

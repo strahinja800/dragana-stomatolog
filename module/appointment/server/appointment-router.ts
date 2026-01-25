@@ -18,11 +18,7 @@ import {
   rejectAppointmentSchema,
   rescheduleAppointmentSchema,
 } from '@/module/appointment/types/appointment-schemas';
-import {
-  adminProcedure,
-  publicProcedure,
-  router,
-} from '@/module/shared/server/trpc/init';
+import { adminProcedure, createTRPCRouter, publicProcedure } from '@/trpc/init';
 
 const DEFAULT_SLOT_DURATION = 30; // minutes
 
@@ -31,7 +27,7 @@ interface TimeSlot {
   isAvailable: boolean;
 }
 
-export const appointmentRouter = router({
+export const appointmentRouter = createTRPCRouter({
   // ============================================
   // PUBLIC QUERIES
   // ============================================
