@@ -76,11 +76,11 @@ export function MilestoneForm({
     trpc.about.createMilestone.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['about'] });
-        toast.success('Milestone uspešno kreiran');
+        toast.success('Postignuće uspešno kreirano');
         handleClose();
       },
       onError: (error) => {
-        toast.error('Greška pri čuvanju milestone-a');
+        toast.error('Greška pri čuvanju postignuća');
         console.error(error);
       },
     })
@@ -90,11 +90,11 @@ export function MilestoneForm({
     trpc.about.updateMilestone.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['about'] });
-        toast.success('Milestone uspešno ažuriran');
+        toast.success('Postignuće uspešno ažurirano');
         handleClose();
       },
       onError: (error) => {
-        toast.error('Greška pri čuvanju milestone-a');
+        toast.error('Greška pri čuvanju postignuća');
         console.error(error);
       },
     })
@@ -128,7 +128,7 @@ export function MilestoneForm({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            {milestone ? 'Izmeni milestone' : 'Dodaj novi milestone'}
+            {milestone ? 'Izmeni postignuće' : 'Dodaj novo postignuće'}
           </DialogTitle>
         </DialogHeader>
 
@@ -213,7 +213,7 @@ export function MilestoneForm({
                       onCheckedChange={field.onChange}
                     />
                     <Label htmlFor="isActive" className="cursor-pointer">
-                      Aktivan milestone
+                      Aktivno postignuće
                     </Label>
                   </>
                 )}

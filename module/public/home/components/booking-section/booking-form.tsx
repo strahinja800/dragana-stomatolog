@@ -73,7 +73,7 @@ export default function BookingForm({
     isPending: isPendingTimeSlots,
   } = useSuspenseQuery(
     trpc.appointment.getTimeSlotsForDate.queryOptions({
-      date: today,
+      date: selectedDate ?? today,
     })
   );
 
