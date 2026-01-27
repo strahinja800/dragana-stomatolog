@@ -326,3 +326,31 @@ model TeamMember {
   @@index([sortOrder])
   @@index([isActive, sortOrder])
 }
+
+// ============================================
+// BLOG
+// ============================================
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model BlogPost {
+  id            String         @id @default(cuid())
+  title         String
+  slug          String         @unique
+  content       String         @db.Text
+  excerpt       String?        @db.Text
+  featuredImage String?
+  imageAlt      String?
+  status        BlogPostStatus @default(DRAFT)
+  publishedAt   DateTime?
+  sortOrder     Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([slug])
+  @@index([status, publishedAt])
+  @@index([sortOrder])
+}
