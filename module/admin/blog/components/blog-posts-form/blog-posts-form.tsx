@@ -1,6 +1,10 @@
 'use client';
 
-import { ImageIcon } from 'lucide-react';
+import { Controller, useForm } from 'react-hook-form';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 import Tiptap from '@/components/TipTap';
 import { Button } from '@/components/ui/button';
@@ -10,7 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -19,6 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  type CreateBlogPostInput,
+  createBlogPostSchema,
+} from '@/module/blog/types/blog-schemas';
+import { useTRPC } from '@/trpc/client';
 
 interface BlogPost {
   id: string;
@@ -39,7 +47,82 @@ interface BlogPostFormProps {
 }
 
 export function BlogPostForm({ open, onClose, post }: BlogPostFormProps) {
-  // TODO: Dodaj logiku - useForm, mutations, etc.
+  const defaultValues = {
+    title: post?.title ?? '',
+    content: post?.content ?? '',
+    status: post?.status ?? 'DRAFT',
+    slug: post?.slug ?? '',
+  };
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+  } = useForm<CreateBlogPostInput>({
+    resolver: zodResolver(createBlogPostSchema),
+    defaultValues,
+  });
+
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  const handleClose = () => {
+    reset(defaultValues);
+    onClose();
+  };
+
+  const { mutate: createPost, isPending: isCreating } = useMutation(
+    trpc.blog.createPost.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['blog'] });
+        toast.success('Članak je uspešno kreiran.');
+        handleClose();
+      },
+      onError: () => {
+        toast.error('Došlo je do greške prilikom kreiranja članka.');
+      },
+    })
+  );
+
+  const { mutate: updatePost, isPending: isUpdating } = useMutation(
+    trpc.blog.updatePost.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['blog'] });
+        toast.success('Članak je uspešno ažuriran.');
+        handleClose();
+      },
+      onError: () => {
+        toast.error('Došlo je do greške prilikom ažuriranja članka.');
+      },
+    })
+  );
+
+  const { mutateAsync: generateSlug, isPending: isGeneratingSlug } =
+    useMutation(trpc.blog.generateSlug.mutationOptions());
+
+  const onSubmit = async (data: CreateBlogPostInput) => {
+    let slug = data.slug;
+
+    if (!post) {
+      try {
+        const result = await generateSlug({ title: data.title });
+        slug = result.slug;
+      } catch (error) {
+        toast.error('Došlo je do greške prilikom generisanja slug-a.');
+        return;
+      }
+    }
+
+    const submitData = { ...data, slug };
+
+    if (!post) {
+      createPost(submitData);
+    } else {
+      updatePost({ id: post.id, ...submitData });
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -48,95 +131,71 @@ export function BlogPostForm({ open, onClose, post }: BlogPostFormProps) {
           <DialogTitle>{post ? 'Izmeni članak' : 'Novi članak'}</DialogTitle>
         </DialogHeader>
 
-        <form className="space-y-6 max-w-4xl">
+        <form className="space-y-6 max-w-4xl" onSubmit={handleSubmit(onSubmit)}>
           {/* Naslov */}
           <div className="space-y-2 max-w-3xl">
             <Label htmlFor="title">Naslov *</Label>
-            <Tiptap
-              placeholder="Unesite naslov članka..."
-              className="h-28 py-2"
-              toolbarPreset="minimal"
+            <Controller
+              name="title"
+              control={control}
+              render={({ field }) => (
+                <Tiptap
+                  placeholder="Unesite naslov članka..."
+                  className="h-28 py-2"
+                  toolbarPreset="minimal"
+                  content={field.value}
+                  onChange={field.onChange}
+                />
+              )}
             />
+            {errors.title && (
+              <span className="text-red-500 text-sm">
+                {errors.title.message}
+              </span>
+            )}
           </div>
 
-          {/* Sadržaj - TipTap Editor placeholder */}
+          {/* Sadržaj */}
           <div className="space-y-2 max-w-3xl">
             <Label>Sadržaj *</Label>
-            <div className="border rounded-md">
-              <Tiptap
-                placeholder="Zapocnite pisanje..."
-                className="min-h-[300px]"
-                toolbarPreset="full"
-              />
-            </div>
-          </div>
-
-          {/* Naslovna slika */}
-          <div className="space-y-2 max-w-3xl">
-            <Label>Naslovna slika</Label>
-
-            {/* TODO: Uslovno renderovanje - ovo je kada NEMA slike */}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full h-32 border-dashed"
-            >
-              <div className="flex flex-col items-center gap-2">
-                <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
-                  Klikni za upload slike
-                </span>
-              </div>
-            </Button>
-
-            {/* TODO: Ovo je kada IMA sliku - uslovno renderovanje
-            <div className="space-y-2">
-              <div className="relative w-full h-48 rounded-lg overflow-hidden border">
-                <Image
-                  src={uploadedImageUrl}
-                  alt="Preview"
-                  fill
-                  className="object-cover"
+            <Controller
+              name="content"
+              control={control}
+              render={({ field }) => (
+                <Tiptap
+                  placeholder="Zapocnite pisanje..."
+                  className="min-h-[300px]"
+                  toolbarPreset="full"
+                  content={field.value}
+                  onChange={field.onChange}
                 />
-              </div>
-              <div className="flex gap-2">
-                <Button type="button" variant="outline" size="sm">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Promeni sliku
-                </Button>
-                <Button type="button" variant="outline" size="sm">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Ukloni sliku
-                </Button>
-              </div>
-            </div>
-            */}
-          </div>
-
-          {/* Alt tekst slike */}
-          <div className="space-y-2 max-w-3xl">
-            <Label htmlFor="imageAlt">
-              Alt tekst slike{' '}
-              <span className="text-xs text-muted-foreground">(opciono)</span>
-            </Label>
-            <Input
-              id="imageAlt"
-              placeholder="Žena pere zube ispravnom tehnikom"
+              )}
             />
+            {errors.content && (
+              <span className="text-red-500 text-sm">
+                {errors.content.message}
+              </span>
+            )}
           </div>
 
           {/* Status */}
           <div className="space-y-2 max-w-3xl">
             <Label htmlFor="status">Status</Label>
-            <Select defaultValue="DRAFT">
-              <SelectTrigger>
-                <SelectValue placeholder="Izaberi status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="DRAFT">Draft</SelectItem>
-                <SelectItem value="PUBLISHED">Objavljen</SelectItem>
-              </SelectContent>
-            </Select>
+            <Controller
+              name="status"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Izaberi status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DRAFT">Draft</SelectItem>
+                    <SelectItem value="PUBLISHED">Objavljen</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
           {/* Footer buttons */}
@@ -144,7 +203,12 @@ export function BlogPostForm({ open, onClose, post }: BlogPostFormProps) {
             <Button type="button" variant="outline" onClick={onClose}>
               Otkaži
             </Button>
-            <Button type="submit">{post ? 'Ažuriraj' : 'Sačuvaj'}</Button>
+            <Button
+              type="submit"
+              disabled={isCreating || isUpdating || isGeneratingSlug}
+            >
+              {post ? 'Ažuriraj' : 'Sačuvaj'}
+            </Button>
           </div>
         </form>
       </DialogContent>

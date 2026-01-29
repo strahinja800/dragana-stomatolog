@@ -17,11 +17,8 @@ export const createBlogPostSchema = z.object({
     .min(1, 'Slug je obavezan')
     .regex(slugRegex, 'Slug može sadržati samo mala slova, brojeve i crtice'),
   content: z.string().min(1, 'Sadržaj je obavezan'),
-  excerpt: z.string().optional(),
-  featuredImage: z.string().optional(),
-  imageAlt: z.string().optional(),
-  status: blogPostStatusSchema.optional().default('DRAFT'),
-  publishedAt: z.coerce.date().optional().nullable(),
+  status: blogPostStatusSchema,
+  publishedAt: z.date().optional().nullable(),
   sortOrder: z.number().optional(),
 });
 
@@ -40,7 +37,7 @@ export const updateBlogPostSchema = z.object({
   featuredImage: z.string().optional().nullable(),
   imageAlt: z.string().optional().nullable(),
   status: blogPostStatusSchema.optional(),
-  publishedAt: z.coerce.date().optional().nullable(),
+  publishedAt: z.date().optional().nullable(),
   sortOrder: z.number().optional(),
 });
 

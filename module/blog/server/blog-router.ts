@@ -160,9 +160,6 @@ export const blogRouter = createTRPCRouter({
           title: input.title.trim(),
           slug: input.slug.trim(),
           content: input.content,
-          excerpt: input.excerpt?.trim(),
-          featuredImage: input.featuredImage,
-          imageAlt: input.imageAlt?.trim(),
           status: input.status,
           publishedAt:
             input.status === 'PUBLISHED'
