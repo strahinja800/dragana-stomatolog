@@ -18,11 +18,20 @@ export const createBlogPostSchema = z.object({
     .regex(slugRegex, 'Slug može sadržati samo mala slova, brojeve i crtice'),
   content: z.string().min(1, 'Sadržaj je obavezan'),
   status: blogPostStatusSchema,
+  featuredImage: z.string().optional().nullable(),
+  imageAlt: z.string().optional().nullable(),
   publishedAt: z.date().optional().nullable(),
   sortOrder: z.number().optional(),
 });
 
 export type CreateBlogPostInput = z.infer<typeof createBlogPostSchema>;
+
+export const blogPostFormSchema = createBlogPostSchema.omit({
+  slug: true,
+  featuredImage: true,
+});
+
+export type BlogPostFormInput = z.infer<typeof blogPostFormSchema>;
 
 export const updateBlogPostSchema = z.object({
   id: z.string(),
