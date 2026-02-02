@@ -116,33 +116,6 @@ export const team = [
   },
 ];
 
-export const blogPosts = [
-  {
-    title: '5 saveta za blistav osmeh',
-    excerpt:
-      'Otkrijte jednostavne navike koje će transformisati vaš osmeh i poboljšati oralno zdravlje.',
-    date: '5. Dec 2024',
-    category: 'Saveti',
-    image: heroImage,
-  },
-  {
-    title: 'Zašto su redovni pregledi važni?',
-    excerpt:
-      'Preventivna nega je ključ za zdrave zube. Saznajte zašto ne treba preskakati preglede.',
-    date: '28. Nov 2024',
-    category: 'Zdravlje',
-    image: dentist1,
-  },
-  {
-    title: 'Moderna implantologija',
-    excerpt:
-      'Sve što treba da znate o zubnim implantatima i procesu njihove ugradnje.',
-    date: '15. Nov 2024',
-    category: 'Tretmani',
-    image: dentist2,
-  },
-];
-
 export const features = [
   'Najsavremenija oprema',
   'Bezbolni tretmani',

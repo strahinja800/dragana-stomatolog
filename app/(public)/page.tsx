@@ -8,8 +8,12 @@ import PortfolioSection from '@/module/public/home/components/portfolio-section/
 import StatisticsSection from '@/module/public/home/components/statistics-section/statistics';
 import TeamSection from '@/module/public/home/components/team-section/team-section';
 import TestimonialsSection from '@/module/public/home/components/testimonials/testimonials-section';
+import { HydrateClient } from '@/trpc/hydrate-client';
+import { prefetch, trpc } from '@/trpc/server';
 
 export default async function HomePage() {
+  void prefetch(trpc.blog.getPublishedPosts.queryOptions({ limit: 3 }));
+
   return (
     <>
       <HeroSection />
@@ -19,7 +23,9 @@ export default async function HomePage() {
       <PortfolioSection />
       <TeamSection />
       <TestimonialsSection />
-      <BlogSection />
+      <HydrateClient>
+        <BlogSection />
+      </HydrateClient>
       <CtaSection />
       <LocationSection />
     </>

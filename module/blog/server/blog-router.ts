@@ -49,24 +49,27 @@ export const blogRouter = createTRPCRouter({
   /**
    * Vraća sve objavljene blog postove (public)
    */
-  getPublishedPosts: publicProcedure.query(async ({ ctx }) => {
-    const posts = await ctx.prisma.blogPost.findMany({
-      where: { status: 'PUBLISHED' },
-      orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        excerpt: true,
-        featuredImage: true,
-        imageAlt: true,
-        publishedAt: true,
-        createdAt: true,
-      },
-    });
+  getPublishedPosts: publicProcedure
+    .input(z.object({ limit: z.number().int().positive().optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      const posts = await ctx.prisma.blogPost.findMany({
+        where: { status: 'PUBLISHED' },
+        orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+        ...(input?.limit && { take: input.limit }),
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          excerpt: true,
+          featuredImage: true,
+          imageAlt: true,
+          publishedAt: true,
+          createdAt: true,
+        },
+      });
 
-    return posts;
-  }),
+      return posts;
+    }),
 
   /**
    * Vraća jedan blog post po slug-u (public)
