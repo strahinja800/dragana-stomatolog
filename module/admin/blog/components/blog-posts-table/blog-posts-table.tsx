@@ -11,10 +11,9 @@ import {
   getSortedRowModel,
   type SortingState,
   useReactTable,
+  type VisibilityState,
 } from '@tanstack/react-table';
 
-import { DataTablePagination } from '@/components/shared/table/data-table-pagination';
-import { DataTableToolbar } from '@/components/shared/table/data-table-toolbar';
 import {
   Table,
   TableBody,
@@ -23,71 +22,61 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { cn } from '@/lib/utils';
 
-import { type Milestone, milestonesColumns } from './milestones-table-columns';
+import { type BlogPostRow, columns } from './blog-posts-table-columns';
+import { BlogPostsTablePagination } from './blog-posts-table-pagination';
+import { BlogPostsTableToolbar } from './blog-posts-table-toolbar';
 
-interface MilestonesTableProps {
-  data: Milestone[];
-  onEdit: (milestone: Milestone) => void;
-  onDelete: (id: string) => void;
-  onToggleActive: (id: string, isActive: boolean) => void;
+interface BlogPostsTableProps {
+  data: BlogPostRow[];
+  onEditPost: (post: BlogPostRow) => void;
+  onDeletePost: (id: string) => void;
 }
 
-export function MilestonesTable({
+export function BlogPostsTable({
   data,
-  onEdit,
-  onDelete,
-  onToggleActive,
-}: MilestonesTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: 'sortOrder', desc: false },
-  ]);
+  onEditPost,
+  onDeletePost,
+}: BlogPostsTableProps) {
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState('');
 
   const table = useReactTable({
     data,
-    columns: milestonesColumns,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: (row, _, filterValue) => {
       const searchValue = filterValue.toLowerCase();
-      const year = (row.getValue('year') as string)?.toLowerCase() ?? '';
       const title = (row.getValue('title') as string)?.toLowerCase() ?? '';
-      const description =
-        (row.getValue('description') as string)?.toLowerCase() ?? '';
-
-      return (
-        year.includes(searchValue) ||
-        title.includes(searchValue) ||
-        description.includes(searchValue)
-      );
+      return title.includes(searchValue);
     },
     state: {
       sorting,
       columnFilters,
+      columnVisibility,
       globalFilter,
     },
     meta: {
-      onEdit,
-      onDelete,
-      onToggleActive,
+      onEdit: (post: BlogPostRow) => onEditPost(post),
+      onDelete: (id: string) => onDeletePost(id),
     },
   });
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar
+      <BlogPostsTableToolbar
         table={table}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
-        searchPlaceholder="Pretraži postignuća..."
       />
       <div className="rounded-md border bg-white">
         <Table>
@@ -112,7 +101,7 @@ export function MilestonesTable({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className={cn(!row.original.isActive && 'opacity-50')}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -127,19 +116,17 @@ export function MilestonesTable({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={milestonesColumns.length}
+                  colSpan={columns.length}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  Nema postignuća. Kliknite "Dodaj postignuće" da dodate prvo.
+                  Nema članaka koji odgovaraju pretrazi.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} totalLabel="Ukupno postignuća:" />
+      <BlogPostsTablePagination table={table} />
     </div>
   );
 }
-
-export { type Milestone } from './milestones-table-columns';

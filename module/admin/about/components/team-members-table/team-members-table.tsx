@@ -26,8 +26,8 @@ import {
 import { cn } from '@/lib/utils';
 
 import {
-  teamMembersColumns,
   type TeamMember,
+  teamMembersColumns,
 } from './team-members-table-columns';
 
 interface TeamMembersTableProps {
@@ -93,49 +93,53 @@ export function TeamMembersTable({
         searchPlaceholder="Pretraži članove tima..."
       />
       <div className="rounded-md border bg-white">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                className={cn(!row.original.isActive && 'opacity-50')}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
                 ))}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={teamMembersColumns.length}
-                className="h-24 text-center text-muted-foreground"
-              >
-                Nema članova tima. Kliknite "Dodaj člana tima" da dodate prvog.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  className={cn(!row.original.isActive && 'opacity-50')}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={teamMembersColumns.length}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  Nema članova tima. Kliknite "Dodaj člana tima" da dodate
+                  prvog.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
       <DataTablePagination table={table} totalLabel="Ukupno članova:" />
     </div>

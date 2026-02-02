@@ -29,9 +29,7 @@ export const milestonesColumns: ColumnDef<Milestone>[] = [
     accessorKey: 'year',
     header: ({ column }) => <SortableHeader column={column} label="Godina" />,
     cell: ({ row }) => (
-      <span className="font-semibold text-primary">
-        {row.getValue('year')}
-      </span>
+      <span className="font-semibold text-primary">{row.getValue('year')}</span>
     ),
   },
   {
