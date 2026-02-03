@@ -75,7 +75,7 @@ export function MilestoneForm({
   const { mutate: createMilestone, isPending: isCreating } = useMutation(
     trpc.about.createMilestone.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['about'] });
+        queryClient.invalidateQueries({ queryKey: [['about']] });
         toast.success('Postignuće uspešno kreirano');
         handleClose();
       },
@@ -89,7 +89,7 @@ export function MilestoneForm({
   const { mutate: updateMilestone, isPending: isUpdating } = useMutation(
     trpc.about.updateMilestone.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['about'] });
+        queryClient.invalidateQueries({ queryKey: [['about']] });
         toast.success('Postignuće uspešno ažurirano');
         handleClose();
       },

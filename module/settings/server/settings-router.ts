@@ -21,6 +21,7 @@ export const settingsRouter = createTRPCRouter({
   /**
    * Vraća radno vreme za sve dane u nedelji, sortirano od ponedeljka
    */
+  //   /api/settings/working-hours
   getWorkingHours: adminProcedure.query(async ({ ctx }) => {
     const workingHours = await ctx.prisma.workingHour.findMany({
       select: {

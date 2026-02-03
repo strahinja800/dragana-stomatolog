@@ -1,14 +1,15 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ImageIcon, Trash2, Upload } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ImageIcon, Loader2, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import Tiptap from '@/components/TipTap';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,55 +41,86 @@ import {
 } from '@/module/blog/types/blog-schemas';
 import { useTRPC } from '@/trpc/client';
 
-interface BlogPost {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  status: 'DRAFT' | 'PUBLISHED';
-  featuredImage?: string | null;
-  imageAlt?: string | null;
-  publishedAt?: Date | null;
-}
-
 interface BlogPostFormProps {
-  open: boolean;
+  blogPostId: string | null;
   onClose: () => void;
-  post?: BlogPost;
 }
 
-export function BlogPostForm({ open, onClose, post }: BlogPostFormProps) {
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(
-    post?.featuredImage || null
-  );
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const defaultValues = {
-    title: post?.title ?? '',
-    content: post?.content ?? '',
-    status: post?.status ?? 'DRAFT',
-    imageAlt: post?.imageAlt ?? '',
-  };
-
-  const { handleSubmit, control, reset } = useForm<BlogPostFormInput>({
-    resolver: zodResolver(blogPostFormSchema),
-    defaultValues,
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result.split(',')[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
+}
+
+const emptyDefaults: BlogPostFormInput = {
+  title: '',
+  content: '',
+  status: 'DRAFT',
+  imageAlt: '',
+  featuredImageFile: undefined,
+};
+
+export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
+  const isOpen = blogPostId !== null;
+  const isEditMode = blogPostId !== null && blogPostId !== 'new';
+
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [removingImage, setRemovingImage] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
+  const { data: post, isLoading: isLoadingPost } = useQuery({
+    ...trpc.blog.getPostById.queryOptions({ id: blogPostId! }),
+    enabled: isEditMode,
+  });
+
+  const { handleSubmit, control, reset, setValue } = useForm<BlogPostFormInput>(
+    {
+      resolver: zodResolver(blogPostFormSchema),
+      defaultValues: emptyDefaults,
+    }
+  );
+
+  useEffect(() => {
+    if (isEditMode && post) {
+      reset({
+        title: post.title,
+        content: post.content,
+        status: post.status,
+        imageAlt: post.imageAlt ?? '',
+        featuredImageFile: undefined,
+      });
+      setPreviewUrl(post.featuredImage || null);
+    } else if (blogPostId === 'new') {
+      reset(emptyDefaults);
+      setPreviewUrl(null);
+    }
+  }, [blogPostId, post, isEditMode, reset]);
+
   const handleClose = () => {
-    reset(defaultValues);
-    setUploadedImageUrl(post?.featuredImage || null);
+    reset(emptyDefaults);
+    setPreviewUrl(null);
+    setRemovingImage(false);
     onClose();
   };
+
+  const queryKeyForAllPosts = trpc.blog.getAllPosts.queryKey();
+  const queryKeyForPost = trpc.blog.getPostById.queryKey();
 
   const { mutate: createPost, isPending: isCreating } = useMutation(
     trpc.blog.createPost.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['blog'] });
+        queryClient.invalidateQueries({ queryKey: queryKeyForAllPosts });
+        queryClient.invalidateQueries({ queryKey: queryKeyForPost });
         toast.success('Članak je uspešno kreiran.');
         handleClose();
       },
@@ -101,7 +133,8 @@ export function BlogPostForm({ open, onClose, post }: BlogPostFormProps) {
   const { mutate: updatePost, isPending: isUpdating } = useMutation(
     trpc.blog.updatePost.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['blog'] });
+        queryClient.invalidateQueries({ queryKey: queryKeyForPost });
+        queryClient.invalidateQueries({ queryKey: queryKeyForAllPosts });
         toast.success('Članak je uspešno ažuriran.');
         handleClose();
       },
@@ -114,11 +147,27 @@ export function BlogPostForm({ open, onClose, post }: BlogPostFormProps) {
   const { mutateAsync: generateSlug, isPending: isGeneratingSlug } =
     useMutation(trpc.blog.generateSlug.mutationOptions());
 
-  const { mutateAsync: getUploadUrl } = useMutation(
-    trpc.blog.getFeaturedImageUploadUrl.mutationOptions()
+  const { mutate: deletePost, isPending: isDeleting } = useMutation(
+    trpc.blog.deletePost.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeyForAllPosts });
+        queryClient.invalidateQueries({ queryKey: queryKeyForPost });
+        toast.success('Blog post je uspešno obrisan.');
+        setShowDeleteConfirm(false);
+        handleClose();
+      },
+      onError: () => {
+        toast.error('Došlo je do greške prilikom brisanja blog posta.');
+      },
+    })
   );
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDelete = () => {
+    if (!blogPostId || blogPostId === 'new') return;
+    deletePost({ id: blogPostId });
+  };
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -128,34 +177,25 @@ export function BlogPostForm({ open, onClose, post }: BlogPostFormProps) {
     }
 
     try {
-      setIsUploading(true);
-
-      const { uploadUrl, publicUrl } = await getUploadUrl({
+      const base64 = await fileToBase64(file);
+      setValue('featuredImageFile', {
+        fileBase64: base64,
         fileName: file.name,
         fileType: file.type,
       });
-
-      const res = await fetch(uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': file.type },
-        body: file,
-      });
-
-      if (!res.ok) throw new Error('Upload nije uspeo');
-
-      setUploadedImageUrl(publicUrl);
-      toast.success('Slika uspešno uploadovana.');
-    } catch (error) {
-      console.error('Image upload error:', error);
-      toast.error('Greška pri uploadu slike.');
+      setPreviewUrl(URL.createObjectURL(file));
+      setRemovingImage(false);
+    } catch {
+      toast.error('Greška pri čitanju fajla.');
     } finally {
-      setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
   const handleRemoveImage = () => {
-    setUploadedImageUrl(null);
+    setValue('featuredImageFile', undefined);
+    setPreviewUrl(null);
+    setRemovingImage(true);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -172,199 +212,251 @@ export function BlogPostForm({ open, onClose, post }: BlogPostFormProps) {
       }
     }
 
-    const submitData = {
-      ...data,
-      slug,
-      featuredImage: uploadedImageUrl,
-      imageAlt: data.imageAlt || undefined,
-    };
+    const { featuredImageFile, ...rest } = data;
 
     if (!post) {
-      createPost(submitData);
+      createPost({
+        ...rest,
+        slug,
+        imageAlt: rest.imageAlt || undefined,
+        featuredImageFile: featuredImageFile || undefined,
+      });
     } else {
-      updatePost({ id: post.id, ...submitData });
+      updatePost({
+        id: post.id,
+        ...rest,
+        slug,
+        imageAlt: rest.imageAlt || undefined,
+        featuredImageFile: featuredImageFile || undefined,
+        removeFeaturedImage: removingImage,
+      });
     }
   };
 
-  const isPending = isCreating || isUpdating || isGeneratingSlug || isUploading;
+  const isPending = isCreating || isUpdating || isGeneratingSlug || isDeleting;
 
   return (
-    <Drawer open={open} onOpenChange={handleClose} direction="right">
-      <DrawerContent className="h-screen data-[vaul-drawer-direction=right]:sm:max-w-3xl">
-        <div className="mx-auto h-full w-full overflow-y-auto">
-          <DrawerHeader>
-            <DrawerTitle>{post ? 'Izmeni članak' : 'Novi članak'}</DrawerTitle>
-            <DrawerDescription>
-              {post
-                ? 'Izmenite podatke postojećeg članka.'
-                : 'Popunite formu za kreiranje novog članka.'}
-            </DrawerDescription>
-          </DrawerHeader>
+    <>
+      <Drawer open={isOpen} onOpenChange={handleClose} direction="right">
+        <DrawerContent className="h-screen data-[vaul-drawer-direction=right]:sm:max-w-3xl">
+          <div className="flex h-full w-full flex-col">
+            <div className="flex-1 overflow-y-auto">
+              <DrawerHeader>
+                <DrawerTitle>
+                  {isEditMode ? 'Izmeni članak' : 'Novi članak'}
+                </DrawerTitle>
+                <DrawerDescription>
+                  {isEditMode
+                    ? 'Izmenite podatke postojećeg članka.'
+                    : 'Popunite formu za kreiranje novog članka.'}
+                </DrawerDescription>
+              </DrawerHeader>
 
-          <form
-            id="blog-post-form"
-            className="px-4 pb-4"
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            <FieldGroup>
-              {/* Naslov */}
-              <Controller
-                name="title"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Naslov *</FieldLabel>
-                    <Tiptap
-                      placeholder="Unesite naslov članka..."
-                      className="h-28 py-2"
-                      toolbarPreset="minimal"
-                      content={field.value}
-                      onChange={field.onChange}
+              {isEditMode && isLoadingPost ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <form
+                  id="blog-post-form"
+                  className="px-4 pb-4"
+                  onSubmit={handleSubmit(onSubmit)}
+                >
+                  <FieldGroup>
+                    {/* Naslov */}
+                    <Controller
+                      name="title"
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel>Naslov *</FieldLabel>
+                          <Tiptap
+                            placeholder="Unesite naslov članka..."
+                            className="h-28 py-2"
+                            toolbarPreset="minimal"
+                            content={field.value}
+                            onChange={field.onChange}
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
 
-              {/* Sadržaj */}
-              <Controller
-                name="content"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Sadržaj *</FieldLabel>
-                    <Tiptap
-                      placeholder="Zapocnite pisanje..."
-                      className="min-h-[300px]"
-                      toolbarPreset="full"
-                      content={field.value}
-                      onChange={field.onChange}
+                    {/* Sadržaj */}
+                    <Controller
+                      name="content"
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel>Sadržaj *</FieldLabel>
+                          <Tiptap
+                            placeholder="Zapocnite pisanje..."
+                            className="min-h-[300px]"
+                            toolbarPreset="full"
+                            content={field.value}
+                            onChange={field.onChange}
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
 
-              {/* Istaknuta slika */}
-              <Field>
-                <FieldLabel>Istaknuta slika</FieldLabel>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-
-                {uploadedImageUrl ? (
-                  <div className="space-y-2">
-                    <div className="relative w-full h-48 rounded-lg overflow-hidden border border-border">
-                      <Image
-                        src={uploadedImageUrl}
-                        alt="Preview"
-                        fill
-                        className="object-cover"
+                    {/* Istaknuta slika */}
+                    <Field>
+                      <FieldLabel>Istaknuta slika</FieldLabel>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
                       />
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploading}
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        Promeni sliku
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleRemoveImage}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Ukloni sliku
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
+
+                      {previewUrl ? (
+                        <div className="group relative w-full h-48 rounded-lg overflow-hidden border border-border">
+                          <Image
+                            src={previewUrl}
+                            alt="Preview"
+                            fill
+                            className="object-cover"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => fileInputRef.current?.click()}
+                            >
+                              <Upload className="mr-2 h-4 w-4" />
+                              Zameni
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              onClick={handleRemoveImage}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Ukloni
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex w-full flex-col items-center gap-3 rounded-lg border-2 border-dashed border-muted-foreground/25 px-6 py-10 text-center transition-colors hover:border-muted-foreground/50 hover:bg-muted/50"
+                        >
+                          <div className="rounded-full bg-muted p-3">
+                            <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">
+                              Dodaj istaknutu sliku
+                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              PNG, JPG ili WebP
+                            </p>
+                          </div>
+                        </button>
+                      )}
+                    </Field>
+
+                    {/* Alt tekst slike */}
+                    <Controller
+                      name="imageAlt"
+                      control={control}
+                      render={({ field }) => (
+                        <Field>
+                          <FieldLabel>
+                            Alt tekst slike{' '}
+                            <span className="text-xs text-muted-foreground">
+                              (opciono)
+                            </span>
+                          </FieldLabel>
+                          <Input
+                            placeholder="Opis slike za pristupačnost..."
+                            {...field}
+                            value={field.value ?? ''}
+                          />
+                        </Field>
+                      )}
+                    />
+
+                    {/* Status */}
+                    <Controller
+                      name="status"
+                      control={control}
+                      render={({ field }) => (
+                        <Field>
+                          <FieldLabel>Status</FieldLabel>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Izaberi status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="DRAFT">Draft</SelectItem>
+                              <SelectItem value="PUBLISHED">
+                                Objavljen
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </Field>
+                      )}
+                    />
+                  </FieldGroup>
+                </form>
+              )}
+            </div>
+
+            <DrawerFooter className="border-t pt-4">
+              <div className="flex items-center justify-between gap-2">
+                {isEditMode && (
                   <Button
                     type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading}
-                    className="w-full h-32 border-dashed"
+                    variant="ghost"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    disabled={isPending}
+                    onClick={() => setShowDeleteConfirm(true)}
                   >
-                    <div className="flex flex-col items-center gap-2">
-                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">
-                        {isUploading
-                          ? 'Uploadovanje...'
-                          : 'Klikni za upload slike'}
-                      </span>
-                    </div>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Obriši
                   </Button>
                 )}
-              </Field>
+                <div className="ml-auto flex items-center gap-2">
+                  <DrawerClose asChild>
+                    <Button variant="outline">Otkaži</Button>
+                  </DrawerClose>
+                  <Button
+                    type="submit"
+                    form="blog-post-form"
+                    disabled={isPending || (isEditMode && isLoadingPost)}
+                  >
+                    {isEditMode ? 'Ažuriraj' : 'Sačuvaj'}
+                  </Button>
+                </div>
+              </div>
+            </DrawerFooter>
+          </div>
+        </DrawerContent>
+      </Drawer>
 
-              {/* Alt tekst slike */}
-              <Controller
-                name="imageAlt"
-                control={control}
-                render={({ field }) => (
-                  <Field>
-                    <FieldLabel>
-                      Alt tekst slike{' '}
-                      <span className="text-xs text-muted-foreground">
-                        (opciono)
-                      </span>
-                    </FieldLabel>
-                    <Input
-                      placeholder="Opis slike za pristupačnost..."
-                      {...field}
-                      value={field.value ?? ''}
-                    />
-                  </Field>
-                )}
-              />
-
-              {/* Status */}
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <Field>
-                    <FieldLabel>Status</FieldLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Izaberi status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="DRAFT">Draft</SelectItem>
-                        <SelectItem value="PUBLISHED">Objavljen</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-          </form>
-
-          <DrawerFooter>
-            <Button type="submit" form="blog-post-form" disabled={isPending}>
-              {post ? 'Ažuriraj' : 'Sačuvaj'}
-            </Button>
-            <DrawerClose asChild>
-              <Button variant="outline">Otkaži</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </div>
-      </DrawerContent>
-    </Drawer>
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        onConfirm={handleDelete}
+        title="Potvrda brisanja"
+        description="Da li ste sigurni da želite da obrišete ovaj blog post? Ova akcija se ne može poništiti."
+        confirmText="Obriši"
+        variant="destructive"
+      />
+    </>
   );
 }

@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-import { generateFileKey, getPresignedUploadUrl } from '@/lib/minio';
+import {
+  generateFileKey,
+  getPresignedUploadUrl,
+  getPublicFileUrl,
+} from '@/lib/minio';
 import {
   createAboutValueSchema,
   createMilestoneSchema,
@@ -373,15 +377,7 @@ export const aboutRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const key = generateFileKey('team-members', input.fileName);
       const uploadUrl = await getPresignedUploadUrl(key);
-
-      // Construct the public URL (after upload completes)
-      const endpoint = process.env.MINIO_ENDPOINT;
-      const port = process.env.MINIO_PORT || '9000';
-      const bucket = process.env.MINIO_BUCKET || 'dental-clinic';
-      const useSSL = process.env.MINIO_USE_SSL === 'true';
-      const protocol = useSSL ? 'https' : 'http';
-
-      const publicUrl = `${protocol}://${endpoint}:${port}/${bucket}/${key}`;
+      const publicUrl = getPublicFileUrl(key);
 
       return {
         uploadUrl,

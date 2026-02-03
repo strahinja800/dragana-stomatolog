@@ -10,6 +10,14 @@ export type BlogPostStatus = z.infer<typeof blogPostStatusSchema>;
 
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+export const fileUploadSchema = z.object({
+  fileBase64: z.string().min(1),
+  fileName: z.string().min(1),
+  fileType: z.string().min(1),
+});
+
+export type FileUploadInput = z.infer<typeof fileUploadSchema>;
+
 export const createBlogPostSchema = z.object({
   title: z.string().min(1, 'Naslov je obavezan'),
   slug: z
@@ -18,17 +26,16 @@ export const createBlogPostSchema = z.object({
     .regex(slugRegex, 'Slug može sadržati samo mala slova, brojeve i crtice'),
   content: z.string().min(1, 'Sadržaj je obavezan'),
   status: blogPostStatusSchema,
-  featuredImage: z.string().optional().nullable(),
   imageAlt: z.string().optional().nullable(),
   publishedAt: z.date().optional().nullable(),
   sortOrder: z.number().optional(),
+  featuredImageFile: fileUploadSchema.optional().nullable(),
 });
 
 export type CreateBlogPostInput = z.infer<typeof createBlogPostSchema>;
 
 export const blogPostFormSchema = createBlogPostSchema.omit({
   slug: true,
-  featuredImage: true,
 });
 
 export type BlogPostFormInput = z.infer<typeof blogPostFormSchema>;
@@ -43,11 +50,12 @@ export const updateBlogPostSchema = z.object({
     .optional(),
   content: z.string().min(1).optional(),
   excerpt: z.string().optional().nullable(),
-  featuredImage: z.string().optional().nullable(),
   imageAlt: z.string().optional().nullable(),
   status: blogPostStatusSchema.optional(),
   publishedAt: z.date().optional().nullable(),
   sortOrder: z.number().optional(),
+  featuredImageFile: fileUploadSchema.optional().nullable(),
+  removeFeaturedImage: z.boolean().optional(),
 });
 
 export type UpdateBlogPostInput = z.infer<typeof updateBlogPostSchema>;
