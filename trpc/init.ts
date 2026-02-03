@@ -7,45 +7,33 @@ import superjson from 'superjson';
 import { auth } from '@/lib/auth-server';
 import { type Session } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
+
 export const createTRPCContext = cache(async () => {
-  const requestHeaders = await headers();
-
-  const session = await auth.api.getSession({
-    headers: requestHeaders,
-  });
-
   return {
     prisma,
-    session: session as Session | null,
-    headers: requestHeaders,
   };
 });
 
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
-// Avoid exporting the entire t-object
-// since it's not very descriptive.
-// For instance, the use of a t variable
-// is common in i18n libraries.
+
 const t = initTRPC.context<Context>().create({
-  /**
-   * @see https://trpc.io/docs/server/data-transformers
-   */
   transformer: superjson,
 });
-// Base router and procedure helpers
+
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const publicProcedure = t.procedure;
 
-export const protectedProcedure = publicProcedure.use(({ ctx, next }) => {
-  if (!ctx.session) {
+export const protectedProcedure = publicProcedure.use(async ({ next }) => {
+  const requestHeaders = await headers();
+  const session = await auth.api.getSession({ headers: requestHeaders });
+
+  if (!session) {
     throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
+
   return next({
-    ctx: {
-      ...ctx,
-      session: ctx.session,
-    },
+    ctx: { session: session as Session },
   });
 });
 
