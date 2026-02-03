@@ -1,50 +1,68 @@
-import Image, { type StaticImageData } from 'next/image';
+import Image from 'next/image';
 import Link from 'next/link';
 
-import { ChevronRight } from 'lucide-react';
+import { format } from 'date-fns';
+import { sr } from 'date-fns/locale';
+import { BookOpen, ChevronRight } from 'lucide-react';
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, '');
+}
 
 interface BlogPost {
-  image: StaticImageData;
+  id: string;
   title: string;
-  category: string;
-  date: string;
-  excerpt: string;
+  slug: string;
+  excerpt: string | null;
+  featuredImage: string | null;
+  imageAlt: string | null;
+  publishedAt: Date | null;
+  createdAt: Date;
 }
 
 interface Props {
-  post: BlogPost[];
+  posts: BlogPost[];
 }
 
-export function BlogArticle({ post }: Props) {
+export function BlogArticle({ posts }: Props) {
   return (
     <div className="grid md:grid-cols-3 gap-8">
-      {post.map((post, index) => (
+      {posts.map((post) => (
         <article
-          key={index}
+          key={post.id}
           className="group rounded-2xl bg-card border border-border shadow-card hover:shadow-hover transition-all duration-300 overflow-hidden"
         >
-          <div className="aspect-16/10 overflow-hidden">
-            <Image
-              src={post.image}
-              alt={post.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
+          <div className="aspect-16/10 overflow-hidden bg-muted">
+            {post.featuredImage ? (
+              <Image
+                src={post.featuredImage}
+                alt={post.imageAlt ?? stripHtml(post.title)}
+                width={600}
+                height={375}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <BookOpen className="w-12 h-12 text-muted-foreground/30" />
+              </div>
+            )}
           </div>
           <div className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="px-3 py-1 rounded-full bg-(--primary-light) text-primary text-xs font-medium">
-                {post.category}
-              </span>
-              <span className="text-sm text-muted-foreground">{post.date}</span>
-            </div>
-            <h3 className="text-2xl font-heading font-semibold text-foreground mb-2 group-hover:text-[rgb(13,162,231)] transition-colors">
-              {post.title}
+            <span className="text-sm text-muted-foreground">
+              {format(post.publishedAt ?? post.createdAt, 'd. MMMM yyyy.', {
+                locale: sr,
+              })}
+            </span>
+            <h3 className="text-2xl font-heading font-semibold text-foreground mt-2 mb-2 line-clamp-2 group-hover:text-[rgb(13,162,231)] transition-colors">
+              {stripHtml(post.title)}
             </h3>
-            <p className="text-muted-foreground text-base leading-7 mb-4">
-              {post.excerpt}
-            </p>
+            {post.excerpt && (
+              <p className="text-muted-foreground text-base leading-7 mb-4 line-clamp-3">
+                {post.excerpt}
+              </p>
+            )}
             <Link
-              href="/blog"
+              href={`/blog/${post.slug}`}
               className="inline-flex items-center text-[rgb(13,162,231)] font-medium text-sm hover:gap-2 transition-all"
             >
               Pročitaj više

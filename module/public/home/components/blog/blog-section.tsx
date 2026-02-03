@@ -1,13 +1,24 @@
+'use client';
+
 import Link from 'next/link';
 
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { BookOpen } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { blogPosts } from '@/data/data';
+import { useTRPC } from '@/trpc/client';
 
 import { BlogArticle } from './blog-article';
 
 export default function BlogSection() {
+  const trpc = useTRPC();
+
+  const { data: posts } = useSuspenseQuery(
+    trpc.blog.getPublishedPosts.queryOptions({ limit: 3 })
+  );
+
+  if (posts.length === 0) return null;
+
   return (
     <section className="py-16 md:py-24 bg-background">
       <div className="container mx-auto px-4">
@@ -27,7 +38,7 @@ export default function BlogSection() {
             </Link>
           </Button>
         </div>
-        <BlogArticle post={blogPosts} />
+        <BlogArticle posts={posts} />
       </div>
     </section>
   );

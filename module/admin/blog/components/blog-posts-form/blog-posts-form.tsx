@@ -12,11 +12,14 @@ import { toast } from 'sonner';
 import Tiptap from '@/components/TipTap';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer';
 import {
   Field,
   FieldError,
@@ -183,178 +186,185 @@ export function BlogPostForm({ open, onClose, post }: BlogPostFormProps) {
     }
   };
 
+  const isPending = isCreating || isUpdating || isGeneratingSlug || isUploading;
+
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{post ? 'Izmeni članak' : 'Novi članak'}</DialogTitle>
-        </DialogHeader>
+    <Drawer open={open} onOpenChange={handleClose} direction="right">
+      <DrawerContent className="h-screen data-[vaul-drawer-direction=right]:sm:max-w-3xl">
+        <div className="mx-auto h-full w-full overflow-y-auto">
+          <DrawerHeader>
+            <DrawerTitle>{post ? 'Izmeni članak' : 'Novi članak'}</DrawerTitle>
+            <DrawerDescription>
+              {post
+                ? 'Izmenite podatke postojećeg članka.'
+                : 'Popunite formu za kreiranje novog članka.'}
+            </DrawerDescription>
+          </DrawerHeader>
 
-        <form className="max-w-4xl" onSubmit={handleSubmit(onSubmit)}>
-          <FieldGroup>
-            {/* Naslov */}
-            <Controller
-              name="title"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="max-w-3xl">
-                  <FieldLabel>Naslov *</FieldLabel>
-                  <Tiptap
-                    placeholder="Unesite naslov članka..."
-                    className="h-28 py-2"
-                    toolbarPreset="minimal"
-                    content={field.value}
-                    onChange={field.onChange}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            {/* Sadržaj */}
-            <Controller
-              name="content"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="max-w-3xl">
-                  <FieldLabel>Sadržaj *</FieldLabel>
-                  <Tiptap
-                    placeholder="Zapocnite pisanje..."
-                    className="min-h-[300px]"
-                    toolbarPreset="full"
-                    content={field.value}
-                    onChange={field.onChange}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            {/* Istaknuta slika */}
-            <Field className="max-w-3xl">
-              <FieldLabel>Istaknuta slika</FieldLabel>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
+          <form
+            id="blog-post-form"
+            className="px-4 pb-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <FieldGroup>
+              {/* Naslov */}
+              <Controller
+                name="title"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Naslov *</FieldLabel>
+                    <Tiptap
+                      placeholder="Unesite naslov članka..."
+                      className="h-28 py-2"
+                      toolbarPreset="minimal"
+                      content={field.value}
+                      onChange={field.onChange}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
               />
 
-              {uploadedImageUrl ? (
-                <div className="space-y-2">
-                  <div className="relative w-full h-48 rounded-lg overflow-hidden border border-border">
-                    <Image
-                      src={uploadedImageUrl}
-                      alt="Preview"
-                      fill
-                      className="object-cover"
+              {/* Sadržaj */}
+              <Controller
+                name="content"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Sadržaj *</FieldLabel>
+                    <Tiptap
+                      placeholder="Zapocnite pisanje..."
+                      className="min-h-[300px]"
+                      toolbarPreset="full"
+                      content={field.value}
+                      onChange={field.onChange}
                     />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isUploading}
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      Promeni sliku
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleRemoveImage}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Ukloni sliku
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="w-full h-32 border-dashed"
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
-                      {isUploading
-                        ? 'Uploadovanje...'
-                        : 'Klikni za upload slike'}
-                    </span>
-                  </div>
-                </Button>
-              )}
-            </Field>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-            {/* Alt tekst slike */}
-            <Controller
-              name="imageAlt"
-              control={control}
-              render={({ field }) => (
-                <Field className="max-w-3xl">
-                  <FieldLabel>
-                    Alt tekst slike{' '}
-                    <span className="text-xs text-muted-foreground">
-                      (opciono)
-                    </span>
-                  </FieldLabel>
-                  <Input
-                    placeholder="Opis slike za pristupačnost..."
-                    {...field}
-                    value={field.value ?? ''}
-                  />
-                </Field>
-              )}
-            />
+              {/* Istaknuta slika */}
+              <Field>
+                <FieldLabel>Istaknuta slika</FieldLabel>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
 
-            {/* Status */}
-            <Controller
-              name="status"
-              control={control}
-              render={({ field }) => (
-                <Field className="max-w-3xl">
-                  <FieldLabel>Status</FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Izaberi status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="DRAFT">Draft</SelectItem>
-                      <SelectItem value="PUBLISHED">Objavljen</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
-              )}
-            />
-          </FieldGroup>
+                {uploadedImageUrl ? (
+                  <div className="space-y-2">
+                    <div className="relative w-full h-48 rounded-lg overflow-hidden border border-border">
+                      <Image
+                        src={uploadedImageUrl}
+                        alt="Preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploading}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Promeni sliku
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRemoveImage}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Ukloni sliku
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="w-full h-32 border-dashed"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        {isUploading
+                          ? 'Uploadovanje...'
+                          : 'Klikni za upload slike'}
+                      </span>
+                    </div>
+                  </Button>
+                )}
+              </Field>
 
-          {/* Footer buttons */}
-          <div className="flex justify-end gap-2 pt-4 mt-6 border-t max-w-3xl">
-            <Button type="button" variant="outline" onClick={handleClose}>
-              Otkaži
-            </Button>
-            <Button
-              type="submit"
-              disabled={
-                isCreating || isUpdating || isGeneratingSlug || isUploading
-              }
-            >
+              {/* Alt tekst slike */}
+              <Controller
+                name="imageAlt"
+                control={control}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel>
+                      Alt tekst slike{' '}
+                      <span className="text-xs text-muted-foreground">
+                        (opciono)
+                      </span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="Opis slike za pristupačnost..."
+                      {...field}
+                      value={field.value ?? ''}
+                    />
+                  </Field>
+                )}
+              />
+
+              {/* Status */}
+              <Controller
+                name="status"
+                control={control}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel>Status</FieldLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Izaberi status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="DRAFT">Draft</SelectItem>
+                        <SelectItem value="PUBLISHED">Objavljen</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+          </form>
+
+          <DrawerFooter>
+            <Button type="submit" form="blog-post-form" disabled={isPending}>
               {post ? 'Ažuriraj' : 'Sačuvaj'}
             </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <DrawerClose asChild>
+              <Button variant="outline">Otkaži</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }
