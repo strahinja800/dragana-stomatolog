@@ -25,6 +25,10 @@ const nextConfig: NextConfig = {
         hostname: '*.convex.cloud',
         pathname: '/api/storage/**',
       },
+      {
+        protocol: 'https',
+        hostname: 's3.hektor-tech.com',
+      },
     ],
   },
 };

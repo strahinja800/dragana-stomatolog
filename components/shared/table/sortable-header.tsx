@@ -3,12 +3,19 @@
 import { type Column } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
+
 interface SortableHeaderProps<T> {
   column: Column<T>;
   label: string;
+  className?: string;
 }
 
-export function SortableHeader<T>({ column, label }: SortableHeaderProps<T>) {
+export function SortableHeader<T>({
+  column,
+  label,
+  className,
+}: SortableHeaderProps<T>) {
   const sorted = column.getIsSorted();
 
   const handleSort = () => {
@@ -32,7 +39,7 @@ export function SortableHeader<T>({ column, label }: SortableHeaderProps<T>) {
     <button
       onClick={handleSort}
       aria-label={`Sortiraj po koloni ${label}${directionText}`}
-      className="flex items-center ml-5"
+      className={cn('flex items-center ml-5', className)}
     >
       <span>{label}</span>
       {sorted === 'asc' && (

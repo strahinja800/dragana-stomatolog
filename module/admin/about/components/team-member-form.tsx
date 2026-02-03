@@ -88,7 +88,7 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
   const { mutate: createMember, isPending: isCreating } = useMutation(
     trpc.about.createTeamMember.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['about'] });
+        queryClient.invalidateQueries({ queryKey: [['about']] });
         toast.success('Član tima uspešno kreiran');
         handleReset();
       },
@@ -102,7 +102,7 @@ export function TeamMemberForm({ open, onClose, member }: TeamMemberFormProps) {
   const { mutate: updateMember, isPending: isUpdating } = useMutation(
     trpc.about.updateTeamMember.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['about'] });
+        queryClient.invalidateQueries({ queryKey: [['about']] });
         toast.success('Član tima uspešno ažuriran');
         handleReset();
       },

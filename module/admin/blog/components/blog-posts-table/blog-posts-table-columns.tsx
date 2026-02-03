@@ -1,14 +1,15 @@
 'use client';
 
+import Image from 'next/image';
+
 import { type ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
+import { ImageIcon } from 'lucide-react';
 
 import { SortableHeader } from '@/components/shared/table/sortable-header';
 import { TableCellText } from '@/components/shared/table/table-cell-text';
 import { Badge } from '@/components/ui/badge';
-
-import { BlogPostsTableRowActions } from './blog-posts-table-row-actions';
 
 export interface BlogPostRow {
   id: string;
@@ -32,9 +33,28 @@ function stripHtml(html: string): string {
 export const columns: ColumnDef<BlogPostRow>[] = [
   {
     accessorKey: 'title',
-    header: ({ column }) => <SortableHeader column={column} label="Naslov" />,
+    header: ({ column }) => (
+      <SortableHeader column={column} label="Naslov" className="ml-1" />
+    ),
     cell: ({ row }) => (
-      <TableCellText value={stripHtml(row.getValue('title'))} />
+      <div className="flex items-center gap-3">
+        {row.original.featuredImage ? (
+          <Image
+            src={row.original.featuredImage}
+            alt={row.original.imageAlt ?? stripHtml(row.getValue('title'))}
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-md object-cover shrink-0"
+          />
+        ) : (
+          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted shrink-0">
+            <ImageIcon className="h-4 w-4 text-muted-foreground" />
+          </div>
+        )}
+        <span className="font-medium truncate">
+          {stripHtml(row.getValue('title'))}
+        </span>
+      </div>
     ),
   },
   {
@@ -63,23 +83,6 @@ export const columns: ColumnDef<BlogPostRow>[] = [
       return (
         <TableCellText
           value={date ? format(date, 'd. MMM yyyy.', { locale: sr }) : '—'}
-        />
-      );
-    },
-  },
-  {
-    id: 'actions',
-    cell: ({ row, table }) => {
-      const post = row.original;
-      const meta = table.options.meta as {
-        onEdit?: (post: BlogPostRow) => void;
-        onDelete?: (id: string) => void;
-      };
-      return (
-        <BlogPostsTableRowActions
-          post={post}
-          onEdit={meta?.onEdit}
-          onDelete={meta?.onDelete}
         />
       );
     },

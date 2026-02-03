@@ -30,14 +30,9 @@ import { BlogPostsTableToolbar } from './blog-posts-table-toolbar';
 interface BlogPostsTableProps {
   data: BlogPostRow[];
   onEditPost: (post: BlogPostRow) => void;
-  onDeletePost: (id: string) => void;
 }
 
-export function BlogPostsTable({
-  data,
-  onEditPost,
-  onDeletePost,
-}: BlogPostsTableProps) {
+export function BlogPostsTable({ data, onEditPost }: BlogPostsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -64,10 +59,6 @@ export function BlogPostsTable({
       columnFilters,
       columnVisibility,
       globalFilter,
-    },
-    meta: {
-      onEdit: (post: BlogPostRow) => onEditPost(post),
-      onDelete: (id: string) => onDeletePost(id),
     },
   });
 
@@ -102,6 +93,8 @@ export function BlogPostsTable({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  className="cursor-pointer"
+                  onClick={() => onEditPost(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

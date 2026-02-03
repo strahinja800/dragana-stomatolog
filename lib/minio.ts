@@ -42,12 +42,25 @@ export const minioClient = {
 /**
  * Inicijalizuje bucket ako ne postoji
  */
+const PUBLIC_READ_POLICY = JSON.stringify({
+  Version: '2012-10-17',
+  Statement: [
+    {
+      Effect: 'Allow',
+      Principal: { AWS: ['*'] },
+      Action: ['s3:GetObject'],
+      Resource: [`arn:aws:s3:::${BUCKET_NAME}/*`],
+    },
+  ],
+});
+
 export async function ensureBucketExists() {
   const client = getMinioClient();
   const exists = await client.bucketExists(BUCKET_NAME);
   if (!exists) {
     await client.makeBucket(BUCKET_NAME);
   }
+  await client.setBucketPolicy(BUCKET_NAME, PUBLIC_READ_POLICY);
 }
 
 /**
@@ -73,11 +86,43 @@ export async function getPresignedDownloadUrl(
 }
 
 /**
+ * Uploaduje fajl direktno na MinIO
+ */
+export async function uploadFile(
+  key: string,
+  buffer: Buffer,
+  contentType: string
+): Promise<void> {
+  const client = getMinioClient();
+  await client.putObject(BUCKET_NAME, key, buffer, buffer.length, {
+    'Content-Type': contentType,
+  });
+}
+
+/**
  * Briše fajl iz storage-a
  */
 export async function deleteFile(key: string): Promise<void> {
   const client = getMinioClient();
   await client.removeObject(BUCKET_NAME, key);
+}
+
+/**
+ * Vraća javni URL za fajl u storage-u
+ */
+export function getPublicFileUrl(key: string): string {
+  if (process.env.MINIO_PUBLIC_URL) {
+    return `${process.env.MINIO_PUBLIC_URL}/${BUCKET_NAME}/${key}`;
+  }
+
+  const endpoint = process.env.MINIO_ENDPOINT || 'localhost';
+  const port = process.env.MINIO_PORT || '9000';
+  const useSSL = process.env.MINIO_USE_SSL === 'true';
+  const protocol = useSSL ? 'https' : 'http';
+  const isDefaultPort =
+    (useSSL && port === '443') || (!useSSL && port === '80');
+
+  return `${protocol}://${endpoint}${isDefaultPort ? '' : `:${port}`}/${BUCKET_NAME}/${key}`;
 }
 
 /**

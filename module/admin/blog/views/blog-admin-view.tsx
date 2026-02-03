@@ -1,12 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
-import { toast } from 'sonner';
+import { parseAsString, useQueryState } from 'nuqs';
 
-import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { BlogPostForm } from '@/module/admin/blog/components/blog-posts-form/blog-posts-form';
 import { BlogPostsTable } from '@/module/admin/blog/components/blog-posts-table/blog-posts-table';
@@ -15,40 +12,18 @@ import { useTRPC } from '@/trpc/client';
 
 export default function BlogAdminView() {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
 
-  const [formOpen, setFormOpen] = useState(false);
-  const [postToEdit, setPostToEdit] = useState<BlogPostRow | undefined>();
-  const [postToDelete, setPostToDelete] = useState<string | null>(null);
+  const [blogPostId, setBlogPostId] = useQueryState(
+    'blogPostId',
+    parseAsString
+  );
 
-  const { data: posts = [] } = useQuery(trpc.blog.getAllPosts.queryOptions());
-
-  const deletePostMutation = useMutation(
-    trpc.blog.deletePost.mutationOptions({
-      onSuccess: () => {
-        setPostToDelete(null);
-        queryClient.invalidateQueries({ queryKey: [['blog']] });
-        toast.success('Članak je uspešno obrisan.');
-      },
-      onError: () => {
-        toast.error('Došlo je do greške prilikom brisanja članka.');
-      },
-    })
+  const { data: posts = [] } = useSuspenseQuery(
+    trpc.blog.getAllPosts.queryOptions()
   );
 
   const handleEdit = (post: BlogPostRow) => {
-    setPostToEdit(post);
-    setFormOpen(true);
-  };
-
-  const handleFormClose = () => {
-    setFormOpen(false);
-    setPostToEdit(undefined);
-  };
-
-  const confirmDelete = () => {
-    if (!postToDelete) return;
-    deletePostMutation.mutate({ id: postToDelete });
+    setBlogPostId(post.id);
   };
 
   return (
@@ -57,35 +32,20 @@ export default function BlogAdminView() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Blog</h1>
           <p className="mt-1 text-muted-foreground">
-            Pregled i upravljanje blog člancima.
+            Pregled i upravljanje blog postovima.
           </p>
         </div>
-        <Button onClick={() => setFormOpen(true)}>
+        <Button onClick={() => setBlogPostId('new')}>
           <Plus className="mr-2 h-4 w-4" />
-          Novi članak
+          Novi blog post
         </Button>
       </div>
 
-      <BlogPostsTable
-        data={posts}
-        onEditPost={handleEdit}
-        onDeletePost={setPostToDelete}
-      />
+      <BlogPostsTable data={posts} onEditPost={handleEdit} />
 
       <BlogPostForm
-        open={formOpen}
-        onClose={handleFormClose}
-        post={postToEdit}
-      />
-
-      <ConfirmDialog
-        open={!!postToDelete}
-        onOpenChange={(open) => !open && setPostToDelete(null)}
-        onConfirm={confirmDelete}
-        title="Potvrda brisanja"
-        description="Da li ste sigurni da želite da obrišete ovaj članak? Ova akcija se ne može poništiti."
-        confirmText="Obriši"
-        variant="destructive"
+        blogPostId={blogPostId}
+        onClose={() => setBlogPostId(null)}
       />
     </div>
   );

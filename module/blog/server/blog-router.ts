@@ -1,7 +1,13 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
-import { generateFileKey, getPresignedUploadUrl } from '@/lib/minio';
+import {
+  BUCKET_NAME,
+  deleteFile,
+  generateFileKey,
+  getPublicFileUrl,
+  uploadFile,
+} from '@/lib/minio';
 import {
   createBlogPostSchema,
   deleteBlogPostSchema,
@@ -41,6 +47,36 @@ function generateSlugFromTitle(title: string): string {
     .replace(/-+/g, '-');
 }
 
+async function uploadFeaturedImage(file: {
+  fileBase64: string;
+  fileName: string;
+  fileType: string;
+}): Promise<string> {
+  const key = generateFileKey('blog', file.fileName);
+  const buffer = Buffer.from(file.fileBase64, 'base64');
+  await uploadFile(key, buffer, file.fileType);
+
+  return getPublicFileUrl(key);
+}
+
+function extractFileKeyFromUrl(fileUrl: string): string {
+  const url = new URL(fileUrl);
+  const path = url.pathname.slice(1);
+  if (path.startsWith(`${BUCKET_NAME}/`)) {
+    return path.slice(BUCKET_NAME.length + 1);
+  }
+  return path;
+}
+
+async function deleteFeaturedImage(imageUrl: string): Promise<void> {
+  try {
+    const key = extractFileKeyFromUrl(imageUrl);
+    await deleteFile(key);
+  } catch {
+    console.error('Failed to delete featured image from storage');
+  }
+}
+
 export const blogRouter = createTRPCRouter({
   // ============================================
   // PUBLIC PROCEDURES
@@ -50,7 +86,9 @@ export const blogRouter = createTRPCRouter({
    * Vraća sve objavljene blog postove (public)
    */
   getPublishedPosts: publicProcedure
-    .input(z.object({ limit: z.number().int().positive().optional() }).optional())
+    .input(
+      z.object({ limit: z.number().int().positive().optional() }).optional()
+    )
     .query(async ({ ctx, input }) => {
       const posts = await ctx.prisma.blogPost.findMany({
         where: { status: 'PUBLISHED' },
@@ -158,11 +196,18 @@ export const blogRouter = createTRPCRouter({
         sortOrder = last ? last.sortOrder + 1 : 1;
       }
 
+      let featuredImage: string | null = null;
+      if (input.featuredImageFile) {
+        featuredImage = await uploadFeaturedImage(input.featuredImageFile);
+      }
+
       const post = await ctx.prisma.blogPost.create({
         data: {
           title: input.title.trim(),
           slug: input.slug.trim(),
           content: input.content,
+          featuredImage,
+          imageAlt: input.imageAlt?.trim() || null,
           status: input.status,
           publishedAt:
             input.status === 'PUBLISHED'
@@ -181,7 +226,7 @@ export const blogRouter = createTRPCRouter({
   updatePost: adminProcedure
     .input(updateBlogPostSchema)
     .mutation(async ({ ctx, input }) => {
-      const { id, ...data } = input;
+      const { id, featuredImageFile, removeFeaturedImage, ...data } = input;
 
       if (data.slug) {
         const existingPost = await ctx.prisma.blogPost.findFirst({
@@ -199,34 +244,53 @@ export const blogRouter = createTRPCRouter({
         }
       }
 
+      const currentPost = await ctx.prisma.blogPost.findUnique({
+        where: { id },
+        select: { featuredImage: true, publishedAt: true },
+      });
+
       let publishedAt = data.publishedAt;
-      if (data.status === 'PUBLISHED') {
-        const currentPost = await ctx.prisma.blogPost.findUnique({
-          where: { id },
-        });
-        if (currentPost && !currentPost.publishedAt && !publishedAt) {
-          publishedAt = new Date();
+      if (
+        data.status === 'PUBLISHED' &&
+        currentPost &&
+        !currentPost.publishedAt &&
+        !publishedAt
+      ) {
+        publishedAt = new Date();
+      }
+
+      let featuredImage: string | null | undefined = undefined;
+
+      if (featuredImageFile) {
+        if (currentPost?.featuredImage) {
+          await deleteFeaturedImage(currentPost.featuredImage);
         }
+        featuredImage = await uploadFeaturedImage(featuredImageFile);
+      } else if (removeFeaturedImage) {
+        if (currentPost?.featuredImage) {
+          await deleteFeaturedImage(currentPost.featuredImage);
+        }
+        featuredImage = null;
       }
 
       const post = await ctx.prisma.blogPost.update({
         where: { id },
         data: {
-          ...(data.title !== undefined && { title: data.title.trim() }),
-          ...(data.slug !== undefined && { slug: data.slug.trim() }),
-          ...(data.content !== undefined && { content: data.content }),
-          ...(data.excerpt !== undefined && {
-            excerpt: data.excerpt?.trim() || null,
-          }),
-          ...(data.featuredImage !== undefined && {
-            featuredImage: data.featuredImage,
-          }),
-          ...(data.imageAlt !== undefined && {
-            imageAlt: data.imageAlt?.trim() || null,
-          }),
-          ...(data.status !== undefined && { status: data.status }),
-          ...(publishedAt !== undefined && { publishedAt }),
-          ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
+          title: data.title?.trim(),
+          slug: data.slug?.trim(),
+          content: data.content,
+          excerpt:
+            data.excerpt !== undefined
+              ? data.excerpt?.trim() || null
+              : undefined,
+          featuredImage,
+          imageAlt:
+            data.imageAlt !== undefined
+              ? data.imageAlt?.trim() || null
+              : undefined,
+          status: data.status,
+          publishedAt,
+          sortOrder: data.sortOrder,
         },
       });
 
@@ -239,6 +303,15 @@ export const blogRouter = createTRPCRouter({
   deletePost: adminProcedure
     .input(deleteBlogPostSchema)
     .mutation(async ({ ctx, input }) => {
+      const post = await ctx.prisma.blogPost.findUnique({
+        where: { id: input.id },
+        select: { featuredImage: true },
+      });
+
+      if (post?.featuredImage) {
+        await deleteFeaturedImage(post.featuredImage);
+      }
+
       await ctx.prisma.blogPost.delete({
         where: { id: input.id },
       });
@@ -281,38 +354,5 @@ export const blogRouter = createTRPCRouter({
       }
 
       return { slug };
-    }),
-
-  // ============================================
-  // FILE UPLOADS
-  // ============================================
-
-  /**
-   * Generiše presigned URL za upload featured slike
-   */
-  getFeaturedImageUploadUrl: adminProcedure
-    .input(
-      z.object({
-        fileName: z.string(),
-        fileType: z.string(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const key = generateFileKey('blog', input.fileName);
-      const uploadUrl = await getPresignedUploadUrl(key);
-
-      const endpoint = process.env.MINIO_ENDPOINT;
-      const port = process.env.MINIO_PORT || '9000';
-      const bucket = process.env.MINIO_BUCKET || 'dental-clinic';
-      const useSSL = process.env.MINIO_USE_SSL === 'true';
-      const protocol = useSSL ? 'https' : 'http';
-
-      const publicUrl = `${protocol}://${endpoint}:${port}/${bucket}/${key}`;
-
-      return {
-        uploadUrl,
-        publicUrl,
-        key,
-      };
     }),
 });

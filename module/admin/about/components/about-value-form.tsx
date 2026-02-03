@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { IconPicker } from '@/module/admin/about/components/icon-picker';
 import { useTRPC } from '@/trpc/client';
 
 interface AboutValue {
@@ -71,7 +72,7 @@ export function AboutValueForm({ open, onClose, value }: AboutValueFormProps) {
   const { mutate: createValue, isPending: isCreating } = useMutation(
     trpc.about.createAboutValue.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['about'] });
+        queryClient.invalidateQueries({ queryKey: [['about']] });
         toast.success('Vrednost uspešno kreirana');
         handleClose();
       },
@@ -85,7 +86,7 @@ export function AboutValueForm({ open, onClose, value }: AboutValueFormProps) {
   const { mutate: updateValue, isPending: isUpdating } = useMutation(
     trpc.about.updateAboutValue.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['about'] });
+        queryClient.invalidateQueries({ queryKey: [['about']] });
         toast.success('Vrednost uspešno ažurirana');
         handleClose();
       },
@@ -131,16 +132,14 @@ export function AboutValueForm({ open, onClose, value }: AboutValueFormProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid gap-4">
             <div className="space-y-2">
-              <Label htmlFor="icon">
-                Ikona{' '}
-                <span className="text-xs text-muted-foreground">
-                  (npr. Heart, Award, Users, Sparkles)
-                </span>
-              </Label>
-              <Input
-                id="icon"
-                {...register('icon', { required: 'Ikona je obavezna' })}
-                placeholder="Heart"
+              <Label>Ikona</Label>
+              <Controller
+                name="icon"
+                control={control}
+                rules={{ required: 'Ikona je obavezna' }}
+                render={({ field }) => (
+                  <IconPicker value={field.value} onChange={field.onChange} />
+                )}
               />
               {errors.icon && (
                 <p className="text-sm text-destructive">

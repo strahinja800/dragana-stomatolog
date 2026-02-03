@@ -1,9 +1,9 @@
 import {
-  BUCKET_NAME,
   deleteFile,
   generateFileKey,
   getPresignedDownloadUrl,
   getPresignedUploadUrl,
+  getPublicFileUrl,
 } from '@/lib/minio';
 import {
   deleteFileSchema,
@@ -11,20 +11,6 @@ import {
   getUploadUrlSchema,
 } from '@/module/upload/types/upload-schemas';
 import { createTRPCRouter, protectedProcedure } from '@/trpc/init';
-
-function getPublicFileUrl(key: string): string {
-  const endpoint = process.env.MINIO_ENDPOINT || 'localhost';
-  const port = process.env.MINIO_PORT || '9000';
-  const useSSL = process.env.MINIO_USE_SSL === 'true';
-  const protocol = useSSL ? 'https' : 'http';
-
-  // If a public URL is configured, use it
-  if (process.env.MINIO_PUBLIC_URL) {
-    return `${process.env.MINIO_PUBLIC_URL}/${BUCKET_NAME}/${key}`;
-  }
-
-  return `${protocol}://${endpoint}:${port}/${BUCKET_NAME}/${key}`;
-}
 
 export const uploadRouter = createTRPCRouter({
   /**

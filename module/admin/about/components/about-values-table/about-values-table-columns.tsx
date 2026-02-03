@@ -5,6 +5,7 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { SortableHeader } from '@/components/shared/table/sortable-header';
 import { TableCellText } from '@/components/shared/table/table-cell-text';
 import { Badge } from '@/components/ui/badge';
+import { getIcon } from '@/module/public/about/lib/icon-map';
 
 import { AboutValuesTableRowActions } from './about-values-table-row-actions';
 
@@ -28,9 +29,16 @@ export const aboutValuesColumns: ColumnDef<AboutValue>[] = [
   {
     accessorKey: 'icon',
     header: 'Ikona',
-    cell: ({ row }) => (
-      <span className="font-mono text-sm">{row.getValue('icon')}</span>
-    ),
+    cell: ({ row }) => {
+      const iconName = row.getValue('icon') as string;
+      const Icon = getIcon(iconName);
+      return (
+        <div className="flex items-center gap-2">
+          <Icon className="size-4 text-muted-foreground" />
+          <span className="text-sm">{iconName}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'title',

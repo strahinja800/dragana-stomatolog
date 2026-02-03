@@ -205,6 +205,12 @@ const Tiptap = ({
     },
   });
 
+  useEffect(() => {
+    if (editor && content !== undefined && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+    }
+  }, [editor, content]);
+
   const options = toolbarOptions ?? TOOLBAR_PRESETS[toolbarPreset];
 
   return (
