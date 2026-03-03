@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Manrope, Playfair_Display } from 'next/font/google';
 
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
@@ -8,19 +8,22 @@ import { TRPCReactProvider } from '@/trpc/client';
 
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const manrope = Manrope({
   subsets: ['latin'],
+  variable: '--font-ui',
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
+  variable: '--font-brand',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Stomatološka ordinacija',
-  description: 'Stomatološka ordinacija',
+  title: 'DENTALHOLIST KONCEPT | Premium Stomatološka Ordinacija',
+  description:
+    'Premium holistički pristup stomatologiji. Online zakazivanje, podsetnici i savremena nega osmeha.',
 };
 
 export default function RootLayout({
@@ -29,9 +32,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="sr" className={`${geistSans}`}>
+    <html lang="sr">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${manrope.variable} ${playfairDisplay.variable} bg-background text-foreground font-sans antialiased`}
       >
         <TRPCReactProvider>
           <NuqsAdapter>

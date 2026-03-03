@@ -79,7 +79,7 @@ function FloatingInput({
             'text-base text-foreground placeholder:text-muted-foreground/60',
             'transition-all duration-300',
             'focus:border-primary/50 focus:outline-none',
-            'focus:bg-background/80 focus:shadow-[0_0_0_4px_hsl(199_89%_48%/0.1)]',
+            'focus:bg-background/80 focus:shadow-[0_0_0_4px_rgba(3,144,159,0.14)]',
             'hover:border-border hover:bg-background/60',
             'disabled:cursor-not-allowed disabled:opacity-50',
             isInvalid && [

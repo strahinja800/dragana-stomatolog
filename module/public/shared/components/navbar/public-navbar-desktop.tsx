@@ -1,11 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Phone } from 'lucide-react';
+import { Calendar, Phone } from 'lucide-react';
 
-import logo from '@/assets/logo-negativ.jpg';
-import { Button } from '@/components/ui/button';
 import { NAV_LINKS } from '@/constants/navigations';
+import { logoIcon, logoText } from '@/data/data';
 import { cn } from '@/lib/utils';
 
 import UserMenu from './user-menu';
@@ -17,32 +16,34 @@ type PublicNavbarDesktopProps = {
 export function PublicNavbarDesktop({ pathname }: PublicNavbarDesktopProps) {
   return (
     <>
-      {/* Logo */}
-      <Link href="/" className="flex items-center gap-2">
-        <div className="flex items-center justify-center gap-2">
-          <div className="rounded-xl flex items-center justify-center">
-            <Image
-              src={logo}
-              alt="DentalCare"
-              height={45}
-              className="rounded-2xl"
-            />
-          </div>
-          <span className="font-heading text-2xl font-semibold text-foreground max-[900px]:hidden">
-            DentalCare
-          </span>
-        </div>
+      <Link href="/" className="group flex min-w-0 items-center gap-2">
+        <Image
+          src={logoIcon}
+          alt="DENTALHOLIST"
+          width={294}
+          height={309}
+          className="h-10 w-auto object-contain drop-shadow-[0_7px_18px_rgba(0,0,0,0.34)] transition-smooth group-hover:scale-[1.01] sm:h-12"
+          priority
+        />
+        <Image
+          src={logoText}
+          alt="DENTALHOLIST"
+          width={935}
+          height={96}
+          className="hidden h-5 w-auto object-contain sm:block sm:h-6"
+        />
       </Link>
 
-      {/* Desktop Navigation */}
-      <div className="hidden md:flex items-center gap-8">
+      <div className="hidden md:flex items-center gap-7">
         {NAV_LINKS.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             className={cn(
-              'text-sm font-medium transition-colors',
-              pathname === link.href ? 'text-[rgb(13,162,231)]' : 'text-black'
+              'relative text-sm font-semibold tracking-wide transition-colors after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300',
+              pathname === link.href
+                ? 'text-accent after:scale-x-100'
+                : 'text-primary-foreground/85 hover:text-accent hover:after:scale-x-100'
             )}
           >
             {link.label}
@@ -50,18 +51,21 @@ export function PublicNavbarDesktop({ pathname }: PublicNavbarDesktopProps) {
         ))}
       </div>
 
-      {/* CTA Button + User Menu */}
-      <div className="hidden md:flex items-center gap-4">
+      <div className="hidden md:flex items-center gap-3">
         <a
           href="tel:+381111234567"
-          className="flex items-center gap-2 text-black hover:text-primary transition-colors"
+          className="flex items-center gap-2 rounded-full border border-white/28 bg-white/12 px-3 py-2 text-sm font-medium text-primary-foreground shadow-[0_8px_20px_-14px_rgba(0,0,0,0.5)] transition-smooth hover:border-accent/60 hover:bg-white/18 hover:text-white"
         >
-          <Phone className="w-4 h-4" />
-          <span className="text-sm font-medium">+381 11 123 4567</span>
+          <Phone className="size-4" />
+          <span>+381 11 123 4567</span>
         </a>
-        <Button asChild>
-          <Link href="/kontakt">Zakaži pregled</Link>
-        </Button>
+        <a
+          href="/kontakt"
+          className="flex items-center gap-2 rounded-full border border-white/28 bg-white/12 px-3 py-2 text-sm font-medium text-primary-foreground shadow-[0_8px_20px_-14px_rgba(0,0,0,0.5)] transition-smooth hover:border-accent/60 hover:bg-white/18 hover:text-white"
+        >
+          <Calendar className="size-4" />
+          <span>Zakaži online</span>
+        </a>
         <UserMenu />
       </div>
     </>

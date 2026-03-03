@@ -40,22 +40,23 @@ export function UserMenuDesktop({ user, onSignOut }: UserMenuDesktopProps) {
           <button
             className={cn(
               'group flex items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-3',
-              'bg-muted/50 hover:bg-muted',
-              'border border-border/50 hover:border-border',
+              'border border-white/30 bg-white/10 hover:border-accent/50 hover:bg-white/16',
+              'text-primary-foreground',
               'transition-all duration-200 ease-out',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+              'shadow-[0_8px_20px_-14px_rgba(0,0,0,0.48)]',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-primary'
             )}
           >
-            <Avatar className="ring-2 ring-background">
+            <Avatar className="ring-2 ring-white/45">
               {user.image && <AvatarImage src={user.image} alt={user.name} />}
-              <AvatarFallback className="bg-primary/10 text-primary font-medium">
+              <AvatarFallback className="bg-accent text-foreground font-medium">
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium text-foreground max-w-24 truncate">
+            <span className="max-w-24 truncate text-sm font-medium text-primary-foreground">
               {firstName}
             </span>
-            <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            <ChevronDown className="h-4 w-4 text-primary-foreground/75 transition-transform duration-200 group-data-[state=open]:rotate-180" />
           </button>
         </DropdownMenuTrigger>
 
