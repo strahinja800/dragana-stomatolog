@@ -1,6 +1,7 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
-import { Calendar, Mail, MapPin, Menu, Phone, Sparkles } from 'lucide-react';
+import { Calendar, Mail, MapPin, Menu, Phone } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +13,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { NAV_LINKS } from '@/constants/navigations';
+import { logoIcon } from '@/data/data';
 import { cn } from '@/lib/utils';
 
 import UserMenu from './user-menu';
@@ -31,46 +33,43 @@ export function PublicNavbarMobile({
 }: PublicNavbarMobileProps) {
   return (
     <>
-      {/* Mobile Menu Button + User Menu */}
       <div className="flex items-center gap-2 md:hidden">
         <UserMenu />
         <button
+          type="button"
           onClick={onOpen}
-          className="text-foreground hover:bg-primary/10 rounded-xl p-2.5 transition-colors"
+          className="rounded-xl border border-white/30 bg-white/10 p-2.5 text-primary-foreground shadow-[0_8px_20px_-14px_rgba(0,0,0,0.48)] transition-smooth hover:border-accent/60 hover:bg-white/16 hover:text-white"
+          aria-label="Otvori meni"
         >
           <Menu className="size-6" />
         </button>
       </div>
 
-      {/* Mobile Menu Sheet */}
       <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <SheetContent
           side="right"
-          className="flex w-[85vw] max-w-sm flex-col gap-0 overflow-hidden border-l-0 p-0"
+          className="flex w-[86vw] max-w-sm flex-col gap-0 overflow-hidden border-l-0 p-0"
         >
-          {/* Decorative background gradient */}
-          <div className="from-primary/5 via-primary/3 pointer-events-none absolute inset-0 bg-gradient-to-br to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
 
-          {/* Header */}
-          <SheetHeader className="relative border-b border-border/40 bg-gradient-to-r from-primary/5 to-transparent px-6 py-5">
+          <SheetHeader className="relative border-b border-border/50 bg-gradient-to-r from-primary/10 to-transparent px-6 py-5">
             <div className="flex items-center gap-3">
-              <div className="shadow-soft flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/80">
-                <Sparkles className="size-5 text-white" />
-              </div>
-              <div>
-                <SheetTitle className="text-lg font-semibold tracking-tight">
-                  DentalCare
-                </SheetTitle>
-                <SheetDescription className="text-xs">
-                  Stomatološka ordinacija
-                </SheetDescription>
+              <Image
+                src={logoIcon}
+                alt="DENTALHOLIST"
+                width={294}
+                height={309}
+                className="h-10 w-auto object-contain drop-shadow-[0_6px_16px_rgba(0,0,0,0.24)]"
+              />
+              <div className="sr-only">
+                <SheetTitle>DENTALHOLIST</SheetTitle>
+                <SheetDescription>Navigacija</SheetDescription>
               </div>
             </div>
           </SheetHeader>
 
-          {/* Navigation */}
           <nav className="relative flex-1 px-4 py-6">
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {NAV_LINKS.map((item, index) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
@@ -105,7 +104,7 @@ export function PublicNavbarMobile({
                         )}
                       />
                     </div>
-                    <span className="text-[15px] font-medium">
+                    <span className="text-[15px] font-semibold">
                       {item.label}
                     </span>
                   </Link>
@@ -113,44 +112,42 @@ export function PublicNavbarMobile({
               })}
             </div>
 
-            {/* CTA Button */}
             <div className="mt-8 px-1">
               <Button
                 size="lg"
-                className="shadow-soft hover:shadow-hover group w-full gap-2.5 rounded-2xl py-6 text-[15px] font-semibold transition-all duration-300"
+                className="btn-shimmer shadow-soft hover:shadow-hover group w-full gap-2.5 rounded-2xl py-6 text-[15px] font-semibold"
                 asChild
               >
                 <Link href="/kontakt" onClick={onClose}>
                   <Calendar className="size-5 transition-transform duration-200 group-hover:scale-110" />
-                  Zakaži pregled
+                  Zakaži online
                 </Link>
               </Button>
             </div>
           </nav>
 
-          {/* Footer with contact info */}
-          <SheetFooter className="relative mt-auto border-t border-border/40 bg-muted/30 px-6 py-5">
+          <SheetFooter className="relative mt-auto border-t border-border/40 bg-muted/40 px-6 py-5">
             <div className="w-full space-y-3">
-              <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+              <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
                 Kontakt informacije
               </p>
-              <div className="space-y-2.5">
+              <div className="space-y-2.5 text-sm">
                 <a
-                  href="tel:+381601234567"
-                  className="text-foreground/70 hover:text-primary flex items-center gap-3 text-sm transition-colors"
+                  href="tel:+381111234567"
+                  className="flex items-center gap-3 text-foreground/75 transition-colors hover:text-primary"
                 >
-                  <Phone className="text-primary/60 size-4" />
-                  <span>+381 60 123 4567</span>
+                  <Phone className="size-4 text-primary/70" />
+                  <span>+381 11 123 4567</span>
                 </a>
                 <a
-                  href="mailto:info@dentalcare.rs"
-                  className="text-foreground/70 hover:text-primary flex items-center gap-3 text-sm transition-colors"
+                  href="mailto:info@dentalholist.rs"
+                  className="flex items-center gap-3 text-foreground/75 transition-colors hover:text-primary"
                 >
-                  <Mail className="text-primary/60 size-4" />
-                  <span>info@dentalcare.rs</span>
+                  <Mail className="size-4 text-primary/70" />
+                  <span>info@dentalholist.rs</span>
                 </a>
-                <div className="text-foreground/70 flex items-center gap-3 text-sm">
-                  <MapPin className="text-primary/60 size-4" />
+                <div className="flex items-center gap-3 text-foreground/75">
+                  <MapPin className="size-4 text-primary/70" />
                   <span>Beograd, Srbija</span>
                 </div>
               </div>

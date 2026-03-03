@@ -19,53 +19,96 @@ interface AboutTeamProps {
 }
 
 export default function AboutTeam({ teamMembers }: AboutTeamProps) {
+  const [lead, ...rest] = teamMembers;
+
   return (
-    <section className="py-24 gradient-hero">
+    <section className="relative gradient-hero py-20 md:py-28 overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-2/3 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="inline-block px-4 py-2 rounded-full bg-(--primary-light) text-primary text-sm font-medium mb-4">
-            Naš tim
-          </span>
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground">
-            Upoznajte naše stručnjake
+        <div className="mx-auto mb-14 max-w-2xl text-center">
+          <span className="section-kicker">Naš tim</span>
+          <h2 className="mt-5 font-heading text-3xl font-bold text-foreground md:text-5xl">
+            Ljudi iza DENTALHOLIST pristupa
           </h2>
+          <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
+            Posvećen tim stručnjaka koji vas vodi kroz svaki korak terapije.
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {teamMembers.map((member) => (
-            <div
+        {lead && (
+          <article className="mx-auto mb-10 max-w-4xl section-shell p-6 transition-smooth hover:shadow-hover-blue sm:p-8">
+            <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:gap-8">
+              <div className="relative shrink-0">
+                <div className="overflow-hidden rounded-3xl border-2 border-primary/20">
+                  <Image
+                    src={lead.imageUrl || '/default-image.png'}
+                    alt={lead.imageAlt || lead.name}
+                    className="h-52 w-52 object-cover sm:h-60 sm:w-60"
+                    width={240}
+                    height={240}
+                  />
+                </div>
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full gradient-accent px-4 py-1.5 text-xs font-semibold text-accent-foreground shadow-glow">
+                  Glavni stomatolog
+                </div>
+              </div>
+              <div className="text-center sm:pt-2 sm:text-left">
+                <h3 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">
+                  {lead.name}
+                </h3>
+                <p className="mt-2 text-sm font-semibold tracking-[0.12em] text-primary uppercase">
+                  {lead.role}
+                </p>
+                {lead.specialty && (
+                  <p className="mt-3 flex items-center justify-center gap-1.5 text-sm text-muted-foreground sm:justify-start">
+                    <GraduationCap className="h-4 w-4 text-primary" />
+                    {lead.specialty}
+                  </p>
+                )}
+                {lead.bio && (
+                  <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted-foreground">
+                    {lead.bio}
+                  </p>
+                )}
+              </div>
+            </div>
+          </article>
+        )}
+
+        <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {rest.map((member) => (
+            <article
               key={member.id}
-              className="p-8 rounded-2xl bg-card border border-border shadow-card hover:shadow-hover transition-all duration-300"
+              className="group section-shell p-6 text-center transition-smooth hover:-translate-y-1 hover:shadow-hover"
             >
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+              <div className="mx-auto mb-5 overflow-hidden rounded-2xl border border-border/60">
                 <Image
                   src={member.imageUrl || '/default-image.png'}
                   alt={member.imageAlt || member.name}
-                  className="w-32 h-32 rounded-2xl object-cover shrink-0"
-                  width={128}
-                  height={128}
+                  className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  width={320}
+                  height={192}
                 />
-                <div className="text-center sm:text-left">
-                  <h3 className="text-xl font-heading font-semibold text-foreground mb-1">
-                    {member.name}
-                  </h3>
-                  <p className="text-[rgb(13,162,231)] font-medium text-sm mb-1">
-                    {member.role}
-                  </p>
-                  {member.specialty && (
-                    <p className="text-muted-foreground text-sm mb-4">
-                      <GraduationCap className="w-4 h-4 inline mr-1" />
-                      {member.specialty}
-                    </p>
-                  )}
-                  {member.bio && (
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {member.bio}
-                    </p>
-                  )}
-                </div>
               </div>
-            </div>
+              <h3 className="font-heading text-xl font-semibold text-foreground">
+                {member.name}
+              </h3>
+              <p className="mt-1.5 text-sm font-semibold tracking-wide text-primary uppercase">
+                {member.role}
+              </p>
+              {member.specialty && (
+                <p className="mt-3 flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
+                  <GraduationCap className="h-4 w-4 text-primary" />
+                  {member.specialty}
+                </p>
+              )}
+              {member.bio && (
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {member.bio}
+                </p>
+              )}
+            </article>
           ))}
         </div>
       </div>

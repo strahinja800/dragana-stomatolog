@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 import {
@@ -7,25 +8,27 @@ import {
   FOOTER_SERVICES,
   FOOTER_SOCIAL_LINKS,
 } from '@/constants/footer';
+import { logoGoldTransparent } from '@/data/data';
 
 export default function Footer() {
   return (
-    <footer className="bg-foreground text-background">
-      <div className="container mx-auto px-4 py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand */}
+    <footer className="relative overflow-hidden bg-[#0a2e33] text-background">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(214,181,107,0.12),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(3,144,159,0.15),transparent_50%)]" />
+
+      <div className="container relative z-10 mx-auto px-4 py-12 md:py-16">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-heading font-bold text-xl">
-                  D
-                </span>
-              </div>
-              <span className="font-heading text-2xl font-semibold">
-                {FOOTER_BRAND.name}
-              </span>
+            <Link
+              href="/"
+              className="inline-block rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              <Image
+                src={logoGoldTransparent}
+                alt="DENTALHOLIST"
+                className="h-14 w-auto object-contain"
+              />
             </Link>
-            <p className="text-background/70 text-sm leading-relaxed">
+            <p className="text-sm leading-relaxed text-background/78">
               {FOOTER_BRAND.description}
             </p>
             <div className="flex items-center gap-2 pt-2">
@@ -33,25 +36,25 @@ export default function Footer() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className="p-2 rounded-lg bg-background/10 hover:bg-primary transition-colors"
+                  className="rounded-lg bg-background/10 p-2 transition-colors hover:bg-accent/20 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  aria-label={link.label}
                 >
-                  <link.icon className="w-5 h-5 md:w-6 md:h-6" />
+                  <link.icon className="h-5 w-5 md:h-6 md:w-6" />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h3 className="font-heading text-lg font-semibold mb-3 md:mb-6">
+            <h3 className="mb-4 font-heading text-lg font-semibold">
               Brzi linkovi
             </h3>
-            <ul className="space-y-1.5 md:space-y-3">
+            <ul className="space-y-2.5">
               {FOOTER_QUICK_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-background/70 hover:text-primary transition-colors text-sm"
+                    className="text-sm text-background/70 transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-none"
                   >
                     {link.label}
                   </Link>
@@ -60,38 +63,32 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
           <div>
-            <h3 className="font-heading text-lg font-semibold mb-3 md:mb-6">
-              Usluge
-            </h3>
-            <ul className="space-y-1.5 md:space-y-3">
+            <h3 className="mb-4 font-heading text-lg font-semibold">Usluge</h3>
+            <ul className="space-y-2.5">
               {FOOTER_SERVICES.map((service) => (
                 <li key={service}>
-                  <span className="text-background/70 text-sm">{service}</span>
+                  <span className="text-sm text-background/70">{service}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
-            <h3 className="font-heading text-lg font-semibold mb-3 md:mb-6">
-              Kontakt
-            </h3>
-            <ul className="space-y-3 md:space-y-4">
+            <h3 className="mb-4 font-heading text-lg font-semibold">Kontakt</h3>
+            <ul className="space-y-4">
               {FOOTER_CONTACT.map((item) => (
                 <li key={item.type} className="flex items-start gap-3">
-                  <item.icon className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <item.icon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
                   {item.href ? (
                     <a
                       href={item.href}
-                      className="text-background/70 hover:text-primary transition-colors text-sm"
+                      className="text-sm text-background/70 transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-none"
                     >
                       {item.value}
                     </a>
                   ) : (
-                    <span className="text-background/70 text-sm">
+                    <span className="text-sm text-background/70">
                       {item.lines?.map((line, index) => (
                         <span key={line}>
                           {line}
@@ -106,9 +103,9 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-background/10 mt-12 pt-8 text-center">
-          <p className="text-background/50 text-sm">
-            © {new Date().getFullYear()} {FOOTER_BRAND.name}. Sva prava
+        <div className="mt-12 border-t border-background/10 pt-8 text-center">
+          <p className="text-sm text-background/50">
+            © {new Date().getFullYear()} DENTALHOLIST KONCEPT. Sva prava
             zadržana.
           </p>
         </div>

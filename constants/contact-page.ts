@@ -10,19 +10,19 @@ export const CONTACT_INFO = [
   {
     icon: Mail,
     title: 'Email',
-    content: 'info@dentalcare.rs',
-    link: 'mailto:info@dentalcare.rs',
+    content: 'info@dentalholist.rs',
+    link: 'mailto:info@dentalholist.rs',
   },
   {
     icon: MapPin,
     title: 'Adresa',
     content: 'Bulevar Kralja Aleksandra 123, Beograd',
-    link: 'https://maps.google.com',
+    link: 'https://maps.google.com/?q=Bulevar+Kralja+Aleksandra+123+Beograd',
   },
   {
     icon: Clock,
     title: 'Radno vreme',
-    content: 'Pon-Pet: 08-20h, Sub: 09-14h',
+    content: 'Pon-Pet: 08:00-20:00, Sub: 09:00-14:00',
     link: null,
   },
 ];

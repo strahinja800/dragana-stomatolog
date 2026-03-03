@@ -1,17 +1,15 @@
 export default function ContactHero() {
   return (
-    <section className="py-32 gradient-hero">
+    <section className="gradient-hero pt-34 pb-20 md:pt-40 md:pb-24">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto">
-          <span className="inline-block px-4 py-2 rounded-full bg-(--primary-light) text-primary text-sm font-medium mb-6">
-            Kontakt
-          </span>
-          <h1 className="text-4xl md:text-5xl font-heading font-bold text-foreground mb-6">
-            Tu smo za vas
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="section-kicker">Kontakt</span>
+          <h1 className="mt-5 text-4xl font-bold text-foreground md:text-5xl">
+            Tu smo za vas i vaš sledeći pregled
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Imate pitanja ili želite da zakažete pregled? Javite nam se i rado
-            ćemo vam pomoći.
+          <p className="mt-6 text-lg text-muted-foreground">
+            Pošaljite upit, zakažite konsultaciju ili nas pozovite direktno.
+            Odgovaramo brzo i precizno.
           </p>
         </div>
       </div>

@@ -44,19 +44,23 @@ export function UserMenuMobile({ user, onSignOut }: UserMenuMobileProps) {
     <div className="md:hidden">
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
-          <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-            <Avatar>
+          <button className="rounded-full shadow-[0_8px_20px_-14px_rgba(0,0,0,0.48)] focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-primary">
+            <Avatar className="ring-2 ring-white/45">
               {user.image && <AvatarImage src={user.image} alt={user.name} />}
-              <AvatarFallback>{initials}</AvatarFallback>
+              <AvatarFallback className="bg-accent text-foreground font-semibold">
+                {initials}
+              </AvatarFallback>
             </Avatar>
           </button>
         </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader className="text-left">
             <div className="flex items-center gap-3">
-              <Avatar size="lg">
+              <Avatar size="lg" className="ring-2 ring-primary/20">
                 {user.image && <AvatarImage src={user.image} alt={user.name} />}
-                <AvatarFallback>{initials}</AvatarFallback>
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  {initials}
+                </AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
                 <DrawerTitle>{user.name}</DrawerTitle>

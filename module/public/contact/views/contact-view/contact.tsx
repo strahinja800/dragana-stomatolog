@@ -3,13 +3,10 @@ import ContactInfo from '@/module/public/contact/components/contact-info';
 
 export default function Contact() {
   return (
-    <section className="py-24 bg-background">
+    <section className="pb-16 md:pb-24">
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-16">
-          {/* Contact Info */}
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
           <ContactInfo />
-
-          {/* Contact Form */}
           <ContactForm />
         </div>
       </div>

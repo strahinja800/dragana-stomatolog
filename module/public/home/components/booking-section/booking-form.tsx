@@ -11,7 +11,14 @@ import {
 } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
 import { startOfDay } from 'date-fns';
-import { ArrowRight, CheckCircle, Loader2, Phone, User } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle,
+  Loader2,
+  Mail,
+  Phone,
+  User,
+} from 'lucide-react';
 import * as z from 'zod';
 
 import { AppointmentCalendar } from '@/components/ui/appointment-calendar';
@@ -20,18 +27,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
-const bookingFormSchema = z.object({
-  name: z.string().min(1, 'Ime je obavezno'),
-  phone: z.string().min(1, 'Broj telefona je obavezan'),
-  date: z.date({ error: 'Datum je obavezan' }),
-  time: z.string().min(1, 'Vreme je obavezno'),
-  symptoms: z.string().optional(),
-});
-
-export type BookingFormData = z.infer<typeof bookingFormSchema>;
+const getBookingFormSchema = (requiresEmail: boolean) =>
+  z.object({
+    name: z.string().min(1, 'Ime je obavezno'),
+    email: requiresEmail
+      ? z.string().email('Unesite validnu email adresu')
+      : z.string().optional(),
+    phone: z.string().min(1, 'Broj telefona je obavezan'),
+    date: z.date({ error: 'Datum je obavezan' }),
+    time: z.string().min(1, 'Vreme je obavezno'),
+    symptoms: z.string().optional(),
+  });
 
 type BookingFormInput = {
   name: string;
+  email?: string;
   phone: string;
   date?: Date;
   time: string;
@@ -41,15 +51,18 @@ type BookingFormInput = {
 interface BookingFormProps {
   patientId?: string;
   defaultName?: string;
+  defaultEmail?: string;
   defaultPhone?: string;
   onSuccess?: () => void;
   hideHeader?: boolean;
 }
 
 const today = startOfDay(new Date());
+
 export default function BookingForm({
   patientId,
   defaultName = '',
+  defaultEmail = '',
   defaultPhone = '',
   onSuccess: onSuccessCallback,
   hideHeader = false,
@@ -59,6 +72,7 @@ export default function BookingForm({
     () => today
   );
 
+  const requiresEmail = !patientId;
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -67,6 +81,7 @@ export default function BookingForm({
     isLoading: isLoadingNonWorkingDays,
     isPending: isPendingNonWorkingDays,
   } = useSuspenseQuery(trpc.appointment.getNonWorkingDays.queryOptions());
+
   const {
     data: timeSlots,
     isLoading: isLoadingTimeSlots,
@@ -77,17 +92,15 @@ export default function BookingForm({
     })
   );
 
-  const isPending =
+  const isPendingData =
     isPendingNonWorkingDays ||
     isPendingTimeSlots ||
     isLoadingNonWorkingDays ||
     isLoadingTimeSlots;
 
-  // Real-time subscription for settings updates
   useSubscription(
     trpc.subscriptions.onSettingsUpdate.subscriptionOptions(undefined, {
-      onData: (event) => {
-        console.log('[BookingForm] Settings update received:', event);
+      onData: () => {
         queryClient.invalidateQueries({
           queryKey: trpc.appointment.getNonWorkingDays.queryKey(),
         });
@@ -104,9 +117,10 @@ export default function BookingForm({
   };
 
   const form = useForm<BookingFormInput>({
-    resolver: zodResolver(bookingFormSchema) as never,
+    resolver: zodResolver(getBookingFormSchema(requiresEmail)) as never,
     defaultValues: {
       name: defaultName,
+      email: defaultEmail,
       phone: defaultPhone,
       date: undefined,
       time: '',
@@ -116,7 +130,6 @@ export default function BookingForm({
 
   const selectedTime = form.watch('time');
 
-  // Public appointment creation (without patientId)
   const { mutate: createPublicAppointment, isPending: isCreatingPublic } =
     useMutation(
       trpc.appointment.create.mutationOptions({
@@ -127,32 +140,22 @@ export default function BookingForm({
             queryKey: trpc.appointment.getTimeSlotsForDate.queryKey(),
           });
         },
-        onError: (error) => {
-          console.error('Failed to create appointment:', error);
-        },
       })
     );
 
-  // Admin appointment creation (with patientId)
   const { mutate: createPatientAppointment, isPending: isCreatingPatient } =
     useMutation(
       trpc.appointment.createForPatient.mutationOptions({
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ['appointment'] });
           queryClient.invalidateQueries({ queryKey: ['patient'] });
-          if (onSuccessCallback) {
-            onSuccessCallback();
-          }
-        },
-        onError: (error) => {
-          console.error('Failed to create appointment:', error);
+          onSuccessCallback?.();
         },
       })
     );
 
-  const isCreating = isCreatingPublic || isCreatingPatient;
-
-  const isPendingForm = form.formState.isSubmitting || isCreating;
+  const isSubmitting =
+    form.formState.isSubmitting || isCreatingPublic || isCreatingPatient;
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
@@ -168,42 +171,41 @@ export default function BookingForm({
     if (!data.date) return;
 
     if (patientId) {
-      // Admin mode - create for existing patient
       createPatientAppointment({
         patientId,
         date: data.date,
         time: data.time,
         symptoms: data.symptoms || undefined,
       });
-    } else {
-      // Public mode - create new booking
-      createPublicAppointment({
-        name: data.name,
-        phone: data.phone,
-        date: data.date,
-        time: data.time,
-        symptoms: data.symptoms || undefined,
-      });
+      return;
     }
+
+    createPublicAppointment({
+      name: data.name,
+      email: data.email ?? '',
+      phone: data.phone,
+      date: data.date,
+      time: data.time,
+      symptoms: data.symptoms || undefined,
+    });
   };
 
-  // Show success state after form submission
   if (isSuccess) {
     return (
-      <div className="relative overflow-hidden rounded-4xl border border-border/30 bg-card/95 p-4 shadow-hover backdrop-blur-xl md:p-8">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-primary/[0.04]" />
+      <div className="section-shell relative overflow-hidden border-border/40 p-4 md:p-8">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.05] via-transparent to-accent/[0.08]" />
 
         <div className="relative z-10 flex flex-col items-center justify-center py-12 text-center">
           <div className="mb-6 flex size-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
             <CheckCircle className="size-10 text-green-600 dark:text-green-400" />
           </div>
 
-          <h3 className="mb-2 font-heading text-2xl font-bold text-foreground md:text-3xl">
-            Zahtev je poslat!
+          <h3 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">
+            Zahtev je uspešno poslat
           </h3>
           <p className="mb-6 max-w-sm text-muted-foreground">
-            Hvala vam na poverenju. Javićemo vam se u roku od 30 minuta radi
-            potvrde termina.
+            Poslali smo potvrdu prijema na vaš email. Uskoro vam stižu i detalji
+            termina.
           </p>
 
           <button
@@ -222,17 +224,17 @@ export default function BookingForm({
   }
 
   return (
-    <div className="relative overflow-hidden rounded-4xl border border-border/30 bg-card/95 p-4 shadow-hover backdrop-blur-xl md:p-8">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-primary/[0.04]" />
+    <div className="section-shell relative overflow-hidden border-border/40 p-4 md:p-8">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-accent/[0.08]" />
 
       <div className="relative z-10">
         {!hideHeader && (
-          <div className="animate-fade-up mb-6 text-center">
-            <h3 className="mb-2 font-heading text-2xl font-bold text-foreground md:text-3xl">
+          <div className="mb-6 text-center animate-fade-up">
+            <h3 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">
               Brzo zakazivanje
             </h3>
             <p className="text-sm text-muted-foreground md:text-base">
-              Popunite formu i javićemo vam se u roku od 30 minuta
+              Popunite formu i dobićete potvrdu prijema na email
             </p>
           </div>
         )}
@@ -259,6 +261,29 @@ export default function BookingForm({
             )}
           />
 
+          {!patientId && (
+            <Controller
+              name="email"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <FloatingInput
+                  id="booking-email"
+                  label="Email adresa"
+                  type="email"
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  icon={<Mail className="size-5" />}
+                  step={2}
+                  isInvalid={fieldState.invalid}
+                  errorMessage={fieldState.error?.message}
+                  disabled={isPendingData}
+                  placeholder="vas@email.com"
+                />
+              )}
+            />
+          )}
+
           <Controller
             name="phone"
             control={form.control}
@@ -271,10 +296,10 @@ export default function BookingForm({
                 onChange={field.onChange}
                 onBlur={field.onBlur}
                 icon={<Phone className="size-5" />}
-                step={2}
+                step={patientId ? 2 : 3}
                 isInvalid={fieldState.invalid}
                 errorMessage={fieldState.error?.message}
-                disabled={isPending}
+                disabled={!!patientId || isPendingData}
                 placeholder="060 123 4567"
               />
             )}
@@ -282,11 +307,11 @@ export default function BookingForm({
 
           <div
             className="animate-fade-up"
-            style={{ animationDelay: '200ms', animationFillMode: 'both' }}
+            style={{ animationDelay: '220ms', animationFillMode: 'both' }}
           >
             <div className="mb-2 flex items-center gap-3">
               <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                3
+                {patientId ? 3 : 4}
               </span>
               <span className="text-sm font-medium text-foreground/80">
                 Izaberite datum i vreme
@@ -301,12 +326,12 @@ export default function BookingForm({
               timeSlots={timeSlots ?? []}
               disabledDates={disabledDates}
               disabledDaysOfWeek={closedDaysOfWeek}
-              disabled={isPending}
+              disabled={isPendingData}
               isLoadingSlots={isLoadingTimeSlots}
             />
 
             {(form.formState.errors.date || form.formState.errors.time) && (
-              <p className="animate-fade-in mt-2 flex items-center gap-1.5 text-sm text-destructive">
+              <p className="mt-2 flex items-center gap-1.5 text-sm text-destructive animate-fade-in">
                 <span className="inline-block size-1 rounded-full bg-destructive" />
                 {form.formState.errors.date?.message ||
                   form.formState.errors.time?.message}
@@ -316,11 +341,11 @@ export default function BookingForm({
 
           <div
             className="animate-fade-up"
-            style={{ animationDelay: '250ms', animationFillMode: 'both' }}
+            style={{ animationDelay: '260ms', animationFillMode: 'both' }}
           >
             <div className="mb-2 flex items-center gap-3">
               <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                4
+                {patientId ? 4 : 5}
               </span>
               <span className="text-sm font-medium text-foreground/80">
                 Opišite simptome (opciono)
@@ -336,7 +361,7 @@ export default function BookingForm({
                   id="booking-symptoms"
                   placeholder="Opišite vaše simptome ili razlog posete..."
                   className="min-h-20 resize-none"
-                  disabled={isPending}
+                  disabled={isPendingData}
                 />
               )}
             />
@@ -344,19 +369,18 @@ export default function BookingForm({
 
           <div
             className="animate-fade-up pt-2"
-            style={{ animationDelay: '350ms', animationFillMode: 'both' }}
+            style={{ animationDelay: '320ms', animationFillMode: 'both' }}
           >
             <button
               type="submit"
-              disabled={isPending}
+              disabled={isSubmitting || isPendingData}
               className={cn(
-                'group relative h-14 w-full rounded-2xl',
+                'group relative h-14 w-full overflow-hidden rounded-2xl',
                 'gradient-primary text-base font-semibold text-white',
                 'shadow-soft hover:shadow-hover',
                 'transition-all duration-300',
                 'hover:scale-[1.02] active:scale-[0.98]',
-                'disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100',
-                'overflow-hidden'
+                'disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100'
               )}
             >
               <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
@@ -364,7 +388,7 @@ export default function BookingForm({
               </div>
 
               <span className="relative flex items-center justify-center gap-2">
-                {isPending ? (
+                {isSubmitting ? (
                   <>
                     <Loader2 className="size-5 animate-spin" />
                     <span>Slanje...</span>
@@ -381,8 +405,8 @@ export default function BookingForm({
         </form>
 
         <div
-          className="animate-fade-up mt-6 border-t border-border/30 pt-5"
-          style={{ animationDelay: '400ms', animationFillMode: 'both' }}
+          className="mt-6 border-t border-border/30 pt-5 animate-fade-up"
+          style={{ animationDelay: '360ms', animationFillMode: 'both' }}
         >
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
             <div className="flex items-center gap-2.5 text-sm">
@@ -390,14 +414,16 @@ export default function BookingForm({
                 <CheckCircle className="size-4 text-primary" />
               </div>
               <span className="text-muted-foreground">
-                Besplatna konsultacija
+                Email potvrda prijema
               </span>
             </div>
             <div className="flex items-center gap-2.5 text-sm">
               <div className="flex size-8 items-center justify-center rounded-full bg-primary/10">
                 <CheckCircle className="size-4 text-primary" />
               </div>
-              <span className="text-muted-foreground">Bez čekanja</span>
+              <span className="text-muted-foreground">
+                Podsetnik 24h pre termina
+              </span>
             </div>
           </div>
         </div>

@@ -11,9 +11,10 @@ export default function PublicNavbar() {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-lg border-b border-border/50">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-primary-strong/70 bg-primary/96 shadow-[0_14px_34px_-20px_rgba(1,111,126,0.95)] backdrop-blur-xl">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-accent/55" />
       <div className="container mx-auto px-4 max-lg:m-0 max-lg:max-w-full">
-        <nav className="flex items-center justify-between h-16">
+        <nav className="flex h-20 items-center justify-between">
           <PublicNavbarDesktop pathname={pathname} />
           <PublicNavbarMobile
             pathname={pathname}

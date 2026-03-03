@@ -20,10 +20,10 @@ interface BlogViewGridProps {
 export default function BlogViewGrid({ posts }: BlogViewGridProps) {
   if (posts.length === 0) {
     return (
-      <section className="py-16 md:py-24 bg-background">
+      <section className="pb-16 md:pb-24">
         <div className="container mx-auto px-4 text-center">
-          <BookOpen className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-          <h2 className="text-2xl font-heading font-semibold text-foreground mb-2">
+          <BookOpen className="mx-auto mb-4 h-16 w-16 text-muted-foreground/30" />
+          <h2 className="mb-2 text-2xl font-semibold text-foreground">
             Nema objavljenih članaka
           </h2>
           <p className="text-muted-foreground">
@@ -35,9 +35,9 @@ export default function BlogViewGrid({ posts }: BlogViewGridProps) {
   }
 
   return (
-    <section className="py-16 md:py-24 bg-background">
+    <section className="pb-16 md:pb-24">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
             <BlogViewCard key={post.id} post={post} />
           ))}

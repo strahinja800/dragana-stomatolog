@@ -4,7 +4,7 @@ interface Service {
   title: string;
   description: string;
   number: string;
-  image: StaticImageData;
+  image: string | StaticImageData;
 }
 
 interface Props {
@@ -15,30 +15,34 @@ export default function Services({ props }: Props) {
   return (
     <>
       {props.map((item, index) => (
-        <div
+        <article
           key={index}
-          className="group relative overflow-hidden rounded-2xl bg-[rgba(2, 255, 255, 0.5)] border border-border p-7 hover:shadow-hover transition-all duration-300"
+          className="section-shell group relative overflow-hidden p-6 transition-smooth hover:-translate-y-1 hover:shadow-hover"
         >
-          <div className="flex items-start justify-between mb-8">
-            <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-card text-foreground font-heading font-bold text-xl shadow-card">
+          <div className="mb-6 flex items-center justify-between">
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/12 font-heading text-lg font-bold text-primary">
               {item.number}
             </span>
+            <span className="rounded-full border border-accent/40 bg-accent/15 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-accent-strong uppercase">
+              Premium
+            </span>
           </div>
-          <div className="relative z-10">
-            <h3 className="text-2xl font-heading font-semibold text-foreground mb-2">
-              {item.title}
-            </h3>
-            <p className="text-muted-foreground text-sm">{item.description}</p>
-          </div>
-          {/* 3D Image */}
-          <div className="absolute -right-8 -bottom-8  w-36 h-36 md:w-40 md:h-40 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
+
+          <h3 className="text-2xl font-semibold text-foreground">
+            {item.title}
+          </h3>
+          <p className="mt-2 max-w-[80%] text-sm text-muted-foreground md:text-base">
+            {item.description}
+          </p>
+
+          <div className="pointer-events-none absolute -bottom-10 -right-8 h-34 w-34 opacity-85 transition-all duration-500 group-hover:scale-110 group-hover:opacity-100 md:h-40 md:w-40">
             <Image
               src={item.image}
               alt={item.title}
-              className="w-full h-full object-contain drop-shadow-lg"
+              className="h-full w-full object-contain drop-shadow-xl"
             />
           </div>
-        </div>
+        </article>
       ))}
     </>
   );

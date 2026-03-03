@@ -1,5 +1,5 @@
 import { startOfDay } from 'date-fns';
-import { CalendarCheck, Clock, MessageCircle, Stethoscope } from 'lucide-react';
+import { CalendarCheck, Clock, MailCheck, ShieldCheck } from 'lucide-react';
 
 import { HydrateClient } from '@/trpc/hydrate-client';
 import { prefetch, trpc } from '@/trpc/server';
@@ -10,19 +10,19 @@ import { BookingSectionSkeleton } from './booking-form-skeleton';
 const features = [
   {
     icon: CalendarCheck,
-    text: 'Online zakazivanje 24/7',
+    text: 'Online zakazivanje dostupno 24/7',
   },
   {
-    icon: MessageCircle,
-    text: 'Potvrda termina putem SMS-a',
+    icon: MailCheck,
+    text: 'Email potvrda i podsetnik 24h pre pregleda',
   },
   {
-    icon: Stethoscope,
-    text: 'Besplatna prva konsultacija',
+    icon: ShieldCheck,
+    text: 'Bezbedno čuvanje podataka pacijenata',
   },
   {
     icon: Clock,
-    text: 'Fleksibilno radno vreme',
+    text: 'Brza potvrda termina od strane tima',
   },
 ];
 
@@ -37,38 +37,37 @@ export default async function BookingSectionServer() {
   );
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden">
-      {/* Subtle gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/[0.03] to-primary/[0.08]" />
+    <section
+      id="zakazivanje"
+      className="relative overflow-hidden py-16 md:py-24"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background via-primary/[0.04] to-primary/[0.09]" />
+      <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
 
-      {/* Decorative blur orbs for depth */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
-
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="grid lg:grid-cols-5 gap-10 lg:gap-16 items-start">
-          {/* Left side - description */}
-          <div className="lg:col-span-2 space-y-6 text-center lg:text-left">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground">
-              Zakažite pregled
-              <span className="block text-primary">brzo i jednostavno</span>
+      <div className="container relative z-10 mx-auto px-4">
+        <div className="grid items-start gap-10 lg:grid-cols-5 lg:gap-16">
+          <div className="space-y-6 text-center lg:col-span-2 lg:text-left">
+            <span className="section-kicker">Brzo Zakazivanje</span>
+            <h2 className="text-3xl font-bold text-foreground md:text-5xl">
+              Zakažite pregled bez poziva i čekanja
             </h2>
 
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              Rezervišite svoj termin online u samo par klikova. Bez čekanja,
-              bez telefonskih poziva - izaberite vreme koje vam odgovara.
+            <p className="text-lg text-muted-foreground">
+              Rezervišite termin online u nekoliko klikova. Nakon potvrde,
+              dobijate email sa detaljima i automatski podsetnik pre dolaska.
             </p>
 
-            <ul className="space-y-4 pt-2">
+            <ul className="space-y-3.5 pt-2">
               {features.map((feature) => (
                 <li
                   key={feature.text}
-                  className="flex items-center gap-3 justify-center lg:justify-start"
+                  className="flex items-center justify-center gap-3 lg:justify-start"
                 >
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <feature.icon className="w-5 h-5 text-primary" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <feature.icon className="h-5 w-5 text-primary" />
                   </div>
-                  <span className="text-foreground font-medium">
+                  <span className="font-medium text-foreground">
                     {feature.text}
                   </span>
                 </li>
@@ -76,7 +75,6 @@ export default async function BookingSectionServer() {
             </ul>
           </div>
 
-          {/* Right side - booking form */}
           <div className="lg:col-span-3">
             <HydrateClient loadingFallback={<BookingSectionSkeleton />}>
               <BookingForm />

@@ -1,26 +1,37 @@
+import { ShieldCheck } from 'lucide-react';
+
 import { STATISTICS } from '@/constants/stats';
 
 export default function StatisticsSection() {
   return (
-    <section className="py-6 md:py-16 lg:py-20 bg-background">
+    <section className="-mt-8 py-8 md:-mt-10 md:py-10">
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-4 gap-4 md:gap-8">
-          {STATISTICS.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-4 p-6 rounded-2xl bg-card border border-border shadow-card"
-            >
-              <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center shrink-0">
-                <item.icon className="w-7 h-7 text-primary-foreground" />
+        <div className="section-shell gradient-card p-5 md:p-6">
+          <div className="grid gap-4 lg:grid-cols-4">
+            {STATISTICS.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-4 rounded-2xl border border-border/60 bg-background/80 p-4"
+              >
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl gradient-primary">
+                  <item.icon className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">
+                    {item.value}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{item.label}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-2xl font-heading font-bold text-foreground">
-                  {item.value}
-                </p>
-                <p className="text-sm text-muted-foreground">{item.label}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <div className="mt-5 flex items-center justify-center gap-2 text-sm font-semibold text-primary">
+            <ShieldCheck className="h-4 w-4" />
+            <span>
+              Licencirani tim, sterilizacioni protokoli i digitalni karton
+            </span>
+          </div>
         </div>
       </div>
     </section>

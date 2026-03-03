@@ -6,26 +6,26 @@ import { Button } from '@/components/ui/button';
 
 export default function CtaSection() {
   return (
-    <section className="py-24 gradient-primary">
+    <section className="py-20 md:py-24">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary-foreground mb-6">
-            Spremni za savršen osmeh?
+        <div className="section-shell gradient-primary px-6 py-12 text-center md:px-10">
+          <h2 className="text-3xl font-bold text-primary-foreground md:text-5xl">
+            Spremni za siguran i prirodan osmeh?
           </h2>
-          <p className="text-primary-foreground/90 text-lg mb-8 max-w-xl mx-auto">
-            Zakažite besplatnu konsultaciju danas i napravite prvi korak ka
-            osmehu iz snova.
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-primary-foreground/88">
+            Zakažite konsultaciju i dobijte personalizovan plan terapije uz
+            podršku DENTALHOLIST tima.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center">
+          <div className="mt-8 flex justify-center">
             <Button
               variant="outline"
-              size="lg"
-              className="px-18 py-7 rounded-3xl text-lg bg-white text-[rgb(13,162,231)]! hover:bg-card/90 font-semibold shadow-soft "
+              size="xl"
+              className="btn-shimmer rounded-full border-white/40 bg-white text-primary hover:bg-white/90"
               asChild
             >
               <Link href="/kontakt">
                 Zakaži pregled
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </div>

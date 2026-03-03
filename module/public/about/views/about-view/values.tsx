@@ -15,35 +15,44 @@ interface AboutValuesProps {
 
 export default function AboutValues({ values }: AboutValuesProps) {
   return (
-    <section className="py-24 bg-background">
+    <section className="py-20 md:py-28">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="inline-block px-4 py-2 rounded-full bg-(--primary-light) text-primary text-sm font-medium mb-4">
-            Naše vrednosti
-          </span>
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground">
-            Šta nas čini posebnim
+        <div className="mx-auto mb-14 max-w-2xl text-center">
+          <span className="section-kicker">Naše vrednosti</span>
+          <h2 className="mt-5 font-heading text-3xl font-bold text-foreground md:text-5xl">
+            Principi po kojima radimo
           </h2>
+          <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
+            Svaki aspekt DENTALHOLIST pristupa je oblikovan vrednostima koje
+            negujemo od prvog dana.
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {values.map((value) => {
+        <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-2 lg:gap-6">
+          {values.map((value, index) => {
             const IconComponent = getIcon(value.icon);
             return (
-              <div
+              <article
                 key={value.id}
-                className="p-6 rounded-2xl bg-card border border-border shadow-card text-center"
+                className="group relative section-shell overflow-hidden p-7 transition-smooth hover:-translate-y-1 hover:shadow-hover-blue sm:p-8"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center mx-auto mb-5">
-                  <IconComponent className="w-7 h-7 text-primary-foreground" />
+                <div className="absolute top-0 left-0 h-1 w-full gradient-accent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                <div className="flex items-start gap-5">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl gradient-primary shadow-soft">
+                    <IconComponent className="h-7 w-7 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground">
+                      {value.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {value.description}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-lg font-heading font-semibold text-foreground mb-3">
-                  {value.title}
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {value.description}
-                </p>
-              </div>
+              </article>
             );
           })}
         </div>

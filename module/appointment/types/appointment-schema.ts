@@ -7,6 +7,7 @@ export const getAvailableSlotsSchema = z.object({
 
 export const createAppointmentSchema = z.object({
   name: z.string().min(1, 'Ime je obavezno'),
+  email: z.string().email('Unesite validnu email adresu'),
   phone: z.string().min(1, 'Broj telefona je obavezan'),
   date: z.coerce.date(),
   time: z.string().regex(/^\d{2}:\d{2}$/, 'Format: HH:MM'),

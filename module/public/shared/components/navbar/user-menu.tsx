@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 
+import { LogIn } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { authClient } from '@/lib/auth-client';
@@ -17,13 +19,20 @@ export default function UserMenu() {
   };
 
   if (isPending) {
-    return <Skeleton className="h-8 w-8 rounded-full" />;
+    return <Skeleton className="h-8 w-8 rounded-full bg-white/25" />;
   }
 
   if (!session?.user) {
     return (
-      <Button asChild variant="outline">
-        <Link href="/login">Prijavi se</Link>
+      <Button
+        asChild
+        variant="outline"
+        className="gap-2 border-white/30 bg-white/10 text-primary-foreground shadow-[0_8px_20px_-14px_rgba(0,0,0,0.48)] hover:border-accent/60 hover:bg-white/16 hover:text-white"
+      >
+        <Link href="/login">
+          <LogIn className="size-4" />
+          Prijavi se
+        </Link>
       </Button>
     );
   }

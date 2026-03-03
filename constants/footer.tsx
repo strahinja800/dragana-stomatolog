@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 export const FOOTER_SERVICES = [
-  'Opšta stomatologija',
+  'Preventivna stomatologija',
   'Estetska stomatologija',
   'Implantologija',
   'Ortodoncija',
@@ -20,6 +20,7 @@ export const FOOTER_QUICK_LINKS = [
   { href: '/', label: 'Početna' },
   { href: '/usluge', label: 'Usluge' },
   { href: '/o-nama', label: 'O nama' },
+  { href: '/blog', label: 'Blog' },
   { href: '/kontakt', label: 'Kontakt' },
 ];
 
@@ -27,17 +28,17 @@ export const FOOTER_SOCIAL_LINKS = [
   {
     label: 'Facebook',
     icon: Facebook,
-    href: 'https://www.facebook.com/dentalcare',
+    href: 'https://www.facebook.com/dentalholist',
   },
   {
     label: 'Instagram',
     icon: Instagram,
-    href: 'https://www.instagram.com/dentalcare',
+    href: 'https://www.instagram.com/dentalholist',
   },
   {
     label: 'LinkedIn',
     icon: Linkedin,
-    href: 'https://www.linkedin.com/company/dentalcare',
+    href: 'https://www.linkedin.com/company/dentalholist',
   },
 ];
 
@@ -56,8 +57,8 @@ export const FOOTER_CONTACT = [
   {
     type: 'email',
     icon: Mail,
-    value: 'info@dentalcare.rs',
-    href: 'mailto:info@dentalcare.rs',
+    value: 'info@dentalholist.rs',
+    href: 'mailto:info@dentalholist.rs',
   },
   {
     type: 'hours',
@@ -67,7 +68,7 @@ export const FOOTER_CONTACT = [
 ];
 
 export const FOOTER_BRAND = {
-  name: 'DentalCare',
+  name: 'DENTALHOLIST KONCEPT',
   description:
-    'Vaš osmeh je naša misija. Pružamo vrhunsku stomatološku negu u modernom i opuštajućem okruženju.',
+    'Premium stomatološka ordinacija sa holističkim pristupom, online zakazivanjem i pažljivo vođenim iskustvom pacijenata.',
 };
