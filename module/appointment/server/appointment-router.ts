@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { addMinutes, endOfDay, startOfDay } from 'date-fns';
 import { z } from 'zod';
 
+import { sendEmail } from '@/lib/email/resend-client';
 import {
   formatLocalTime,
   getCurrentLocalTimeMinutes,
@@ -9,6 +10,10 @@ import {
   isLocalToday,
   parseLocalTime,
 } from '@/lib/timezone';
+import {
+  getBookingConfirmedEmail,
+  getBookingReceivedEmail,
+} from '@/module/appointment/server/appointment-email-templates';
 import {
   confirmAppointmentSchema,
   createAppointmentForPatientSchema,
@@ -202,9 +207,15 @@ export const appointmentRouter = createTRPCRouter({
           data: {
             firstName,
             lastName,
+            email: input.email,
             phone: input.phone,
             isMain: false,
           },
+        });
+      } else if (!patient.email) {
+        patient = await ctx.prisma.patient.update({
+          where: { id: patient.id },
+          data: { email: input.email },
         });
       }
 
@@ -214,6 +225,7 @@ export const appointmentRouter = createTRPCRouter({
           patientId: patient.id,
           startTime,
           endTime,
+          email: input.email,
           phone: input.phone,
           symptoms: input.symptoms,
           status: 'PENDING',
@@ -224,6 +236,25 @@ export const appointmentRouter = createTRPCRouter({
           patient: true,
         },
       });
+
+      const receivedEmail = getBookingReceivedEmail({
+        patientName: `${firstName} ${lastName}`.trim(),
+        startTime,
+      });
+
+      const emailResult = await sendEmail({
+        to: input.email,
+        subject: receivedEmail.subject,
+        html: receivedEmail.html,
+        text: receivedEmail.text,
+      });
+
+      if (!emailResult.success) {
+        console.error('[appointment.create] Booking received email failed', {
+          appointmentId: appointment.id,
+          reason: emailResult.message,
+        });
+      }
 
       return appointment;
     }),
@@ -352,6 +383,7 @@ export const appointmentRouter = createTRPCRouter({
           patientId: patient.id,
           startTime,
           endTime,
+          email: patient.email ?? undefined,
           phone: patient.phone,
           symptoms: input.symptoms,
           status: 'CONFIRMED',
@@ -362,6 +394,32 @@ export const appointmentRouter = createTRPCRouter({
           patient: true,
         },
       });
+
+      if (appointment.email) {
+        const confirmedEmail = getBookingConfirmedEmail({
+          patientName:
+            `${appointment.patient.firstName} ${appointment.patient.lastName}`.trim(),
+          startTime: appointment.startTime,
+          serviceName: null,
+        });
+
+        const emailResult = await sendEmail({
+          to: appointment.email,
+          subject: confirmedEmail.subject,
+          html: confirmedEmail.html,
+          text: confirmedEmail.text,
+        });
+
+        if (!emailResult.success) {
+          console.error(
+            '[appointment.createForPatient] Confirmation email failed',
+            {
+              appointmentId: appointment.id,
+              reason: emailResult.message,
+            }
+          );
+        }
+      }
 
       return appointment;
     }),
@@ -413,6 +471,31 @@ export const appointmentRouter = createTRPCRouter({
           serviceType: true,
         },
       });
+
+      const confirmationEmail = updated.email ?? updated.patient.email;
+
+      if (confirmationEmail) {
+        const confirmedEmail = getBookingConfirmedEmail({
+          patientName:
+            `${updated.patient.firstName} ${updated.patient.lastName}`.trim(),
+          startTime: updated.startTime,
+          serviceName: updated.serviceType?.name,
+        });
+
+        const emailResult = await sendEmail({
+          to: confirmationEmail,
+          subject: confirmedEmail.subject,
+          html: confirmedEmail.html,
+          text: confirmedEmail.text,
+        });
+
+        if (!emailResult.success) {
+          console.error('[appointment.confirm] Confirmation email failed', {
+            appointmentId: updated.id,
+            reason: emailResult.message,
+          });
+        }
+      }
 
       return updated;
     }),

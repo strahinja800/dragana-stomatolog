@@ -201,6 +201,7 @@ model Appointment {
   status             AppointmentStatus @default(PENDING)
   startTime          DateTime
   endTime            DateTime
+  email              String?
   notes              String?
   phone              String?
   symptoms           String?
@@ -218,6 +219,7 @@ model Appointment {
   @@index([status])
   @@index([startTime])
   @@index([status, startTime])
+  @@index([email])
 }
 
 // ============================================
