@@ -22,49 +22,41 @@ interface BlogPostViewHeroProps {
 
 export default function BlogPostViewHero({ post }: BlogPostViewHeroProps) {
   return (
-    <section className="py-24 gradient-hero">
+    <section className="gradient-hero pt-34 pb-16 md:pt-40 md:pb-20">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col gap-4">
-            <Link
-              href="/blog"
-              className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Nazad na blog
-            </Link>
+        <div className="mx-auto max-w-4xl">
+          <Link
+            href="/blog"
+            className="inline-flex items-center text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Nazad na blog
+          </Link>
 
-            <span className="inline-block text-sm text-muted-foreground mb-4 ml-6">
-              {format(
-                post.publishedAt ?? post.createdAt,
-                'EEEE, d. MMMM yyyy.',
-                {
-                  locale: sr,
-                }
-              )}
-            </span>
-          </div>
+          <p className="mt-4 text-sm text-muted-foreground">
+            {format(post.publishedAt ?? post.createdAt, 'EEEE, d. MMMM yyyy.', {
+              locale: sr,
+            })}
+          </p>
 
           <h1
-            className="text-3xl md:text-5xl font-heading font-bold text-foreground mb-6"
+            className="mt-5 text-3xl font-bold text-foreground md:text-5xl"
             dangerouslySetInnerHTML={{ __html: post.title }}
           />
 
           {post.excerpt && (
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              {post.excerpt}
-            </p>
+            <p className="mt-5 text-lg text-muted-foreground">{post.excerpt}</p>
           )}
         </div>
 
         {post.featuredImage && (
-          <div className="max-w-5xl mx-auto mt-12">
+          <div className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-3xl border border-border/60 shadow-card">
             <Image
               src={post.featuredImage}
               alt={post.imageAlt ?? stripHtml(post.title)}
               width={1200}
               height={630}
-              className="w-full rounded-2xl shadow-card object-cover"
+              className="h-full w-full object-cover"
               priority
             />
           </div>

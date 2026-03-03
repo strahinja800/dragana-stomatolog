@@ -1,17 +1,15 @@
 export default function BlogViewHero() {
   return (
-    <section className="py-40 gradient-hero">
+    <section className="gradient-hero pt-34 pb-20 md:pt-40 md:pb-24">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-4xl mx-auto">
-          <span className="inline-block px-4 py-2 rounded-full bg-(--primary-light) text-primary text-sm font-medium mb-6">
-            Blog
-          </span>
-          <h1 className="text-4xl md:text-6xl font-heading font-bold text-foreground mb-6">
+        <div className="mx-auto max-w-4xl text-center">
+          <span className="section-kicker">Blog</span>
+          <h1 className="mt-5 text-4xl font-bold text-foreground md:text-6xl">
             Korisni saveti i novosti
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Pratite naš blog za najnovije savete o oralnom zdravlju,
-            stomatološkim tretmanima i zdravim navikama za celu porodicu.
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
+            Pratite naš blog za savete o oralnom zdravlju, tretmanima i navikama
+            koje čuvaju osmeh dugoročno.
           </p>
         </div>
       </div>

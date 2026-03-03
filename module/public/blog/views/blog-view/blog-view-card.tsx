@@ -24,7 +24,7 @@ interface BlogViewCardProps {
 
 export default function BlogViewCard({ post }: BlogViewCardProps) {
   return (
-    <article className="group rounded-2xl bg-card border border-border shadow-card hover:shadow-hover transition-all duration-300 overflow-hidden">
+    <article className="section-shell group overflow-hidden transition-smooth hover:-translate-y-1 hover:shadow-hover-blue">
       <div className="aspect-16/10 overflow-hidden bg-muted">
         {post.featuredImage ? (
           <Image
@@ -32,11 +32,11 @@ export default function BlogViewCard({ post }: BlogViewCardProps) {
             alt={post.imageAlt ?? stripHtml(post.title)}
             width={600}
             height={375}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <BookOpen className="w-12 h-12 text-muted-foreground/30" />
+          <div className="flex h-full w-full items-center justify-center">
+            <BookOpen className="h-12 w-12 text-muted-foreground/30" />
           </div>
         )}
       </div>
@@ -48,22 +48,22 @@ export default function BlogViewCard({ post }: BlogViewCardProps) {
           })}
         </span>
 
-        <h3 className="text-xl font-heading font-semibold text-foreground mt-2 mb-3 line-clamp-2 group-hover:text-[rgb(13,162,231)] transition-colors">
+        <h3 className="mt-2 mb-3 line-clamp-2 text-xl font-semibold text-foreground transition-colors group-hover:text-primary">
           {stripHtml(post.title)}
         </h3>
 
         {post.excerpt && (
-          <p className="text-muted-foreground text-base leading-7 mb-4 line-clamp-3">
+          <p className="mb-4 line-clamp-3 text-base text-muted-foreground">
             {post.excerpt}
           </p>
         )}
 
         <Link
           href={`/blog/${post.slug}`}
-          className="inline-flex items-center text-[rgb(13,162,231)] font-medium text-sm hover:gap-2 transition-all"
+          className="inline-flex items-center text-sm font-semibold text-primary transition-all hover:gap-2"
         >
           Pročitaj više
-          <ChevronRight className="w-4 h-4 ml-1" />
+          <ChevronRight className="ml-1 h-4 w-4" />
         </Link>
       </div>
     </article>
