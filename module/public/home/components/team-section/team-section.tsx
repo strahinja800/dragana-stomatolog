@@ -9,33 +9,26 @@ import TeamMembers from './team-members';
 
 export default function TeamSection() {
   return (
-    <section className="py-16 md:py-24 bg-background">
+    <section className="py-16 md:py-24">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="inline-block px-4 py-2 rounded-full bg-(--primary-light) text-primary text-sm font-medium mb-4">
-            Naš tim
-          </span>
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-4">
-            Upoznajte naše stručnjake
+        <div className="mx-auto mb-12 max-w-2xl text-center">
+          <span className="section-kicker">Naš Tim</span>
+          <h2 className="mt-4 text-3xl font-bold text-foreground md:text-5xl">
+            Stručnjaci kojima verujete
           </h2>
-          <p className="text-muted-foreground">
-            Tim posvećenih profesionalaca sa dugogodišnjim iskustvom u
-            stomatologiji.
+          <p className="mt-4 text-muted-foreground">
+            Interdisciplinarni tim koji vodi terapiju od prvog pregleda do
+            završne kontrole.
           </p>
         </div>
 
         <TeamMembers team={team} />
 
-        <div className="text-center mt-12">
-          <Button
-            variant="outline"
-            size="default"
-            className="text-lg px-8 py-6 border-[rgb(13,162,231)] hover:bg-[rgb(13,162,231)] text-[rgb(13,162,231)] rounded-3xl"
-            asChild
-          >
+        <div className="mt-12 text-center">
+          <Button asChild variant="outline" className="rounded-full px-7">
             <Link href="/o-nama">
               Više o timu
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>

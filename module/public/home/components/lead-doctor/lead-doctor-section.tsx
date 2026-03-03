@@ -3,112 +3,94 @@ import Link from 'next/link';
 
 import { ArrowRight, Award, GraduationCap, Star } from 'lucide-react';
 
-import dentist1 from '@/assets/dentist-1.jpg';
 import { Button } from '@/components/ui/button';
+import { dentist1 } from '@/data/data';
 
 export default function LeadDoctorSection() {
   return (
-    <section className="py-16 md:py-24 bg-background overflow-hidden">
+    <section className="py-16 md:py-24">
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Image Side */}
+        <div className="grid items-center gap-12 lg:grid-cols-2">
           <div className="relative">
-            <div className="relative z-10">
-              <div className="aspect-4/5 rounded-3xl overflow-hidden shadow-hover">
-                <Image
-                  src={dentist1}
-                  alt="Dr. Ana Jovanović"
-                  className="w-full h-full object-cover"
-                />
+            <div className="overflow-hidden rounded-4xl border border-border/60 shadow-card">
+              <Image
+                src={dentist1}
+                alt="Dr. Ana Jovanović, glavni stomatolog DENTALHOLIST ordinacije"
+                className="h-full w-full object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                width={1920}
+                height={1080}
+              />
+            </div>
+
+            <div className="absolute -bottom-6 right-4 max-w-72 rounded-3xl border border-border/70 bg-card/96 p-5 shadow-hover md:right-8">
+              <div className="mb-3 flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl gradient-primary">
+                  <Award className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-heading text-lg font-bold text-foreground">
+                    15+ godina
+                  </p>
+                  <p className="text-xs tracking-[0.12em] text-muted-foreground uppercase">
+                    kliničkog iskustva
+                  </p>
+                </div>
               </div>
-              {/* Floating Card */}
-              <div className="absolute -bottom-6 -right-3 md:-right-6 lg:right-8 bg-card rounded-2xl p-6 shadow-hover border border-border max-w-70">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-3xl gradient-primary flex items-center justify-center">
-                    <Award className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <p className="font-heading font-bold text-foreground">
-                      15+ godina
-                    </p>
-                    <p className="text-sm text-muted-foreground">iskustva</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-4 h-4 fill-primary text-primary"
-                    />
-                  ))}
-                  <span className="text-sm text-muted-foreground ml-2">
-                    5.0 ocena
-                  </span>
-                </div>
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-accent text-accent" />
+                ))}
+                <span className="ml-2 text-sm font-medium text-muted-foreground">
+                  Ocena 5.0
+                </span>
               </div>
             </div>
-            {/* Background Decoration */}
-            <div className="absolute top-8 -left-8 w-full h-full rounded-3xl bg-primary/10 -z-10" />
           </div>
 
-          {/* Content Side */}
           <div className="space-y-6">
+            <span className="section-kicker">Glavni Stomatolog</span>
             <div>
-              <span className="inline-block px-4 py-2 rounded-full bg-(--primary-light) text-primary text-sm font-medium mb-4">
-                Upoznajte našu glavnu lekarku
-              </span>
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-2">
+              <h2 className="text-3xl font-bold text-foreground md:text-5xl">
                 Dr. Ana Jovanović
               </h2>
-              <p className="text-[rgb(13,162,231)] font-medium">
+              <p className="mt-2 font-semibold tracking-wide text-primary uppercase">
                 Specijalista estetske stomatologije
               </p>
             </div>
 
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              Sa više od 15 godina iskustva u stomatologiji, dr. Ana Jovanović
-              je posvećena pružanju vrhunske nege svakom pacijentu. Njena strast
-              za estetskom stomatologijom i kontinuirano usavršavanje
-              omogućavaju joj da primenjuje najnovije tehnike i tehnologije u
-              svakodnevnoj praksi.
+            <p className="text-lg text-muted-foreground">
+              Sa više od 15 godina iskustva, dr Ana vodi tim fokusiran na
+              preciznu i nežnu stomatologiju. Svaki plan terapije je
+              personalizovan i oslonjen na savremenu dijagnostiku.
             </p>
 
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              Diplomirala je na Stomatološkom fakultetu Univerziteta u Beogradu,
-              a specijalizaciju je završila u Švajcarskoj. Redovno učestvuje na
-              međunarodnim kongresima i radionicama kako bi svojim pacijentima
-              pružila najbolju moguću negu.
-            </p>
-
-            <div className="grid sm:grid-cols-2 gap-4 pt-4">
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 border border-border">
-                <GraduationCap className="w-5 h-5 text-primary" />
-                <div>
-                  <p className="font-medium text-foreground text-base">
-                    Stomatološki fakultet
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Univerzitet u Beogradu
-                  </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-border/70 bg-card/80 p-4">
+                <div className="mb-2 flex items-center gap-2 text-primary">
+                  <GraduationCap className="h-5 w-5" />
+                  <p className="font-semibold text-foreground">Edukacija</p>
                 </div>
+                <p className="text-sm text-muted-foreground">
+                  Stomatološki fakultet Univerziteta u Beogradu + međunarodne
+                  edukacije.
+                </p>
               </div>
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 border border-border">
-                <Award className="w-5 h-5 text-primary" />
-                <div>
-                  <p className="font-medium text-foreground text-base">
-                    Specijalizacija
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Estetska stomatologija
-                  </p>
+              <div className="rounded-2xl border border-border/70 bg-card/80 p-4">
+                <div className="mb-2 flex items-center gap-2 text-primary">
+                  <Award className="h-5 w-5" />
+                  <p className="font-semibold text-foreground">Fokus</p>
                 </div>
+                <p className="text-sm text-muted-foreground">
+                  Estetska i restaurativna stomatologija uz dugoročno praćenje.
+                </p>
               </div>
             </div>
 
-            <Button asChild>
+            <Button asChild className="btn-shimmer rounded-full px-6">
               <Link href="/o-nama">
-                Više o timu
-                <ArrowRight className="w-4 h-4 ml-2" />
+                Upoznajte ceo tim
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </div>

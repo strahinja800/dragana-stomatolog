@@ -1,63 +1,90 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
-import { Sparkles, Star } from 'lucide-react';
+import { ArrowRight, Phone, Star } from 'lucide-react';
 
-import { dentist1, dentist2, heroImage } from '@/data/data';
+import { Button } from '@/components/ui/button';
+import {
+  dentist1,
+  dentist2,
+  heroImage,
+  logoGoldTransparent,
+} from '@/data/data';
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-[40vh] flex items-center overflow-hidden md:mt-10">
-      {/* Full background image */}
+    <section className="relative mt-20 min-h-[calc(100svh-5rem)] overflow-hidden">
       <div className="absolute inset-0">
         <Image
           src={heroImage}
-          alt="Moderna stomatološka ordinacija"
-          className="w-full h-full object-cover"
+          alt="DENTALHOLIST moderna stomatološka ordinacija"
+          className="h-full w-full object-cover"
+          priority
+          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-linear-to-r from-foreground/85 via-foreground/60 to-foreground/30" />
+        <div className="absolute inset-0 bg-linear-to-b from-foreground/58 via-foreground/46 to-foreground/65" />
       </div>
 
-      <div className="container mx-auto px-4 py-20 relative z-10">
-        <div className="max-w-3xl mx-auto text-center space-y-8 animate-fade-up">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 backdrop-blur-sm text-primary-foreground text-sm font-medium border border-primary/30">
-            <Sparkles className="w-4 h-4" />
-            <span>Vaš savršen osmeh počinje ovde</span>
-          </div>
+      <div className="container relative z-10 mx-auto flex min-h-[calc(100svh-5rem)] items-center px-4 py-10 md:py-12">
+        <div className="mx-auto flex max-w-4xl flex-col items-center gap-5 text-center animate-fade-up">
+          <Image
+            src={logoGoldTransparent}
+            alt="DENTALHOLIST"
+            width={951}
+            height={459}
+            className="mx-auto w-50 md:w-90 lg:w-110 h-auto"
+          />
 
-          <h1 className="text-4xl md:text-6xl xl:text-8xl font-heading font-bold text-primary-foreground leading-tighter">
-            Stomatologija koja
-            <span className="block text-primary"> inspiriše osmeh</span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto leading-relaxed">
-            Bilo da niste bili kod zubara 6 meseci ili 6 godina, olakšavamo vam
-            povratak sa nežnom negom i bez osude.
+          <p className="mx-auto max-w-3xl text-lg text-primary-foreground/88 ">
+            Precizna dijagnostika, individualni plan terapije i digitalno vođeno
+            iskustvo uz besprekoran standard nege.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:items-center">
+            <Button asChild size="xl" className="btn-shimmer rounded-full px-8">
+              <Link href="#zakazivanje">
+                Zakaži online
+                <ArrowRight className="ml-1 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="xl"
+              variant="outline"
+              className="rounded-full border-primary/50 bg-white/10 px-8 text-primary-foreground backdrop-blur hover:bg-white/15 hover:text-primary-foreground"
+            >
+              <a href="tel:+381111234567">
+                <Phone className="mr-1 h-5 w-5" />
+                Pozovi odmah
+              </a>
+            </Button>
+          </div>
+
+          <div className="flex flex-col items-center justify-center gap-4 pt-2 sm:flex-row sm:items-center">
             <div className="flex -space-x-3">
               {[dentist1, dentist2].map((img, i) => (
                 <Image
                   key={i}
                   src={img}
-                  alt={`Tim ${i + 1}`}
-                  className="w-12 h-12 rounded-full border-2 border-primary-foreground object-cover"
+                  alt={`DENTALHOLIST tim ${i + 1}`}
+                  className="h-12 w-12 rounded-full border-2 border-primary-foreground object-cover"
                 />
               ))}
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center border-2 border-primary-foreground">
-                <span className="text-primary-foreground text-sm font-semibold">
-                  +5
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary-foreground bg-primary">
+                <span className="text-sm font-semibold text-primary-foreground">
+                  +7
                 </span>
               </div>
             </div>
+
             <div className="text-center sm:text-left">
-              <div className="flex items-center justify-center sm:justify-start gap-1">
+              <div className="flex items-center justify-center gap-1 sm:justify-start">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                  <Star key={i} className="h-4 w-4 fill-accent text-accent" />
                 ))}
               </div>
-              <p className="text-sm text-primary-foreground/70">
-                Preko 500+ recenzija
+              <p className="mt-1 text-sm text-primary-foreground/84">
+                10.000+ zadovoljnih pacijenata i ocena 5.0
               </p>
             </div>
           </div>
