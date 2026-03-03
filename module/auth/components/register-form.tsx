@@ -10,7 +10,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import logo from '@/assets/logo-negativ.jpg';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -27,6 +26,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { logoNegativ } from '@/data/data';
 import { authClient } from '@/lib/auth-client';
 import { parseAuthError } from '@/module/auth/lib/auth-error-handler';
 import {
@@ -114,15 +114,13 @@ export function RegisterForm() {
         <Link href="/" className="mx-auto mb-4 inline-flex items-center gap-3">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-soft">
             <Image
-              src={logo}
-              alt="DentalCare"
+              src={logoNegativ}
+              alt="DENTALHOLIST KONCEPT"
               height={36}
               className="h-9 w-auto"
             />
           </div>
-          <span className="text-foreground font-semibold text-xl">
-            DentalCare
-          </span>
+          <span className="text-foreground font-semibold text-xl">DENTALHOLIST</span>
         </Link>
         <CardTitle>Registrujte se</CardTitle>
         <CardDescription>

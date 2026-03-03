@@ -1,90 +1,95 @@
-import { Clock, Heart, Shield, Sparkles } from 'lucide-react';
+import { BellRing, CalendarClock, CircleCheckBig, Shield } from 'lucide-react';
 
-import dentist1 from '@/assets/dentist-1.jpg';
-import dentist2 from '@/assets/dentist-2.jpg';
-import heroImage from '@/assets/hero-dental.jpg';
-import portfolio1 from '@/assets/portfolio-1.png';
-import portfolio2 from '@/assets/portfolio-2.png';
-import portfolio3 from '@/assets/portfolio-3.png';
-import portfolio4 from '@/assets/portfolio-4.png';
-import portfolio5 from '@/assets/portfolio-5.png';
+import logoGoldTransparent from '@/public/assets/dentalholist-logo-gold-transparent.svg';
+import logoHorizontal from '@/public/assets/dentalholist-logo-horizontal.svg';
+import logoIcon from '@/public/assets/dentalholist-logo-icon.svg';
+import logoText from '@/public/assets/dentalholist-logo-text.svg';
+import dentist1 from '@/public/assets/dentist-1.jpg';
+import dentist2 from '@/public/assets/dentist-2.jpg';
+import heroImage from '@/public/assets/hero-dental.jpg';
+import logoNegativ from '@/public/assets/logo-negativ.jpg';
+import portfolio1 from '@/public/assets/portfolio-1.png';
+import portfolio2 from '@/public/assets/portfolio-2.png';
+import portfolio3 from '@/public/assets/portfolio-3.png';
+import portfolio4 from '@/public/assets/portfolio-4.png';
+import portfolio5 from '@/public/assets/portfolio-5.png';
 
 export const portfolioItems = [
   {
     number: '01',
     title: 'Preventivna nega',
-    description: 'Kompletna briga o zdravlju vaših zuba',
+    description: 'Kompletna zaštita i održavanje zdravog osmeha.',
     image: portfolio1,
   },
   {
     number: '02',
     title: 'Implantologija',
-    description: 'Najsavremeniji zubni implantati',
+    description: 'Precizna i dugotrajna implantološka rešenja.',
     image: portfolio2,
   },
   {
     number: '03',
-    title: 'Dijagnostika',
-    description: 'Precizna analiza i planiranje lečenja',
+    title: 'Digitalna dijagnostika',
+    description: 'Tačno planiranje terapije uz savremenu tehnologiju.',
     image: portfolio3,
   },
   {
     number: '04',
     title: 'Ortodoncija',
-    description: 'Ispravljanje vilice i zuba',
+    description: 'Funkcionalno i estetsko ispravljanje zuba.',
     image: portfolio4,
   },
   {
     number: '05',
     title: 'Protetika',
-    description: 'Kvalitetne krunice i mostovi',
+    description: 'Krunice, mostovi i rešenja prirodnog izgleda.',
     image: portfolio5,
   },
 ];
 
 export const services = [
   {
-    icon: Sparkles,
+    icon: CircleCheckBig,
     title: 'Estetska stomatologija',
-    description: 'Izbeljivanje zuba, fasete i kompletna transformacija osmeha.',
+    description: 'Izbeljivanje zuba, fasete i potpuna transformacija osmeha.',
   },
   {
     icon: Shield,
     title: 'Preventivna nega',
-    description: 'Redovni pregledi, čišćenje i fluoridacija za zdravlje zuba.',
+    description: 'Kontrole i profesionalna higijena za dugoročno zdravlje.',
   },
   {
-    icon: Heart,
+    icon: CalendarClock,
     title: 'Implantologija',
-    description: 'Moderna ugradnja implantata za savršen i trajan osmeh.',
+    description: 'Savremena ugradnja implantata uz digitalno planiranje.',
   },
   {
-    icon: Clock,
-    title: 'Hitna pomoć',
-    description: 'Brza pomoć za bol u zubima i hitne stomatološke situacije.',
+    icon: BellRing,
+    title: 'Kontrolni podsetnici',
+    description: 'Email potvrde i automatski podsetnici za naredni pregled.',
   },
 ];
 
 export const testimonials = [
   {
     name: 'Marija Petrović',
-    role: 'Pacijent od 2019',
+    role: 'Pacijent od 2019.',
     content:
-      'Neverovatno iskustvo! Tim DentalCare-a me je potpuno opustio i učinio da se osećam kao kod kuće. Moj osmeh nikada nije izgledao bolje.',
+      'Prvi put sam imala osećaj da stomatologija može biti potpuno mirno i premium iskustvo. Sve je jasno, profesionalno i bez stresa.',
     rating: 5,
   },
   {
     name: 'Stefan Jovanović',
-    role: 'Pacijent od 2021',
+    role: 'Pacijent od 2021.',
     content:
-      'Profesionalizam na najvišem nivou. Implantat koji sam dobio izgleda potpuno prirodno. Preporučujem svima!',
+      'Plan terapije je bio detaljan, a rezultat iznad očekivanja. Komunikacija i podsetnici su mi mnogo olakšali celu proceduru.',
     rating: 5,
   },
   {
     name: 'Ana Nikolić',
-    role: 'Pacijent od 2020',
+    role: 'Pacijent od 2020.',
     content:
-      'Konačno zubar od koga se ne plašim! Atmosfera je opuštajuća, a rezultati fantastični. Hvala vam!',
+      'Od prvog kontakta do kontrole sve je bilo organizovano besprekorno. Tim je stručan, pažljiv i potpuno posvećen pacijentu.',
     rating: 5,
   },
 ];
@@ -92,7 +97,7 @@ export const testimonials = [
 export const team = [
   {
     name: 'Dr. Ana Jovanović',
-    role: 'Glavna stomatologinja',
+    role: 'Glavni stomatolog',
     specialty: 'Estetska stomatologija',
     image: dentist1,
   },
@@ -104,23 +109,93 @@ export const team = [
   },
   {
     name: 'Dr. Jelena Marković',
-    role: 'Ortodont',
-    specialty: 'Fiksne proteze',
+    role: 'Specijalista ortodoncije',
+    specialty: 'Fiksna i providna ortodoncija',
     image: dentist1,
   },
   {
     name: 'Dr. Nikola Stanković',
-    role: 'Endodontista',
-    specialty: 'Lečenje kanala',
+    role: 'Specijalista endodoncije',
+    specialty: 'Mikroskopsko lečenje kanala',
     image: dentist2,
   },
 ];
 
-export const features = [
-  'Najsavremenija oprema',
-  'Bezbolni tretmani',
-  'Fleksibilno zakazivanje',
-  'Porodična stomatologija',
+export const beforeAfterCases = [
+  {
+    title: 'Estetska rekonstrukcija prednjih zuba',
+    summary: 'Kombinacija faseta i minimalno invazivne preparacije.',
+    beforeImage: dentist1,
+    afterImage: dentist2,
+    beforeLabel: 'PRE',
+    afterLabel: 'POSLE',
+  },
+  {
+    title: 'Implantološka rehabilitacija',
+    summary: 'Povrat funkcije i prirodnog izgleda osmeha.',
+    beforeImage: dentist2,
+    afterImage: dentist1,
+    beforeLabel: 'PRE',
+    afterLabel: 'POSLE',
+  },
+  {
+    title: 'Profesionalna oralna rehabilitacija',
+    summary: 'Konzervativni pristup sa dugoročnim planom kontrole.',
+    beforeImage: dentist1,
+    afterImage: dentist2,
+    beforeLabel: 'PRE',
+    afterLabel: 'POSLE',
+  },
 ];
 
-export { dentist1, dentist2, heroImage };
+export const bookingProcessSteps = [
+  {
+    step: '01',
+    title: 'Online zakazivanje',
+    description:
+      'Izaberite datum i vreme koje vam odgovara i pošaljite zahtev u manje od jednog minuta.',
+  },
+  {
+    step: '02',
+    title: 'Email potvrda termina',
+    description:
+      'Nakon potvrde od strane ordinacije dobijate detalje termina na email.',
+  },
+  {
+    step: '03',
+    title: 'Podsetnik 24h pre pregleda',
+    description:
+      'Automatski email podsetnik vam pomaže da ne propustite kontrolu.',
+  },
+];
+
+export const homeFaqItems = [
+  {
+    question: 'Da li mogu da zakažem termin van radnog vremena?',
+    answer:
+      'Online formu možete popuniti 24/7, a potvrdu termina dobijate čim tim obradi zahtev.',
+  },
+  {
+    question: 'Koliko unapred stiže podsetnik za termin?',
+    answer: 'Podsetnik stiže email-om 24 sata pre potvrđenog termina.',
+  },
+  {
+    question: 'Da li je prva konsultacija obavezna?',
+    answer:
+      'Da, inicijalna konsultacija omogućava da kreiramo precizan i individualan plan terapije.',
+  },
+  {
+    question: 'Da li postoji plan plaćanja za veće terapije?',
+    answer:
+      'Za kompleksnije terapije nudimo fazni plan i transparentnu procenu troškova.',
+  },
+];
+
+export const features = [
+  'Savremena dijagnostika',
+  'Bezbedni i nežni tretmani',
+  'Online zakazivanje i podsetnici',
+  'Personalizovan plan terapije',
+];
+
+export { dentist1, dentist2, heroImage, logoGoldTransparent, logoHorizontal, logoIcon, logoNegativ, logoText };

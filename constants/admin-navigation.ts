@@ -41,9 +41,9 @@ export const ADMIN_NAV_ITEMS = [
 ];
 
 export const ADMIN_BRAND = {
-  name: 'DentalCare',
+  name: 'DENTALHOLIST',
   subtitle: 'Admin Panel',
-  mobileTitle: 'DentalCare Admin',
+  mobileTitle: 'DENTALHOLIST Admin',
 };
 
 export const ADMIN_ACTIONS = {
