@@ -103,7 +103,9 @@ export function LoginForm() {
               className="h-9 w-auto"
             />
           </div>
-          <span className="text-foreground font-semibold text-xl">DENTALHOLIST</span>
+          <span className="text-foreground font-semibold text-xl">
+            DENTALHOLIST
+          </span>
         </Link>
         <CardTitle>Prijavite se</CardTitle>
         <CardDescription>

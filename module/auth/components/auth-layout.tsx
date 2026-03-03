@@ -6,7 +6,8 @@ export const AuthLayout = ({ children }: { children: React.ReactNode }) => {
       </main>
 
       <footer className="p-6 text-center text-sm text-muted-foreground">
-        &copy; {new Date().getFullYear()} DENTALHOLIST KONCEPT. Sva prava zadržana.
+        &copy; {new Date().getFullYear()} DENTALHOLIST KONCEPT. Sva prava
+        zadržana.
       </footer>
     </div>
   );

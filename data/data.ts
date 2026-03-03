@@ -198,4 +198,13 @@ export const features = [
   'Personalizovan plan terapije',
 ];
 
-export { dentist1, dentist2, heroImage, logoGoldTransparent, logoHorizontal, logoIcon, logoNegativ, logoText };
+export {
+  dentist1,
+  dentist2,
+  heroImage,
+  logoGoldTransparent,
+  logoHorizontal,
+  logoIcon,
+  logoNegativ,
+  logoText,
+};

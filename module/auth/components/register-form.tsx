@@ -120,7 +120,9 @@ export function RegisterForm() {
               className="h-9 w-auto"
             />
           </div>
-          <span className="text-foreground font-semibold text-xl">DENTALHOLIST</span>
+          <span className="text-foreground font-semibold text-xl">
+            DENTALHOLIST
+          </span>
         </Link>
         <CardTitle>Registrujte se</CardTitle>
         <CardDescription>
