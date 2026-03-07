@@ -83,10 +83,7 @@ export default function BookingForm({
     isPending: isPendingNonWorkingDays,
   } = useSuspenseQuery(trpc.appointment.getNonWorkingDays.queryOptions());
 
-  const {
-    data: timeSlots,
-    isFetching: isLoadingTimeSlots,
-  } = useQuery(
+  const { data: timeSlots, isFetching: isLoadingTimeSlots } = useQuery(
     trpc.appointment.getTimeSlotsForDate.queryOptions({
       date: selectedDate ?? today,
     })
