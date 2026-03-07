@@ -1,8 +1,7 @@
 import Link from 'next/link';
 
-import { FileQuestion, Home } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
+import { FileQuestion, Home } from '@/constants/icons';
 
 export default function NotFound() {
   return (

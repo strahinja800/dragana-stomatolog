@@ -3,8 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { Clock, Heart, Users } from 'lucide-react';
-
+import { Clock, Heart, Users } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 
 const ABOUT_TABS = [

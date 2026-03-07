@@ -14,6 +14,7 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table';
 
+import { DataTablePagination } from '@/components/shared/table/data-table-pagination';
 import {
   Table,
   TableBody,
@@ -24,7 +25,6 @@ import {
 } from '@/components/ui/table';
 
 import { type BlogPostRow, columns } from './blog-posts-table-columns';
-import { BlogPostsTablePagination } from './blog-posts-table-pagination';
 import { BlogPostsTableToolbar } from './blog-posts-table-toolbar';
 
 interface BlogPostsTableProps {
@@ -119,7 +119,7 @@ export function BlogPostsTable({ data, onEditPost }: BlogPostsTableProps) {
           </TableBody>
         </Table>
       </div>
-      <BlogPostsTablePagination table={table} />
+      <DataTablePagination table={table} totalLabel="Ukupno članaka:" />
     </div>
   );
 }

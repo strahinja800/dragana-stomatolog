@@ -1,8 +1,7 @@
 'use client';
 
-import { Shield, TrendingUp, UserCheck, Users } from 'lucide-react';
-
 import { Card, CardContent } from '@/components/ui/card';
+import { Shield, TrendingUp, UserCheck, Users } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 
 interface StatsCardsProps {

@@ -1,7 +1,5 @@
 'use client';
 
-import { Check, MoreHorizontal, RefreshCw, X } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -10,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Check, MoreHorizontal, RefreshCw, X } from '@/constants/icons';
 
 import { type Appointment } from './appointment-table-columns';
 

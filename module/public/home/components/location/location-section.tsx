@@ -1,6 +1,5 @@
-import { ArrowRight, Clock, MapPin, Phone } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
+import { ArrowRight, Clock, MapPin, Phone } from '@/constants/icons';
 
 export default function LocationSection() {
   return (

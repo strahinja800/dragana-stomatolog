@@ -1,4 +1,4 @@
-import type { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from '@/constants/icons';
 import {
   Activity,
   Award,
@@ -25,7 +25,7 @@ import {
   Trophy,
   Users,
   Zap,
-} from 'lucide-react';
+} from '@/constants/icons';
 
 export const ICON_MAP: Record<string, LucideIcon> = {
   Heart,

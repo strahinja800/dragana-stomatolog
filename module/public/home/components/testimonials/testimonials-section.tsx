@@ -1,5 +1,4 @@
-import { Star } from 'lucide-react';
-
+import { Star } from '@/constants/icons';
 import { testimonials } from '@/data/data';
 
 export default function TestimonialsSection() {

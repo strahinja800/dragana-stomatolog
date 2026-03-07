@@ -4,8 +4,7 @@ import type { CSSProperties } from 'react';
 import { useState } from 'react';
 import Image, { type StaticImageData } from 'next/image';
 
-import { GripVertical } from 'lucide-react';
-
+import { GripVertical } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 
 export type BeforeAfterCompareCardProps = {

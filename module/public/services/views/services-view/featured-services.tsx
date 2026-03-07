@@ -1,8 +1,7 @@
 import Link from 'next/link';
 
-import { ArrowRight, CheckCircle } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
+import { ArrowRight, CheckCircle } from '@/constants/icons';
 import { SERVICES } from '@/constants/services';
 
 const FEATURED_INDICES = [1, 2, 3]; // Estetska, Implantologija, Ortodoncija

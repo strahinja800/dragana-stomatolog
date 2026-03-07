@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import { GraduationCap } from 'lucide-react';
+import { GraduationCap } from '@/constants/icons';
 
 interface TeamMember {
   id: string;

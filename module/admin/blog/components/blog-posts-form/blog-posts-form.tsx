@@ -6,7 +6,6 @@ import Image from 'next/image';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ImageIcon, Loader2, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
@@ -35,6 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ImageIcon, Loader2, Trash2, Upload } from '@/constants/icons';
 import {
   type BlogPostFormInput,
   blogPostFormSchema,

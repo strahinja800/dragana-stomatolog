@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 
-import { Menu } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { ADMIN_BRAND } from '@/constants/admin-navigation';
+import { Menu } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 import { AdminSidebar } from '@/module/admin/shared/components/admin-sidebar/admin-sidebar';
 import { AdminSidebarMobile } from '@/module/admin/shared/components/admin-sidebar/admin-sidebar-mobile';

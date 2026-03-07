@@ -1,10 +1,10 @@
 'use client';
 
 import { type Table } from '@tanstack/react-table';
-import { Search, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Search, X } from '@/constants/icons';
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;

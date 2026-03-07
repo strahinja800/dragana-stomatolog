@@ -1,8 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Calendar, Phone } from 'lucide-react';
-
+import { Calendar, Phone } from '@/constants/icons';
 import { NAV_LINKS } from '@/constants/navigations';
 import { logoIcon, logoText } from '@/data/data';
 import { cn } from '@/lib/utils';

@@ -3,7 +3,6 @@
 import Link from 'next/link';
 
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ArrowLeft, Loader2 } from '@/constants/icons';
 import { PatientAppointments } from '@/module/admin/patients/components/patient-appointments';
 import { PatientBasicInfo } from '@/module/admin/patients/components/patient-basic-info';
 import { PatientDetailsHeader } from '@/module/admin/patients/components/patient-details-header';

@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-import { LayoutDashboard, LogOut, User } from 'lucide-react';
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +13,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
+import { LayoutDashboard, LogOut, User } from '@/constants/icons';
 
 type UserMenuMobileProps = {
   user: {

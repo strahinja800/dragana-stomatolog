@@ -1,4 +1,4 @@
-import { Construction } from 'lucide-react';
+import { Construction } from '@/constants/icons';
 
 interface UnderConstructionProps {
   title: string;

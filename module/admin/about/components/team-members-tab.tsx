@@ -7,12 +7,12 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus } from '@/constants/icons';
 import { TeamMemberForm } from '@/module/admin/about/components/team-member-form';
 import {
   type TeamMember,

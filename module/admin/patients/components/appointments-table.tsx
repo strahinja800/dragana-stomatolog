@@ -3,7 +3,6 @@
 import { Fragment, useState } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
@@ -16,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { ChevronDown, ChevronRight, Trash2 } from '@/constants/icons';
 import type {
   AppointmentWithRelations,
   MedicalRecordWithRelations,

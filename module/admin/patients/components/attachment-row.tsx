@@ -1,8 +1,7 @@
 'use client';
 
-import { File, Trash2 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
+import { File, Trash2 } from '@/constants/icons';
 import type { Attachment } from '@/lib/generated/prisma/client';
 
 interface AttachmentRowProps {

@@ -14,8 +14,8 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
-import { CalendarClock, Loader2 } from 'lucide-react';
 
+import { DataTablePagination } from '@/components/shared/table/data-table-pagination';
 import {
   Table,
   TableBody,
@@ -24,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { CalendarClock, Loader2 } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 import { ConfirmDialog } from '@/module/admin/termini/components/confirm-dialog';
 import { RejectDialog } from '@/module/admin/termini/components/reject-dialog';
@@ -36,7 +37,6 @@ import {
   type AppointmentTableMeta,
   columns,
 } from './appointment-table-columns';
-import { AppointmentTablePagination } from './appointment-table-pagination';
 import { AppointmentTableToolbar } from './appointment-table-toolbar';
 
 interface AppointmentTableProps {
@@ -208,7 +208,7 @@ export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
             </TableBody>
           </Table>
         </div>
-        <AppointmentTablePagination table={table} />
+        <DataTablePagination table={table} totalLabel="Ukupno termina:" />
       </div>
 
       <ConfirmDialog

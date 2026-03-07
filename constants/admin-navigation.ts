@@ -5,7 +5,7 @@ import {
   LayoutDashboard,
   Settings,
   Users,
-} from 'lucide-react';
+} from '@/constants/icons';
 
 export const ADMIN_NAV_ITEMS = [
   {

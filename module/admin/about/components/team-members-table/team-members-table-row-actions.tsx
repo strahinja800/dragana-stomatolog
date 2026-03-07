@@ -1,7 +1,5 @@
 'use client';
 
-import { Edit, Eye, EyeOff, MoreHorizontal, Trash2 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -10,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Edit, Eye, EyeOff, MoreHorizontal, Trash2 } from '@/constants/icons';
 
 import type { TeamMember } from './team-members-table-columns';
 

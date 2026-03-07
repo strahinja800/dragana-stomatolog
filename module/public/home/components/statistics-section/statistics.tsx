@@ -1,5 +1,4 @@
-import { ShieldCheck } from 'lucide-react';
-
+import { ShieldCheck } from '@/constants/icons';
 import { STATISTICS } from '@/constants/stats';
 
 export default function StatisticsSection() {

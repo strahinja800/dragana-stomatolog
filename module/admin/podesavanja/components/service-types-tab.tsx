@@ -7,7 +7,6 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from '@tanstack/react-query';
-import { Clock, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -43,6 +42,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { Clock, Loader2, Pencil, Plus, Trash2 } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
