@@ -33,13 +33,13 @@ export function PublicNavbarDesktop({ pathname }: PublicNavbarDesktopProps) {
         />
       </Link>
 
-      <div className="hidden lg:flex items-center gap-7">
+      <div className="hidden lg:flex items-center lg:gap-1 xl:gap-7">
         {NAV_LINKS.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             className={cn(
-              'relative text-sm font-semibold tracking-wide transition-colors after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300',
+              'relative text-sm lg:text-xs xl:text-base font-semibold tracking-wide transition-colors after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300',
               pathname === link.href
                 ? 'text-accent after:scale-x-100'
                 : 'text-primary-foreground/85 hover:text-accent hover:after:scale-x-100'
