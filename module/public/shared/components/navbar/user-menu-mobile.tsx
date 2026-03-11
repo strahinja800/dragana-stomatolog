@@ -40,7 +40,7 @@ export function UserMenuMobile({ user, onSignOut }: UserMenuMobileProps) {
   };
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
           <button className="rounded-full shadow-[0_8px_20px_-14px_rgba(0,0,0,0.48)] focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-primary">
