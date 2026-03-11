@@ -33,7 +33,7 @@ export function PublicNavbarDesktop({ pathname }: PublicNavbarDesktopProps) {
         />
       </Link>
 
-      <div className="hidden md:flex items-center gap-7">
+      <div className="hidden lg:flex items-center gap-7">
         {NAV_LINKS.map((link) => (
           <Link
             key={link.href}
@@ -50,7 +50,7 @@ export function PublicNavbarDesktop({ pathname }: PublicNavbarDesktopProps) {
         ))}
       </div>
 
-      <div className="hidden md:flex items-center gap-3">
+      <div className="hidden lg:flex items-center gap-3">
         <a
           href="tel:+381111234567"
           className="flex items-center gap-2 rounded-full border border-white/28 bg-white/12 px-3 py-2 text-sm font-medium text-primary-foreground shadow-[0_8px_20px_-14px_rgba(0,0,0,0.5)] transition-smooth hover:border-accent/60 hover:bg-white/18 hover:text-white"

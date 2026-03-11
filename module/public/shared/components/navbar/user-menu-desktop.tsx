@@ -33,7 +33,7 @@ export function UserMenuDesktop({ user, onSignOut }: UserMenuDesktopProps) {
     : 'Pregledaj i uredi podatke';
 
   return (
-    <div className="hidden md:block">
+    <div className="hidden lg:block">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
