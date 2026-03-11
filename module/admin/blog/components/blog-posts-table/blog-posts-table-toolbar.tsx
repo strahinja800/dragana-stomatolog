@@ -1,7 +1,6 @@
 'use client';
 
 import { type Table } from '@tanstack/react-table';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -20,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Search, SlidersHorizontal, X } from '@/constants/icons';
 
 import { type BlogPostRow } from './blog-posts-table-columns';
 

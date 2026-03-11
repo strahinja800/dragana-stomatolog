@@ -1,16 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   useMutation,
+  useQuery,
   useQueryClient,
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
 import { startOfDay } from 'date-fns';
+import * as z from 'zod';
+
+import { AppointmentCalendar } from '@/components/ui/appointment-calendar';
+import { FloatingInput } from '@/components/ui/floating-input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   ArrowRight,
   CheckCircle,
@@ -18,12 +24,7 @@ import {
   Mail,
   Phone,
   User,
-} from 'lucide-react';
-import * as z from 'zod';
-
-import { AppointmentCalendar } from '@/components/ui/appointment-calendar';
-import { FloatingInput } from '@/components/ui/floating-input';
-import { Textarea } from '@/components/ui/textarea';
+} from '@/constants/icons';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
@@ -82,21 +83,14 @@ export default function BookingForm({
     isPending: isPendingNonWorkingDays,
   } = useSuspenseQuery(trpc.appointment.getNonWorkingDays.queryOptions());
 
-  const {
-    data: timeSlots,
-    isLoading: isLoadingTimeSlots,
-    isPending: isPendingTimeSlots,
-  } = useSuspenseQuery(
+  const { data: timeSlots, isFetching: isLoadingTimeSlots } = useQuery(
     trpc.appointment.getTimeSlotsForDate.queryOptions({
       date: selectedDate ?? today,
     })
   );
 
   const isPendingData =
-    isPendingNonWorkingDays ||
-    isPendingTimeSlots ||
-    isLoadingNonWorkingDays ||
-    isLoadingTimeSlots;
+    isPendingNonWorkingDays || isLoadingNonWorkingDays || isLoadingTimeSlots;
 
   useSubscription(
     trpc.subscriptions.onSettingsUpdate.subscriptionOptions(undefined, {
@@ -128,7 +122,7 @@ export default function BookingForm({
     },
   });
 
-  const selectedTime = form.watch('time');
+  const selectedTime = useWatch({ control: form.control, name: 'time' });
 
   const { mutate: createPublicAppointment, isPending: isCreatingPublic } =
     useMutation(

@@ -3,7 +3,6 @@
 import { useRef, useState } from 'react';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Paperclip, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
+import { Paperclip, Upload } from '@/constants/icons';
 import { useTRPC } from '@/trpc/client';
 
 import { AttachmentRow } from './attachment-row';

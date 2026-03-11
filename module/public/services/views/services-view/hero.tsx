@@ -1,4 +1,4 @@
-import { Sparkles, Star } from 'lucide-react';
+import { Sparkles, Star } from '@/constants/icons';
 
 import CtaServices from './cta-services';
 import FeaturedServices from './featured-services';

@@ -1,8 +1,7 @@
 import Link from 'next/link';
 
-import { ArrowLeft } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
+import { ArrowLeft } from '@/constants/icons';
 import type { PatientData } from '@/module/admin/patients/types/patient-types';
 
 interface PatientDetailsHeaderProps {

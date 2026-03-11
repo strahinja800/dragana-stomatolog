@@ -2,10 +2,9 @@
 
 import { type FallbackProps } from 'react-error-boundary';
 
-import { AlertCircle, RefreshCw } from 'lucide-react';
-
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { AlertCircle, RefreshCw } from '@/constants/icons';
 
 /**
  * A reusable error fallback component that can be used with ErrorBoundary

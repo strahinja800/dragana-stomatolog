@@ -14,6 +14,7 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table';
 
+import { DataTablePagination } from '@/components/shared/table/data-table-pagination';
 import {
   Table,
   TableBody,
@@ -24,7 +25,6 @@ import {
 } from '@/components/ui/table';
 
 import { columns, type Patient } from './patients-table-columns';
-import { PatientsTablePagination } from './patients-table-pagination';
 import { PatientsTableToolbar } from './patients-table-toolbar';
 
 interface PatientsTableProps {
@@ -131,7 +131,7 @@ export function PatientsTable({ data, onDeletePatient }: PatientsTableProps) {
           </TableBody>
         </Table>
       </div>
-      <PatientsTablePagination table={table} />
+      <DataTablePagination table={table} totalLabel="Ukupno pacijenata:" />
     </div>
   );
 }

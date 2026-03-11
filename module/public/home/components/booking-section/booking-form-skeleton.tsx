@@ -1,6 +1,5 @@
-import { ArrowRight, CheckCircle, Mail, Phone, User } from 'lucide-react';
-
 import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowRight, CheckCircle, Mail, Phone, User } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 
 export function BookingSectionSkeleton() {

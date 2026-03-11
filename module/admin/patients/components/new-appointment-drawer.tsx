@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 
-import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { Plus } from '@/constants/icons';
 import BookingForm from '@/module/public/home/components/booking-section/booking-form';
 
 interface NewAppointmentDrawerProps {

@@ -2,10 +2,9 @@
 
 import Link from 'next/link';
 
-import { LogIn } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { LogIn } from '@/constants/icons';
 import { authClient } from '@/lib/auth-client';
 
 import { UserMenuDesktop } from './user-menu-desktop';

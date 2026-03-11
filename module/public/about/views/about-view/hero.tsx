@@ -1,7 +1,6 @@
 import Image from 'next/image';
 
-import { Award, Clock, Users } from 'lucide-react';
-
+import { Award, Clock, Users } from '@/constants/icons';
 import { dentist1, dentist2 } from '@/data/data';
 
 const stats = [

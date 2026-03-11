@@ -9,7 +9,6 @@ import {
 } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
-import { CalendarPlus, Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -26,6 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { CalendarPlus, Loader2, Trash2 } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 

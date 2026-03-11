@@ -1,4 +1,4 @@
-import { BookOpen } from 'lucide-react';
+import { BookOpen } from '@/constants/icons';
 
 import BlogViewCard from './blog-view-card';
 

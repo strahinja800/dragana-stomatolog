@@ -6,7 +6,7 @@ import {
   Mail,
   MapPin,
   Phone,
-} from 'lucide-react';
+} from '@/constants/icons';
 
 export const FOOTER_SERVICES = [
   'Preventivna stomatologija',

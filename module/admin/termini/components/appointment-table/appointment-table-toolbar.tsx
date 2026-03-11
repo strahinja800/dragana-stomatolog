@@ -1,7 +1,6 @@
 'use client';
 
 import { type Table } from '@tanstack/react-table';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -13,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Search, SlidersHorizontal, X } from '@/constants/icons';
 
 import { type Appointment } from './appointment-table-columns';
 

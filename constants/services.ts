@@ -7,7 +7,7 @@ import {
   Sparkles,
   Stethoscope,
   Syringe,
-} from 'lucide-react';
+} from '@/constants/icons';
 
 export const SERVICES = [
   {

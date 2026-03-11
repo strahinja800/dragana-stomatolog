@@ -1,5 +1,9 @@
-import { BellRing, CalendarClock, CircleCheckBig, Shield } from 'lucide-react';
-
+import {
+  BellRing,
+  CalendarClock,
+  CircleCheckBig,
+  Shield,
+} from '@/constants/icons';
 import logoGoldTransparent from '@/public/assets/dentalholist-logo-gold-transparent.svg';
 import logoHorizontal from '@/public/assets/dentalholist-logo-horizontal.svg';
 import logoIcon from '@/public/assets/dentalholist-logo-icon.svg';

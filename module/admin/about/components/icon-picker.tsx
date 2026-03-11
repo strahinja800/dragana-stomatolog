@@ -2,7 +2,14 @@
 
 import { useState } from 'react';
 
-import type { LucideIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import type { LucideIcon } from '@/constants/icons';
 import {
   Activity,
   Award,
@@ -29,15 +36,7 @@ import {
   Trophy,
   Users,
   Zap,
-} from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@/constants/icons';
 import { cn } from '@/lib/utils';
 
 export const AVAILABLE_ICONS: { name: string; icon: LucideIcon }[] = [

@@ -1,4 +1,4 @@
-import { Clock, Mail, MapPin, Phone } from 'lucide-react';
+import { Clock, Mail, MapPin, Phone } from '@/constants/icons';
 
 export const CONTACT_INFO = [
   {

@@ -3,11 +3,11 @@
 import { useState } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { Button } from '@/components/ui/button';
+import { Trash2 } from '@/constants/icons';
 import type { MedicalRecordWithRelations } from '@/module/admin/patients/types/patient-types';
 import { useTRPC } from '@/trpc/client';
 

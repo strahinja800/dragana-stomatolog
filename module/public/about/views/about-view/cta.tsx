@@ -1,8 +1,7 @@
 import Link from 'next/link';
 
-import { ArrowRight, MapPin, Phone } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
+import { ArrowRight, MapPin, Phone } from '@/constants/icons';
 
 export default function AboutCta() {
   return (

@@ -1,4 +1,4 @@
-import { Award, Microscope, ShieldCheck, Users } from 'lucide-react';
+import { Award, Microscope, ShieldCheck, Users } from '@/constants/icons';
 
 const TRUST_POINTS = [
   {

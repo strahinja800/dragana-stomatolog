@@ -2,8 +2,6 @@
 
 import Link from 'next/link';
 
-import { Eye, MoreHorizontal, Trash2 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Eye, MoreHorizontal, Trash2 } from '@/constants/icons';
 
 import { type Patient } from './patients-table-columns';
 

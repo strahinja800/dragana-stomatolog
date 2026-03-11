@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, Heart, Star } from 'lucide-react';
+import { CheckCircle, Clock, Heart, Star } from '@/constants/icons';
 
 export const STATISTICS = [
   { icon: CheckCircle, value: '15+', label: 'Godina iskustva' },

@@ -1,4 +1,4 @@
-import { BookOpen, Home, Mail, Sparkles, Users } from 'lucide-react';
+import { BookOpen, Home, Mail, Sparkles, Users } from '@/constants/icons';
 
 export const NAV_LINKS = [
   { href: '/', label: 'Početna', icon: Home },

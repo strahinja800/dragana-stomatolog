@@ -3,9 +3,9 @@
 import Link from 'next/link';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { BookOpen } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { BookOpen } from '@/constants/icons';
 import { useTRPC } from '@/trpc/client';
 
 import { BlogArticle } from './blog-article';

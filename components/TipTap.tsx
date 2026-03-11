@@ -6,6 +6,8 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+
+import { Button } from '@/components/ui/button';
 import {
   Bold,
   Heading2,
@@ -16,9 +18,7 @@ import {
   Quote,
   Strikethrough,
   Underline as UnderlineIcon,
-} from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
+} from '@/constants/icons';
 import { cn } from '@/lib/utils';
 
 type ToolbarOption =

@@ -3,8 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { Calendar, Clock, Stethoscope } from 'lucide-react';
-
+import { Calendar, Clock, Stethoscope } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 
 const SETTINGS_TABS = [

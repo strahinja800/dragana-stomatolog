@@ -1,8 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Calendar, Mail, MapPin, Menu, Phone } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -12,6 +10,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { Calendar, Mail, MapPin, Menu, Phone } from '@/constants/icons';
 import { NAV_LINKS } from '@/constants/navigations';
 import { logoIcon } from '@/data/data';
 import { cn } from '@/lib/utils';

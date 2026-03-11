@@ -3,7 +3,8 @@ import Link from 'next/link';
 
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
-import { ArrowLeft } from 'lucide-react';
+
+import { ArrowLeft } from '@/constants/icons';
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, '');

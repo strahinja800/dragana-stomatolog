@@ -1,10 +1,10 @@
 'use client';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
 import { parseAsString, useQueryState } from 'nuqs';
 
 import { Button } from '@/components/ui/button';
+import { Plus } from '@/constants/icons';
 import { BlogPostForm } from '@/module/admin/blog/components/blog-posts-form/blog-posts-form';
 import { BlogPostsTable } from '@/module/admin/blog/components/blog-posts-table/blog-posts-table';
 import type { BlogPostRow } from '@/module/admin/blog/components/blog-posts-table/blog-posts-table-columns';

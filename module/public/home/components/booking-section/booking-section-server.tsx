@@ -1,6 +1,11 @@
 import { startOfDay } from 'date-fns';
-import { CalendarCheck, Clock, MailCheck, ShieldCheck } from 'lucide-react';
 
+import {
+  CalendarCheck,
+  Clock,
+  MailCheck,
+  ShieldCheck,
+} from '@/constants/icons';
 import { HydrateClient } from '@/trpc/hydrate-client';
 import { prefetch, trpc } from '@/trpc/server';
 

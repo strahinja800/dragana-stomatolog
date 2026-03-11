@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { ExternalLink, LogOut, Stethoscope } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -18,6 +16,7 @@ import {
   ADMIN_BRAND,
   ADMIN_NAV_ITEMS,
 } from '@/constants/admin-navigation';
+import { ExternalLink, LogOut, Stethoscope } from '@/constants/icons';
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 

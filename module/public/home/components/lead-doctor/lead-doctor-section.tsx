@@ -1,9 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { ArrowRight, Award, GraduationCap, Star } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
+import { ArrowRight, Award, GraduationCap, Star } from '@/constants/icons';
 import { dentist1 } from '@/data/data';
 
 export default function LeadDoctorSection() {

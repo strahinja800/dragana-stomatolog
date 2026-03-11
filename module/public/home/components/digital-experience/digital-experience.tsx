@@ -1,4 +1,9 @@
-import { BellRing, CalendarCheck, ShieldCheck, Smartphone } from 'lucide-react';
+import {
+  BellRing,
+  CalendarCheck,
+  ShieldCheck,
+  Smartphone,
+} from '@/constants/icons';
 
 const features = [
   {
