@@ -15,7 +15,6 @@ import { ArrowLeft, Loader2 } from '@/constants/icons';
 import { PatientAppointments } from '@/module/admin/patients/components/patient-appointments';
 import { PatientBasicInfo } from '@/module/admin/patients/components/patient-basic-info';
 import { PatientDetailsHeader } from '@/module/admin/patients/components/patient-details-header';
-import { PatientSystemInfo } from '@/module/admin/patients/components/patient-system-info';
 import { useTRPC } from '@/trpc/client';
 
 interface PatientDetailsViewProps {
@@ -66,12 +65,14 @@ export function PatientDetailsView({ patientId }: PatientDetailsViewProps) {
     <div className="space-y-8">
       <PatientDetailsHeader patient={patient} />
       <PatientBasicInfo patient={patient} />
-      <PatientSystemInfo patient={patient} />
       <PatientAppointments
         patient={patient}
         appointments={appointments}
         allMedicalRecords={medicalRecords}
       />
+      <p className="text-center text-xs text-muted-foreground">
+        ID: {patient.id}
+      </p>
     </div>
   );
 }

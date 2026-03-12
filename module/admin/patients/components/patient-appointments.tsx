@@ -15,6 +15,7 @@ import type {
   PatientData,
 } from '@/module/admin/patients/types/patient-types';
 
+import { AppointmentDetailsDrawer } from './appointment-details-drawer';
 import { AppointmentsTable } from './appointments-table';
 import { NewAppointmentDrawer } from './new-appointment-drawer';
 
@@ -29,9 +30,9 @@ export function PatientAppointments({
   appointments,
   allMedicalRecords,
 }: PatientAppointmentsProps) {
-  const [expandedAppointments, setExpandedAppointments] = useState<Set<string>>(
-    new Set()
-  );
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<
+    string | null
+  >(null);
 
   const recordsByAppointment = allMedicalRecords.reduce(
     (acc, record) => {
@@ -44,49 +45,53 @@ export function PatientAppointments({
     {} as Record<string, MedicalRecordWithRelations[]>
   );
 
-  const toggleAppointment = (appointmentId: string) => {
-    setExpandedAppointments((prev) => {
-      const next = new Set(prev);
-      if (next.has(appointmentId)) {
-        next.delete(appointmentId);
-      } else {
-        next.add(appointmentId);
-      }
-      return next;
-    });
-  };
+  const selectedAppointment =
+    appointments.find((a) => a.id === selectedAppointmentId) ?? null;
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Termini</CardTitle>
-            <CardDescription>
-              Zakazani i prošli termini pacijenta ({appointments.length})
-            </CardDescription>
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Termini</CardTitle>
+              <CardDescription>
+                Zakazani i prošli termini pacijenta ({appointments.length})
+              </CardDescription>
+            </div>
+            <NewAppointmentDrawer
+              patientId={patient.id}
+              patientName={`${patient.firstName} ${patient.lastName}`}
+              patientPhone={patient.phone || ''}
+            />
           </div>
-          <NewAppointmentDrawer
-            patientId={patient.id}
-            patientName={`${patient.firstName} ${patient.lastName}`}
-            patientPhone={patient.phone || ''}
-          />
-        </div>
-      </CardHeader>
-      <CardContent>
-        {appointments.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Nema zakazanih termina.
-          </p>
-        ) : (
-          <AppointmentsTable
-            appointments={appointments}
-            recordsByAppointment={recordsByAppointment}
-            expandedAppointments={expandedAppointments}
-            onToggleAppointment={toggleAppointment}
-          />
-        )}
-      </CardContent>
-    </Card>
+        </CardHeader>
+        <CardContent>
+          {appointments.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Nema zakazanih termina.
+            </p>
+          ) : (
+            <AppointmentsTable
+              appointments={appointments}
+              recordsByAppointment={recordsByAppointment}
+              onSelectAppointment={setSelectedAppointmentId}
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      <AppointmentDetailsDrawer
+        appointment={selectedAppointment}
+        records={
+          selectedAppointmentId
+            ? (recordsByAppointment[selectedAppointmentId] ?? [])
+            : []
+        }
+        patientId={patient.id}
+        open={!!selectedAppointmentId}
+        onOpenChange={(open) => !open && setSelectedAppointmentId(null)}
+      />
+    </>
   );
 }
