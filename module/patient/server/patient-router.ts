@@ -260,4 +260,10 @@ export const patientRouter = createTRPCRouter({
 
       return { success: true };
     }),
+
+  getStats: adminProcedure.query(async ({ ctx }) => {
+    const totalPatients = await ctx.prisma.patient.count();
+
+    return { totalPatients };
+  }),
 });

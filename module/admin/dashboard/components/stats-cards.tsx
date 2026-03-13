@@ -1,41 +1,41 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Shield, TrendingUp, UserCheck, Users } from '@/constants/icons';
+import { CalendarClock, Clock, TrendingUp, Users } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 
 interface StatsCardsProps {
-  totalUsers: number;
-  adminCount: number;
-  activeUsers: number;
-  newThisMonth: number;
+  todayAppointments: number;
+  pendingAppointments: number;
+  totalPatients: number;
+  newPatientsThisMonth: number;
 }
 
 const stats = [
   {
-    key: 'totalUsers',
-    label: 'Ukupno korisnika',
-    icon: Users,
+    key: 'todayAppointments' as const,
+    label: 'Današnji termini',
+    icon: CalendarClock,
     color: 'text-primary',
     bgColor: 'bg-primary/10',
   },
   {
-    key: 'adminCount',
-    label: 'Administratori',
-    icon: Shield,
+    key: 'pendingAppointments' as const,
+    label: 'Na čekanju',
+    icon: Clock,
     color: 'text-amber-500',
     bgColor: 'bg-amber-500/10',
   },
   {
-    key: 'activeUsers',
-    label: 'Aktivni korisnici',
-    icon: UserCheck,
+    key: 'totalPatients' as const,
+    label: 'Ukupno pacijenata',
+    icon: Users,
     color: 'text-emerald-500',
     bgColor: 'bg-emerald-500/10',
   },
   {
-    key: 'newThisMonth',
-    label: 'Novi ovog meseca',
+    key: 'newPatientsThisMonth' as const,
+    label: 'Novi pacijenti (ovaj mesec)',
     icon: TrendingUp,
     color: 'text-violet-500',
     bgColor: 'bg-violet-500/10',
@@ -43,16 +43,16 @@ const stats = [
 ] as const;
 
 export function StatsCards({
-  totalUsers,
-  adminCount,
-  activeUsers,
-  newThisMonth,
+  todayAppointments,
+  pendingAppointments,
+  totalPatients,
+  newPatientsThisMonth,
 }: StatsCardsProps) {
   const values = {
-    totalUsers,
-    adminCount,
-    activeUsers,
-    newThisMonth,
+    todayAppointments,
+    pendingAppointments,
+    totalPatients,
+    newPatientsThisMonth,
   };
 
   return (
@@ -64,9 +64,7 @@ export function StatsCards({
             'group cursor-default overflow-hidden border-0 shadow-card transition-all duration-300',
             'hover:-translate-y-1 hover:shadow-hover'
           )}
-          style={{
-            animationDelay: `${index * 100}ms`,
-          }}
+          style={{ animationDelay: `${index * 100}ms` }}
         >
           <CardContent className="flex items-center gap-4 p-6">
             <div
