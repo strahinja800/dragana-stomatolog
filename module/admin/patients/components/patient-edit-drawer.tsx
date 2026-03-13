@@ -56,9 +56,7 @@ export function PatientEditDrawer({
   >(patient.gender ?? undefined);
 
   useEffect(() => {
-    if (open) {
-      setSelectedGender(patient.gender ?? undefined);
-    }
+    setSelectedGender(patient.gender ?? undefined);
   }, [open, patient.id, patient.gender]);
 
   const {
