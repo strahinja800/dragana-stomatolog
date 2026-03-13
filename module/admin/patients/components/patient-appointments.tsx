@@ -89,7 +89,7 @@ export function PatientAppointments({
             : []
         }
         patientId={patient.id}
-        open={!!selectedAppointmentId}
+        open={!!selectedAppointment}
         onOpenChange={(open) => !open && setSelectedAppointmentId(null)}
       />
     </>

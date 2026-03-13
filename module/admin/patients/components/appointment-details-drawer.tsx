@@ -112,6 +112,7 @@ export function AppointmentDetailsDrawer({
     if (!open) {
       setView('list');
       reset();
+      setRecordToDelete(null);
     }
     onOpenChange(open);
   };

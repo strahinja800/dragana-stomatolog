@@ -138,6 +138,7 @@ export function PatientDetailsHeader({ patient }: PatientDetailsHeaderProps) {
       </div>
 
       <PatientEditDrawer
+        key={String(editOpen)}
         patient={patient}
         open={editOpen}
         onOpenChange={setEditOpen}
