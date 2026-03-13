@@ -1,11 +1,12 @@
 'use client';
 
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -15,27 +16,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ChevronDown, ChevronRight, Trash2 } from '@/constants/icons';
+import { Trash2 } from '@/constants/icons';
 import type {
   AppointmentWithRelations,
   MedicalRecordWithRelations,
 } from '@/module/admin/patients/types/patient-types';
 import { useTRPC } from '@/trpc/client';
 
-import { MedicalRecordsList } from './medical-records-list';
-
 interface AppointmentsTableProps {
   appointments: AppointmentWithRelations[];
   recordsByAppointment: Record<string, MedicalRecordWithRelations[]>;
-  expandedAppointments: Set<string>;
-  onToggleAppointment: (appointmentId: string) => void;
+  onSelectAppointment: (appointmentId: string) => void;
 }
 
 export function AppointmentsTable({
   appointments,
   recordsByAppointment,
-  expandedAppointments,
-  onToggleAppointment,
+  onSelectAppointment,
 }: AppointmentsTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [appointmentToDelete, setAppointmentToDelete] = useState<string | null>(
@@ -80,71 +77,56 @@ export function AppointmentsTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-12"></TableHead>
             <TableHead>Datum</TableHead>
             <TableHead>Vreme</TableHead>
             <TableHead>Simptomi</TableHead>
-            <TableHead>Napomena</TableHead>
+            <TableHead>Zapisi</TableHead>
             <TableHead className="w-20">Akcije</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {appointments.map((appointment) => {
             const startDate = new Date(appointment.startTime);
-            const records = recordsByAppointment[appointment.id] || [];
-            const isExpanded = expandedAppointments.has(appointment.id);
+            const records = recordsByAppointment[appointment.id] ?? [];
 
             return (
-              <Fragment key={appointment.id}>
-                <TableRow
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => onToggleAppointment(appointment.id)}
-                >
-                  <TableCell>
-                    {records.length > 0 &&
-                      (isExpanded ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4" />
-                      ))}
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {startDate.toLocaleDateString('sr-RS')}
-                  </TableCell>
-                  <TableCell>
-                    {startDate.toLocaleTimeString('sr-RS', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </TableCell>
-                  <TableCell>{appointment.symptoms || '—'}</TableCell>
-                  <TableCell>{appointment.notes || '—'}</TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => handleDeleteClick(appointment.id, e)}
-                      disabled={isDeleting}
-                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-
-                {/* Expanded Content */}
-                {isExpanded && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="bg-muted/30 p-0">
-                      <MedicalRecordsList
-                        appointmentId={appointment.id}
-                        patientId={appointment.patientId}
-                        records={records}
-                      />
-                    </TableCell>
-                  </TableRow>
-                )}
-              </Fragment>
+              <TableRow
+                key={appointment.id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => onSelectAppointment(appointment.id)}
+              >
+                <TableCell className="font-medium">
+                  {startDate.toLocaleDateString('sr-RS')}
+                </TableCell>
+                <TableCell>
+                  {startDate.toLocaleTimeString('sr-RS', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </TableCell>
+                <TableCell>{appointment.symptoms || '—'}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant={records.length > 0 ? 'default' : 'outline'}
+                    className="text-xs"
+                  >
+                    {records.length > 0
+                      ? `${records.length} ${records.length === 1 ? 'zapis' : 'zapisa'}`
+                      : 'Nema zapisa'}
+                  </Badge>
+                </TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => handleDeleteClick(appointment.id, e)}
+                    disabled={isDeleting}
+                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
             );
           })}
         </TableBody>
