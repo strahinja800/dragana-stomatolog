@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -54,6 +54,13 @@ export function PatientEditDrawer({
   const [selectedGender, setSelectedGender] = useState<
     'MALE' | 'FEMALE' | undefined
   >(patient.gender ?? undefined);
+
+  useEffect(() => {
+    if (open) {
+      setSelectedGender(patient.gender ?? undefined);
+    }
+  }, [open, patient.id, patient.gender]);
+
   const {
     register,
     handleSubmit,
