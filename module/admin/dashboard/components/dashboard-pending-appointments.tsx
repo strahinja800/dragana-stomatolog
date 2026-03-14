@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Clock, User, X } from '@/constants/icons';
+import { Check, Clock, ExternalLink, User, X } from '@/constants/icons';
 import { ConfirmDialog } from '@/module/admin/termini/components/confirm-dialog';
 import { RejectDialog } from '@/module/admin/termini/components/reject-dialog';
 import { useTRPC } from '@/trpc/client';
@@ -34,6 +35,17 @@ export function DashboardPendingAppointments() {
           <CardTitle className="flex items-center gap-2 text-lg font-semibold">
             <Clock className="size-5 text-amber-500" />
             Termini na čekanju
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5 text-xs text-muted-foreground"
+              asChild
+            >
+              <Link href="/admin/patients">
+                <ExternalLink className="size-3.5" />
+                Svi pacijenti
+              </Link>
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

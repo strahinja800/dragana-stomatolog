@@ -262,8 +262,30 @@ export const patientRouter = createTRPCRouter({
     }),
 
   getStats: adminProcedure.query(async ({ ctx }) => {
-    const totalPatients = await ctx.prisma.patient.count();
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    return { totalPatients };
+    const [totalPatients, newPatientsThisMonth] = await Promise.all([
+      ctx.prisma.patient.count(),
+      ctx.prisma.patient.count({
+        where: { createdAt: { gte: startOfMonth } },
+      }),
+    ]);
+
+    return { totalPatients, newPatientsThisMonth };
+  }),
+
+  getRecent: adminProcedure.query(async ({ ctx }) => {
+    return ctx.prisma.patient.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        createdAt: true,
+      },
+    });
   }),
 });

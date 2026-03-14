@@ -47,7 +47,10 @@ interface NewPatientDrawerProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export function NewPatientDrawer({ open: openProp, onOpenChange }: NewPatientDrawerProps = {}) {
+export function NewPatientDrawer({
+  open: openProp,
+  onOpenChange,
+}: NewPatientDrawerProps = {}) {
   const [internalOpen, setInternalOpen] = useState(false);
 
   const open = openProp !== undefined ? openProp : internalOpen;

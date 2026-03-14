@@ -40,7 +40,7 @@ export function AdminView() {
         todayAppointments={todayAppointments?.length ?? 0}
         pendingAppointments={pendingAppointments?.length ?? 0}
         totalPatients={totalPatients?.totalPatients ?? 0}
-        newPatientsThisMonth={8} // Placeholder, implement real logic to get this number
+        newPatientsThisMonth={totalPatients?.newPatientsThisMonth ?? 0}
       />
 
       {/* Row 2 - Main content */}
