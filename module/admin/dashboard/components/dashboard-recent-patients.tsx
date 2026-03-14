@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ExternalLink, User, Users } from '@/constants/icons';
 
 interface RecentPatient {
@@ -16,11 +11,36 @@ interface RecentPatient {
 }
 
 const PLACEHOLDER_PATIENTS: RecentPatient[] = [
-  { id: '1', name: 'Jovana Milić', registeredAt: '13. mar 2026.', phone: '063 123 456' },
-  { id: '2', name: 'Dragan Vasić', registeredAt: '12. mar 2026.', phone: '064 987 654' },
-  { id: '3', name: 'Ivana Todorović', registeredAt: '11. mar 2026.', phone: '065 555 111' },
-  { id: '4', name: 'Milan Kostić', registeredAt: '10. mar 2026.', phone: '060 222 333' },
-  { id: '5', name: 'Tamara Lukić', registeredAt: '9. mar 2026.', phone: '066 444 777' },
+  {
+    id: '1',
+    name: 'Jovana Milić',
+    registeredAt: '13. mar 2026.',
+    phone: '063 123 456',
+  },
+  {
+    id: '2',
+    name: 'Dragan Vasić',
+    registeredAt: '12. mar 2026.',
+    phone: '064 987 654',
+  },
+  {
+    id: '3',
+    name: 'Ivana Todorović',
+    registeredAt: '11. mar 2026.',
+    phone: '065 555 111',
+  },
+  {
+    id: '4',
+    name: 'Milan Kostić',
+    registeredAt: '10. mar 2026.',
+    phone: '060 222 333',
+  },
+  {
+    id: '5',
+    name: 'Tamara Lukić',
+    registeredAt: '9. mar 2026.',
+    phone: '066 444 777',
+  },
 ];
 
 export function DashboardRecentPatients() {

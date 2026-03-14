@@ -9,28 +9,41 @@ import { CalendarClock, Clock, User } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
-type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
+type AppointmentStatus =
+  | 'PENDING'
+  | 'CONFIRMED'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'NO_SHOW';
 
-const STATUS_CONFIG: Record<AppointmentStatus, { label: string; className: string }> = {
+const STATUS_CONFIG: Record<
+  AppointmentStatus,
+  { label: string; className: string }
+> = {
   PENDING: {
     label: 'Na čekanju',
-    className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+    className:
+      'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800',
   },
   CONFIRMED: {
     label: 'Potvrđen',
-    className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+    className:
+      'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
   },
   COMPLETED: {
     label: 'Završen',
-    className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+    className:
+      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800',
   },
   CANCELLED: {
     label: 'Odbijen',
-    className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800',
+    className:
+      'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800',
   },
   NO_SHOW: {
     label: 'Nije došao',
-    className: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-800',
+    className:
+      'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-800',
   },
 };
 
@@ -86,7 +99,10 @@ export function DashboardTodaysSchedule() {
                     </div>
                     <Badge
                       variant="outline"
-                      className={cn('text-xs font-medium', statusConfig.className)}
+                      className={cn(
+                        'text-xs font-medium',
+                        statusConfig.className
+                      )}
                     >
                       {statusConfig.label}
                     </Badge>

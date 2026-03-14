@@ -11,7 +11,7 @@ export default async function AdminPage() {
 
   return (
     <HydrateClient>
-      <AdminView />;
+      <AdminView />
     </HydrateClient>
   );
 }
