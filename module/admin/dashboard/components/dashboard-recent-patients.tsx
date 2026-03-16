@@ -41,30 +41,25 @@ export function DashboardRecentPatients() {
       <CardContent className="p-0">
         <ul className="divide-y divide-border/50">
           {patients.map((patient) => (
-            <li
-              key={patient.id}
-              className="flex items-center gap-4 px-6 py-3.5 transition-colors hover:bg-muted/30"
-            >
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
-                <User className="size-4 text-emerald-500" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">
-                  {patient.firstName} {patient.lastName}
-                </p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {patient.phone ?? 'Bez broja'} ·{' '}
-                  {format(new Date(patient.createdAt), 'd. MMM yyyy.', {
-                    locale: sr,
-                  })}
-                </p>
-              </div>
+            <li key={patient.id}>
               <Link
                 href={`/admin/patients/${patient.id}`}
-                className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
-                title="Otvori profil"
+                className="flex items-center gap-4 px-6 py-3.5 transition-colors hover:bg-muted/30"
               >
-                <ExternalLink className="size-4" />
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
+                  <User className="size-4 text-emerald-500" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">
+                    {patient.firstName} {patient.lastName}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {patient.phone ?? 'Bez broja'} ·{' '}
+                    {format(new Date(patient.createdAt), 'd. MMM yyyy.', {
+                      locale: sr,
+                    })}
+                  </p>
+                </div>
               </Link>
             </li>
           ))}

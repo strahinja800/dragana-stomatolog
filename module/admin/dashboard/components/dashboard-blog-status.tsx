@@ -30,7 +30,7 @@ export function DashboardBlogStatus() {
             className="gap-1.5 text-xs text-muted-foreground"
           >
             <ExternalLink className="size-3.5" />
-            <Link href="/admin/blog">Blog admin</Link>
+            <Link href="/admin/blog">Upravljaj blogom</Link>
           </Button>
         </CardTitle>
       </CardHeader>
