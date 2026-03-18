@@ -18,7 +18,7 @@ export function AdminView() {
   const { data: pendingAppointments } = useSuspenseQuery(
     trpc.appointment.getPending.queryOptions()
   );
-  const { data: totalPatients } = useSuspenseQuery(
+  const { data: patientStats } = useSuspenseQuery(
     trpc.patient.getStats.queryOptions()
   );
 
@@ -39,8 +39,8 @@ export function AdminView() {
       <StatsCards
         todayAppointments={todayAppointments?.length ?? 0}
         pendingAppointments={pendingAppointments?.length ?? 0}
-        totalPatients={totalPatients?.totalPatients ?? 0}
-        newPatientsThisMonth={totalPatients?.newPatientsThisMonth ?? 0}
+        totalPatients={patientStats?.totalPatients ?? 0}
+        newPatientsThisMonth={patientStats?.newPatientsThisMonth ?? 0}
       />
 
       {/* Row 2 - Main content */}

@@ -41,9 +41,9 @@ export function DashboardPendingAppointments() {
               className="gap-1.5 text-xs text-muted-foreground"
               asChild
             >
-              <Link href="/admin/patients">
+              <Link href="/admin/appointments">
                 <ExternalLink className="size-3.5" />
-                Svi pacijenti
+                Svi termini
               </Link>
             </Button>
           </CardTitle>

@@ -357,7 +357,7 @@ export const blogRouter = createTRPCRouter({
     }),
 
   //  Published posts count for dashboard
-  getPublishedCount: publicProcedure.query(async ({ ctx }) => {
+  getPublishedCount: adminProcedure.query(async ({ ctx }) => {
     const count = await ctx.prisma.blogPost.count({
       where: { status: 'PUBLISHED' },
     });
@@ -365,7 +365,7 @@ export const blogRouter = createTRPCRouter({
   }),
 
   //  Draft posts count for dashboard
-  getDraftCount: publicProcedure.query(async ({ ctx }) => {
+  getDraftCount: adminProcedure.query(async ({ ctx }) => {
     const count = await ctx.prisma.blogPost.count({
       where: {
         status: 'DRAFT',

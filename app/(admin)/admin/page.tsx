@@ -9,6 +9,8 @@ export default async function AdminPage() {
   void prefetch(trpc.appointment.getPending.queryOptions());
   void prefetch(trpc.patient.getStats.queryOptions());
   void prefetch(trpc.patient.getRecent.queryOptions());
+  void prefetch(trpc.blog.getPublishedCount.queryOptions());
+  void prefetch(trpc.blog.getDraftCount.queryOptions());
 
   return (
     <HydrateClient>

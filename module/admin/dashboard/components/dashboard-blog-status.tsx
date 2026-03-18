@@ -25,12 +25,15 @@ export function DashboardBlogStatus() {
             Blog status
           </span>
           <Button
+            asChild
             variant="ghost"
             size="sm"
             className="gap-1.5 text-xs text-muted-foreground"
           >
-            <ExternalLink className="size-3.5" />
-            <Link href="/admin/blog">Upravljaj blogom</Link>
+            <Link href="/admin/blog" className="inline-flex items-center">
+              <ExternalLink className="size-3.5" />
+              <span>Upravljaj blogom</span>
+            </Link>
           </Button>
         </CardTitle>
       </CardHeader>

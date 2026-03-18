@@ -45,7 +45,7 @@ export function ScheduleAppointmentDrawer({
 
   const trpc = useTRPC();
 
-  const { data: patients = [] } = useQuery({
+  const { data: patients = [], isFetching } = useQuery({
     ...trpc.patient.search.queryOptions({ query }),
     enabled: query.length >= 2,
   });
@@ -98,9 +98,11 @@ export function ScheduleAppointmentDrawer({
                   onValueChange={setQuery}
                 />
                 <CommandList>
-                  {query.length >= 2 && patients.length === 0 && (
-                    <CommandEmpty>Nema rezultata</CommandEmpty>
-                  )}
+                  {query.length >= 2 &&
+                    !isFetching &&
+                    patients.length === 0 && (
+                      <CommandEmpty>Nema rezultata</CommandEmpty>
+                    )}
                   {patients.length > 0 && (
                     <CommandGroup>
                       {patients.map((patient) => (
