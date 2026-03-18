@@ -40,7 +40,8 @@ export function ScheduleAppointmentDrawer({
   onOpenChange,
 }: ScheduleAppointmentDrawerProps) {
   const [query, setQuery] = useState('');
-  const [selectedPatient, setSelectedPatient] = useState<SelectedPatient | null>(null);
+  const [selectedPatient, setSelectedPatient] =
+    useState<SelectedPatient | null>(null);
 
   const trpc = useTRPC();
 
