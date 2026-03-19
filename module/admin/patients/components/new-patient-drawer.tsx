@@ -42,8 +42,19 @@ interface PatientFormData {
   notes?: string;
 }
 
-export function NewPatientDrawer() {
-  const [open, setOpen] = useState(false);
+interface NewPatientDrawerProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function NewPatientDrawer({
+  open: openProp,
+  onOpenChange,
+}: NewPatientDrawerProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const open = openProp !== undefined ? openProp : internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
   const [selectedGender, setSelectedGender] = useState<
     'MALE' | 'FEMALE' | undefined
   >();
@@ -92,14 +103,18 @@ export function NewPatientDrawer() {
     });
   };
 
+  const isControlled = openProp !== undefined;
+
   return (
     <Drawer open={open} onOpenChange={setOpen} direction="right">
-      <DrawerTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Novi pacijent
-        </Button>
-      </DrawerTrigger>
+      {!isControlled && (
+        <DrawerTrigger asChild>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Novi pacijent
+          </Button>
+        </DrawerTrigger>
+      )}
       <DrawerContent className="h-screen max-w-4xl">
         <div className="mx-auto h-full w-full max-w-2xl overflow-y-auto">
           <DrawerHeader>

@@ -558,4 +558,19 @@ export const appointmentRouter = createTRPCRouter({
 
       return updated;
     }),
+
+  //  Danasnji termini za admin dashboard
+  getToday: adminProcedure.query(({ ctx }) => {
+    const now = new Date();
+    return ctx.prisma.appointment.findMany({
+      where: {
+        startTime: {
+          gte: startOfDay(now),
+          lte: endOfDay(now),
+        },
+      },
+      include: { patient: true, serviceType: true },
+      orderBy: { startTime: 'asc' },
+    });
+  }),
 });

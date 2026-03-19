@@ -175,6 +175,7 @@ model Patient {
   medications String?
   notes       String?
   isMain      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
 
   appointments   Appointment[]
   invoices       Invoice[]
@@ -182,6 +183,7 @@ model Patient {
 
   @@index([phone])
   @@index([email])
+  @@index([createdAt])
 }
 
 // ============================================
