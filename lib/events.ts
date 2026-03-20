@@ -7,6 +7,7 @@ ee.setMaxListeners(100);
 // Event names (channels)
 export const EVENT_NAMES = {
   SETTINGS_UPDATE: 'settings:update',
+  APPOINTMENT_CREATED: 'appointment:created',
 } as const;
 
 // Settings event type constants
@@ -21,6 +22,21 @@ export type SettingsUpdateEvent = {
   type: (typeof SETTINGS_EVENT_TYPES)[keyof typeof SETTINGS_EVENT_TYPES];
   timestamp: number;
 };
+
+export type AppointmentCreatedEvent = {
+  appointmentId: string;
+  patientName: string;
+  serviceName: string | null;
+  startTime: string;
+  timestamp: number;
+};
+
+export function emitAppointmentCreated(
+  payload: Omit<AppointmentCreatedEvent, 'timestamp'>
+) {
+  const event: AppointmentCreatedEvent = { ...payload, timestamp: Date.now() };
+  ee.emit(EVENT_NAMES.APPOINTMENT_CREATED, event);
+}
 
 // Emit helper
 export function emitSettingsUpdate(type: SettingsUpdateEvent['type']) {

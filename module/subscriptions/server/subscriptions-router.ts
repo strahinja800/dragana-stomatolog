@@ -2,8 +2,13 @@ import { tracked } from '@trpc/server';
 import { on } from 'events';
 import { z } from 'zod';
 
-import { ee, EVENT_NAMES, type SettingsUpdateEvent } from '@/lib/events';
-import { createTRPCRouter, publicProcedure } from '@/trpc/init';
+import {
+  type AppointmentCreatedEvent,
+  ee,
+  EVENT_NAMES,
+  type SettingsUpdateEvent,
+} from '@/lib/events';
+import { adminProcedure, createTRPCRouter, publicProcedure } from '@/trpc/init';
 
 export const subscriptionsRouter = createTRPCRouter({
   /**
@@ -51,4 +56,21 @@ export const subscriptionsRouter = createTRPCRouter({
         console.log(`[SSE] Settings subscription ended`);
       }
     }),
+
+  /**
+   * Subscribe to new appointment notifications (admin only).
+   * Emitted when a patient submits a new booking request.
+   */
+  onNewAppointment: adminProcedure.subscription(async function* (opts) {
+    const eventName = EVENT_NAMES.APPOINTMENT_CREATED;
+
+    try {
+      for await (const [data] of on(ee, eventName, { signal: opts.signal })) {
+        const event = data as AppointmentCreatedEvent;
+        yield tracked(String(event.timestamp), event);
+      }
+    } finally {
+      console.log(`[SSE] Appointment subscription ended`);
+    }
+  }),
 });

@@ -1,5 +1,7 @@
+import React from 'react';
 import { NextResponse } from 'next/server';
 
+import { Body, Html, Section, Text } from '@react-email/components';
 import { z } from 'zod';
 
 import { sendEmail } from '@/lib/email/resend-client';
@@ -46,17 +48,24 @@ export async function POST(request: Request) {
   const emailResult = await sendEmail({
     to: clinicEmail,
     subject: `Novi kontakt upit: ${fullName}`,
-    text: `Ime i prezime: ${fullName}\nEmail: ${email}\nTelefon: ${phone}\nUsluga: ${service}\n\nPoruka:\n${message}`,
-    html: `
-      <div style="font-family: Ebrima, Arial, sans-serif; color:#1c2a2f; line-height:1.6;">
-        <h2>Novi kontakt upit</h2>
-        <p><strong>Ime i prezime:</strong> ${fullName}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Telefon:</strong> ${phone}</p>
-        <p><strong>Usluga:</strong> ${service}</p>
-        <p><strong>Poruka:</strong><br/>${message.replace(/\n/g, '<br/>')}</p>
-      </div>
-    `,
+    react: React.createElement(
+      Html,
+      null,
+      React.createElement(
+        Body,
+        null,
+        React.createElement(
+          Section,
+          null,
+          React.createElement(Text, null, `Ime i prezime: ${fullName}`),
+          React.createElement(Text, null, `Email: ${email}`),
+          React.createElement(Text, null, `Telefon: ${phone}`),
+          React.createElement(Text, null, `Usluga: ${service}`),
+          React.createElement(Text, null, `Poruka:`),
+          React.createElement(Text, null, message)
+        )
+      )
+    ),
   });
 
   if (!emailResult.success) {
