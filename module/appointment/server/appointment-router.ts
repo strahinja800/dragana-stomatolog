@@ -1,7 +1,9 @@
+import crypto from 'crypto';
+
 import React from 'react';
 
 import { TRPCError } from '@trpc/server';
-import { addMinutes, endOfDay, startOfDay } from 'date-fns';
+import { addHours, addMinutes, endOfDay, startOfDay } from 'date-fns';
 import { z } from 'zod';
 
 import AdminNewAppointment, {
@@ -16,6 +18,9 @@ import AppointmentConfirmed, {
 import AppointmentRejected, {
   subject as appointmentRejectedSubject,
 } from '@/emails/appointment-rejected';
+import AppointmentTimeProposal, {
+  subject as appointmentTimeProposalSubject,
+} from '@/emails/appointment-time-proposal';
 import { sendEmail } from '@/lib/email/resend-client';
 import { emitAppointmentCreated } from '@/lib/events';
 import {
@@ -31,6 +36,7 @@ import {
   createAppointmentSchema,
   getAllAppointmentsSchema,
   getTimeSlotsSchema,
+  proposeTimeSchema,
   rejectAppointmentSchema,
   rescheduleAppointmentSchema,
 } from '@/module/appointment/types/appointment-schemas';
@@ -282,10 +288,13 @@ export const appointmentRouter = createTRPCRouter({
         });
 
         if (!adminEmailResult.success) {
-          console.error('[appointment.create] Admin notification email failed', {
-            appointmentId: appointment.id,
-            reason: adminEmailResult.message,
-          });
+          console.error(
+            '[appointment.create] Admin notification email failed',
+            {
+              appointmentId: appointment.id,
+              reason: adminEmailResult.message,
+            }
+          );
         }
       }
 
@@ -620,6 +629,84 @@ export const appointmentRouter = createTRPCRouter({
       });
 
       return updated;
+    }),
+
+  /**
+   * Predlaže pacijentu novi termin i šalje email sa accept/reject linkovima
+   */
+  proposeTime: adminProcedure
+    .input(proposeTimeSchema)
+    .mutation(async ({ ctx, input }) => {
+      const appointment = await ctx.prisma.appointment.findUnique({
+        where: { id: input.id },
+        include: { patient: true, serviceType: true },
+      });
+
+      if (!appointment) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Termin nije pronađen' });
+      }
+
+      const patientEmail = appointment.email ?? appointment.patient.email;
+
+      if (!patientEmail) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Pacijent nema email adresu',
+        });
+      }
+
+      const duration = appointment.serviceType?.durationMinutes ?? DEFAULT_SLOT_DURATION;
+      const proposedStartTime = parseLocalTime(input.newdate, input.newTime);
+      const proposedEndTime = addMinutes(proposedStartTime, duration);
+
+      const conflict = await ctx.prisma.appointment.findFirst({
+        where: {
+          startTime: { gte: proposedStartTime, lt: proposedEndTime },
+          status: { in: ['CONFIRMED', 'PENDING'] },
+          id: { not: input.id },
+        },
+      });
+
+      if (conflict) {
+        throw new TRPCError({ code: 'CONFLICT', message: 'Ovaj termin je već zauzet' });
+      }
+
+      const identifier = `appointment-proposal:${input.id}`;
+      const token = crypto.randomBytes(16).toString('hex');
+
+      await ctx.prisma.verification.deleteMany({ where: { identifier } });
+      await ctx.prisma.verification.create({
+        data: {
+          identifier,
+          value: token,
+          expiresAt: addHours(new Date(), 72),
+        },
+      });
+
+      await ctx.prisma.appointment.update({
+        where: { id: input.id },
+        data: { proposedStartTime, proposedEndTime },
+      });
+
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+      const acceptUrl = `${baseUrl}/api/termin/odgovor?token=${token}&action=accept`;
+      const rejectUrl = `${baseUrl}/api/termin/odgovor?token=${token}&action=reject`;
+
+      const patientName =
+        `${appointment.patient.firstName} ${appointment.patient.lastName}`.trim();
+
+      await sendEmail({
+        to: patientEmail,
+        subject: appointmentTimeProposalSubject,
+        react: React.createElement(AppointmentTimeProposal, {
+          patientName,
+          proposedStartTime,
+          acceptUrl,
+          rejectUrl,
+        }),
+      });
+
+      return { success: true };
     }),
 
   //  Danasnji termini za admin dashboard

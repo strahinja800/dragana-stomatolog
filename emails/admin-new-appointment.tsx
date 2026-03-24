@@ -37,12 +37,16 @@ export default function AdminNewAppointment({
           <Heading as="h1" style={s.heading}>
             Novi zahtev za termin
           </Heading>
-          <Text style={s.text}>Stigao je novi zahtev za termin putem sajta.</Text>
+          <Text style={s.text}>
+            Stigao je novi zahtev za termin putem sajta.
+          </Text>
           <Section style={detailBox}>
             <Text style={detailLabel}>Pacijent</Text>
             <Text style={detailValue}>{patientName}</Text>
             <Text style={detailLabel}>Željeni termin</Text>
-            <Text style={detailValue}>{format(startTime, 'dd.MM.yyyy. HH:mm')}</Text>
+            <Text style={detailValue}>
+              {format(startTime, 'dd.MM.yyyy. HH:mm')}
+            </Text>
             {phone && (
               <>
                 <Text style={detailLabel}>Telefon</Text>
