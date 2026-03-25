@@ -12,7 +12,7 @@ export async function GET(request: Request) {
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
   const redirectUrl = (status: string) =>
-    NextResponse.redirect(`${baseUrl}/termin/odgovor?status=${status}`);
+    NextResponse.redirect(`${baseUrl}/appointment/response?status=${status}`);
 
   if (!token || (action !== 'accept' && action !== 'reject')) {
     return redirectUrl('invalid');

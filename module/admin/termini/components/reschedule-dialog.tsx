@@ -58,7 +58,7 @@ export function RescheduleDialog({
   };
 
   const { mutate: rescheduleAppointment, isPending } = useMutation(
-    trpc.appointment.reschedule.mutationOptions({
+    trpc.appointment.proposeTime.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['appointment'] });
         toast.success('Termin promenjen', {

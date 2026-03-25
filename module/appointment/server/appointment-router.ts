@@ -1,8 +1,7 @@
-import crypto from 'crypto';
-
 import React from 'react';
 
 import { TRPCError } from '@trpc/server';
+import crypto from 'crypto';
 import { addHours, addMinutes, endOfDay, startOfDay } from 'date-fns';
 import { z } from 'zod';
 
@@ -643,7 +642,10 @@ export const appointmentRouter = createTRPCRouter({
       });
 
       if (!appointment) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Termin nije pronađen' });
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Termin nije pronađen',
+        });
       }
 
       const patientEmail = appointment.email ?? appointment.patient.email;
@@ -655,8 +657,9 @@ export const appointmentRouter = createTRPCRouter({
         });
       }
 
-      const duration = appointment.serviceType?.durationMinutes ?? DEFAULT_SLOT_DURATION;
-      const proposedStartTime = parseLocalTime(input.newdate, input.newTime);
+      const duration =
+        appointment.serviceType?.durationMinutes ?? DEFAULT_SLOT_DURATION;
+      const proposedStartTime = parseLocalTime(input.newDate, input.newTime);
       const proposedEndTime = addMinutes(proposedStartTime, duration);
 
       const conflict = await ctx.prisma.appointment.findFirst({
@@ -668,7 +671,10 @@ export const appointmentRouter = createTRPCRouter({
       });
 
       if (conflict) {
-        throw new TRPCError({ code: 'CONFLICT', message: 'Ovaj termin je već zauzet' });
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'Ovaj termin je već zauzet',
+        });
       }
 
       const identifier = `appointment-proposal:${input.id}`;
@@ -688,14 +694,15 @@ export const appointmentRouter = createTRPCRouter({
         data: { proposedStartTime, proposedEndTime },
       });
 
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
-      const acceptUrl = `${baseUrl}/api/termin/odgovor?token=${token}&action=accept`;
-      const rejectUrl = `${baseUrl}/api/termin/odgovor?token=${token}&action=reject`;
+      const baseUrl =
+        process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+      const acceptUrl = `${baseUrl}/api/appointment/response?token=${token}&action=accept`;
+      const rejectUrl = `${baseUrl}/api/appointment/response?token=${token}&action=reject`;
 
       const patientName =
         `${appointment.patient.firstName} ${appointment.patient.lastName}`.trim();
 
-      await sendEmail({
+      const emailResult = await sendEmail({
         to: patientEmail,
         subject: appointmentTimeProposalSubject,
         react: React.createElement(AppointmentTimeProposal, {
@@ -705,6 +712,13 @@ export const appointmentRouter = createTRPCRouter({
           rejectUrl,
         }),
       });
+
+      if (!emailResult.success) {
+        console.error('[appointment.proposeTime] Email failed', {
+          appointmentId: input.id,
+          reason: emailResult.message,
+        });
+      }
 
       return { success: true };
     }),

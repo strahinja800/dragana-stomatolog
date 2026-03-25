@@ -83,6 +83,6 @@ export type GetTimeSlotsInput = z.infer<typeof getTimeSlotsSchema>;
 //  Propose new time for pending appointment (patient)
 export const proposeTimeSchema = z.object({
   id: z.string(),
-  newdate: z.date(),
+  newDate: z.date(),
   newTime: z.string().regex(/^\d{2}:\d{2}$/),
 });
