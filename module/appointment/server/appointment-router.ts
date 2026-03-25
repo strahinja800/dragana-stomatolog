@@ -664,9 +664,20 @@ export const appointmentRouter = createTRPCRouter({
 
       const conflict = await ctx.prisma.appointment.findFirst({
         where: {
-          startTime: { gte: proposedStartTime, lt: proposedEndTime },
           status: { in: ['CONFIRMED', 'PENDING'] },
           id: { not: input.id },
+          OR: [
+            {
+              // Overlap with existing scheduled appointment times
+              startTime: { lt: proposedEndTime },
+              endTime: { gt: proposedStartTime },
+            },
+            {
+              // Overlap with other pending proposed times
+              proposedStartTime: { lt: proposedEndTime },
+              proposedEndTime: { gt: proposedStartTime },
+            },
+          ],
         },
       });
 

@@ -6,11 +6,12 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+  const url = new URL(request.url);
+  const { searchParams } = url;
   const token = searchParams.get('token');
   const action = searchParams.get('action'); // 'accept' ili 'reject'
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? url.origin;
   const redirectUrl = (status: string) =>
     NextResponse.redirect(`${baseUrl}/appointment/response?status=${status}`);
 
@@ -19,7 +20,10 @@ export async function GET(request: Request) {
   }
 
   const verification = await prisma.verification.findFirst({
-    where: { value: token },
+    where: {
+      value: token,
+      identifier: { startsWith: 'appointment-proposal:' },
+    },
   });
 
   if (!verification) {
@@ -32,6 +36,11 @@ export async function GET(request: Request) {
   }
 
   const appointmentId = verification.identifier.split(':')[1];
+
+  if (!appointmentId) {
+    return redirectUrl('invalid');
+  }
+
   const appointment = await prisma.appointment.findUnique({
     where: { id: appointmentId },
   });

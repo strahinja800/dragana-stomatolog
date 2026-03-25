@@ -1,6 +1,3 @@
-// TODO: Placeholder — zamijeni sa pravom React Email komponentom
-// Props: { patientName: string, startTime: Date, reason: string | null }
-
 import {
   Body,
   Container,

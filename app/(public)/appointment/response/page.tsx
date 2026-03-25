@@ -1,11 +1,11 @@
 import { defaultConfig, statusConfig } from './response-config';
 
 interface Props {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: { status?: string };
 }
 
-export default async function AppointmentResponsePage({ searchParams }: Props) {
-  const { status } = await searchParams;
+export default function AppointmentResponsePage({ searchParams }: Props) {
+  const { status } = searchParams;
   const config =
     status && status in statusConfig
       ? statusConfig[status as keyof typeof statusConfig]
