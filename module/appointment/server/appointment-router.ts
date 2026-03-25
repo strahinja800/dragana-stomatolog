@@ -1,8 +1,27 @@
+import React from 'react';
+
 import { TRPCError } from '@trpc/server';
-import { addMinutes, endOfDay, startOfDay } from 'date-fns';
+import crypto from 'crypto';
+import { addHours, addMinutes, endOfDay, startOfDay } from 'date-fns';
 import { z } from 'zod';
 
+import AdminNewAppointment, {
+  subject as adminNewAppointmentSubject,
+} from '@/emails/admin-new-appointment';
+import AppointmentBookingReceived, {
+  subject as bookingReceivedSubject,
+} from '@/emails/appointment-booking-received';
+import AppointmentConfirmed, {
+  subject as appointmentConfirmedSubject,
+} from '@/emails/appointment-confirmed';
+import AppointmentRejected, {
+  subject as appointmentRejectedSubject,
+} from '@/emails/appointment-rejected';
+import AppointmentTimeProposal, {
+  subject as appointmentTimeProposalSubject,
+} from '@/emails/appointment-time-proposal';
 import { sendEmail } from '@/lib/email/resend-client';
+import { emitAppointmentCreated } from '@/lib/events';
 import {
   formatLocalTime,
   getCurrentLocalTimeMinutes,
@@ -11,15 +30,12 @@ import {
   parseLocalTime,
 } from '@/lib/timezone';
 import {
-  getBookingConfirmedEmail,
-  getBookingReceivedEmail,
-} from '@/module/appointment/server/appointment-email-templates';
-import {
   confirmAppointmentSchema,
   createAppointmentForPatientSchema,
   createAppointmentSchema,
   getAllAppointmentsSchema,
   getTimeSlotsSchema,
+  proposeTimeSchema,
   rejectAppointmentSchema,
   rescheduleAppointmentSchema,
 } from '@/module/appointment/types/appointment-schemas';
@@ -237,16 +253,16 @@ export const appointmentRouter = createTRPCRouter({
         },
       });
 
-      const receivedEmail = getBookingReceivedEmail({
-        patientName: `${firstName} ${lastName}`.trim(),
-        startTime,
-      });
+      const patientName = `${firstName} ${lastName}`.trim();
 
+      // Email to patient
       const emailResult = await sendEmail({
         to: input.email,
-        subject: receivedEmail.subject,
-        html: receivedEmail.html,
-        text: receivedEmail.text,
+        subject: bookingReceivedSubject,
+        react: React.createElement(AppointmentBookingReceived, {
+          patientName,
+          startTime,
+        }),
       });
 
       if (!emailResult.success) {
@@ -255,6 +271,39 @@ export const appointmentRouter = createTRPCRouter({
           reason: emailResult.message,
         });
       }
+
+      // Email to admin
+      const clinicEmail = process.env.CLINIC_EMAIL;
+      if (clinicEmail) {
+        const adminEmailResult = await sendEmail({
+          to: clinicEmail,
+          subject: adminNewAppointmentSubject,
+          react: React.createElement(AdminNewAppointment, {
+            patientName,
+            startTime,
+            phone: input.phone,
+            symptoms: input.symptoms ?? null,
+          }),
+        });
+
+        if (!adminEmailResult.success) {
+          console.error(
+            '[appointment.create] Admin notification email failed',
+            {
+              appointmentId: appointment.id,
+              reason: adminEmailResult.message,
+            }
+          );
+        }
+      }
+
+      // SSE notification to admin dashboard
+      emitAppointmentCreated({
+        appointmentId: appointment.id,
+        patientName,
+        serviceName: null,
+        startTime: startTime.toISOString(),
+      });
 
       return appointment;
     }),
@@ -396,18 +445,17 @@ export const appointmentRouter = createTRPCRouter({
       });
 
       if (appointment.email) {
-        const confirmedEmail = getBookingConfirmedEmail({
-          patientName:
-            `${appointment.patient.firstName} ${appointment.patient.lastName}`.trim(),
-          startTime: appointment.startTime,
-          serviceName: null,
-        });
+        const patientName =
+          `${appointment.patient.firstName} ${appointment.patient.lastName}`.trim();
 
         const emailResult = await sendEmail({
           to: appointment.email,
-          subject: confirmedEmail.subject,
-          html: confirmedEmail.html,
-          text: confirmedEmail.text,
+          subject: appointmentConfirmedSubject,
+          react: React.createElement(AppointmentConfirmed, {
+            patientName,
+            startTime: appointment.startTime,
+            serviceName: null,
+          }),
         });
 
         if (!emailResult.success) {
@@ -475,18 +523,17 @@ export const appointmentRouter = createTRPCRouter({
       const confirmationEmail = updated.email ?? updated.patient.email;
 
       if (confirmationEmail) {
-        const confirmedEmail = getBookingConfirmedEmail({
-          patientName:
-            `${updated.patient.firstName} ${updated.patient.lastName}`.trim(),
-          startTime: updated.startTime,
-          serviceName: updated.serviceType?.name,
-        });
+        const patientName =
+          `${updated.patient.firstName} ${updated.patient.lastName}`.trim();
 
         const emailResult = await sendEmail({
           to: confirmationEmail,
-          subject: confirmedEmail.subject,
-          html: confirmedEmail.html,
-          text: confirmedEmail.text,
+          subject: appointmentConfirmedSubject,
+          react: React.createElement(AppointmentConfirmed, {
+            patientName,
+            startTime: updated.startTime,
+            serviceName: updated.serviceType?.name ?? null,
+          }),
         });
 
         if (!emailResult.success) {
@@ -516,6 +563,30 @@ export const appointmentRouter = createTRPCRouter({
           patient: true,
         },
       });
+
+      const rejectionEmail = updated.email ?? updated.patient.email;
+
+      if (rejectionEmail) {
+        const patientName =
+          `${updated.patient.firstName} ${updated.patient.lastName}`.trim();
+
+        const emailResult = await sendEmail({
+          to: rejectionEmail,
+          subject: appointmentRejectedSubject,
+          react: React.createElement(AppointmentRejected, {
+            patientName,
+            startTime: updated.startTime,
+            reason: input.reason ?? null,
+          }),
+        });
+
+        if (!emailResult.success) {
+          console.error('[appointment.reject] Rejection email failed', {
+            appointmentId: updated.id,
+            reason: emailResult.message,
+          });
+        }
+      }
 
       return updated;
     }),
@@ -557,6 +628,110 @@ export const appointmentRouter = createTRPCRouter({
       });
 
       return updated;
+    }),
+
+  /**
+   * Predlaže pacijentu novi termin i šalje email sa accept/reject linkovima
+   */
+  proposeTime: adminProcedure
+    .input(proposeTimeSchema)
+    .mutation(async ({ ctx, input }) => {
+      const appointment = await ctx.prisma.appointment.findUnique({
+        where: { id: input.id },
+        include: { patient: true, serviceType: true },
+      });
+
+      if (!appointment) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Termin nije pronađen',
+        });
+      }
+
+      const patientEmail = appointment.email ?? appointment.patient.email;
+
+      if (!patientEmail) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Pacijent nema email adresu',
+        });
+      }
+
+      const duration =
+        appointment.serviceType?.durationMinutes ?? DEFAULT_SLOT_DURATION;
+      const proposedStartTime = parseLocalTime(input.newDate, input.newTime);
+      const proposedEndTime = addMinutes(proposedStartTime, duration);
+
+      const conflict = await ctx.prisma.appointment.findFirst({
+        where: {
+          status: { in: ['CONFIRMED', 'PENDING'] },
+          id: { not: input.id },
+          OR: [
+            {
+              // Overlap with existing scheduled appointment times
+              startTime: { lt: proposedEndTime },
+              endTime: { gt: proposedStartTime },
+            },
+            {
+              // Overlap with other pending proposed times
+              proposedStartTime: { lt: proposedEndTime },
+              proposedEndTime: { gt: proposedStartTime },
+            },
+          ],
+        },
+      });
+
+      if (conflict) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'Ovaj termin je već zauzet',
+        });
+      }
+
+      const identifier = `appointment-proposal:${input.id}`;
+      const token = crypto.randomBytes(16).toString('hex');
+
+      await ctx.prisma.verification.deleteMany({ where: { identifier } });
+      await ctx.prisma.verification.create({
+        data: {
+          identifier,
+          value: token,
+          expiresAt: addHours(new Date(), 72),
+        },
+      });
+
+      await ctx.prisma.appointment.update({
+        where: { id: input.id },
+        data: { proposedStartTime, proposedEndTime },
+      });
+
+      const baseUrl =
+        process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+      const acceptUrl = `${baseUrl}/api/appointment/response?token=${token}&action=accept`;
+      const rejectUrl = `${baseUrl}/api/appointment/response?token=${token}&action=reject`;
+
+      const patientName =
+        `${appointment.patient.firstName} ${appointment.patient.lastName}`.trim();
+
+      const emailResult = await sendEmail({
+        to: patientEmail,
+        subject: appointmentTimeProposalSubject,
+        react: React.createElement(AppointmentTimeProposal, {
+          patientName,
+          proposedStartTime,
+          acceptUrl,
+          rejectUrl,
+        }),
+      });
+
+      if (!emailResult.success) {
+        console.error('[appointment.proposeTime] Email failed', {
+          appointmentId: input.id,
+          reason: emailResult.message,
+        });
+      }
+
+      return { success: true };
     }),
 
   //  Danasnji termini za admin dashboard

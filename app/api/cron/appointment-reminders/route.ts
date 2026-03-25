@@ -1,10 +1,13 @@
+import React from 'react';
 import { NextResponse } from 'next/server';
 
 import { addHours } from 'date-fns';
 
+import AppointmentReminder, {
+  subject as appointmentReminderSubject,
+} from '@/emails/appointment-reminder';
 import { sendEmail } from '@/lib/email/resend-client';
 import { prisma } from '@/lib/prisma';
-import { getAppointmentReminderEmail } from '@/module/appointment/server/appointment-email-templates';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -56,19 +59,18 @@ async function processReminders() {
       continue;
     }
 
-    const payload = getAppointmentReminderEmail({
-      patientName:
-        `${appointment.patient.firstName} ${appointment.patient.lastName}`.trim() ||
-        'Pacijent',
-      startTime: appointment.startTime,
-      serviceName: appointment.serviceType?.name,
-    });
+    const patientName =
+      `${appointment.patient.firstName} ${appointment.patient.lastName}`.trim() ||
+      'Pacijent';
 
     const emailResult = await sendEmail({
       to: appointment.email,
-      subject: payload.subject,
-      html: payload.html,
-      text: payload.text,
+      subject: appointmentReminderSubject,
+      react: React.createElement(AppointmentReminder, {
+        patientName,
+        startTime: appointment.startTime,
+        serviceName: appointment.serviceType?.name ?? null,
+      }),
     });
 
     if (!emailResult.success) {

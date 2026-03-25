@@ -79,3 +79,10 @@ export const getTimeSlotsSchema = z.object({
 });
 
 export type GetTimeSlotsInput = z.infer<typeof getTimeSlotsSchema>;
+
+//  Propose new time for pending appointment (patient)
+export const proposeTimeSchema = z.object({
+  id: z.string(),
+  newDate: z.date(),
+  newTime: z.string().regex(/^\d{2}:\d{2}$/, 'Format: HH:MM'),
+});

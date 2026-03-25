@@ -15,14 +15,14 @@ datasource db {
 // ============================================
 
 model User {
-  id            String    @id @default(cuid())
+  id            String   @id @default(cuid())
   name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  email         String   @unique
+  emailVerified Boolean  @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  role          UserRole  @default(patient)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  role          UserRole @default(patient)
 
   banned     Boolean   @default(false)
   banReason  String?
@@ -214,6 +214,9 @@ model Appointment {
   updatedAt          DateTime          @updatedAt
 
   medicalRecords MedicalRecord[]
+
+  proposedStartTime DateTime?
+  proposedEndTime   DateTime?
 
   @@index([patientId])
   @@index([dentistId])
