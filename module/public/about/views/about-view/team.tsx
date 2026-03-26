@@ -2,28 +2,42 @@ import Image from 'next/image';
 
 import { GraduationCap } from '@/constants/icons';
 
-interface TeamMember {
-  id: string;
-  name: string;
-  role: string;
-  specialty?: string | null;
-  bio?: string | null;
-  imageUrl?: string | null;
-  imageAlt?: string | null;
-  sortOrder: number;
-  isActive: boolean;
-}
+const TEAM_MEMBERS = [
+  {
+    id: '1',
+    name: 'Dr. Dragana Petrović',
+    role: 'Osnivač i glavni stomatolog',
+    specialty: 'Implantologija i estetska stomatologija',
+    bio: 'Sa više od 15 godina iskustva, dr. Petrović je pokrenula DENTALHOLIST sa ciljem da pacijentima pruži stomatološku negu koja spaja visoku stručnost sa iskrenom brigom. Specijalizovala se u Beogradu i Beču.',
+    imageUrl: null,
+    imageAlt: 'Dr. Dragana Petrović',
+  },
+  {
+    id: '2',
+    name: 'Dr. Marko Nikolić',
+    role: 'Ortodont',
+    specialty: 'Ortodoncija i nevidljivi aparatići',
+    bio: 'Specijalista ortodoncije sa fokusom na savremene tehnike ispravljanja zuba uz minimalan diskomfor.',
+    imageUrl: null,
+    imageAlt: 'Dr. Marko Nikolić',
+  },
+  {
+    id: '3',
+    name: 'Dr. Ana Jovanović',
+    role: 'Dečji stomatolog',
+    specialty: 'Pedijatrijska stomatologija',
+    bio: 'Posvećena stvaranju pozitivnih iskustava za najmlađe pacijente, uz poseban pristup koji smanjuje strah od stomatologa.',
+    imageUrl: null,
+    imageAlt: 'Dr. Ana Jovanović',
+  },
+];
 
-interface AboutTeamProps {
-  teamMembers: TeamMember[];
-}
-
-export default function AboutTeam({ teamMembers }: AboutTeamProps) {
-  const [lead, ...rest] = teamMembers;
+export default function AboutTeam() {
+  const [lead, ...rest] = TEAM_MEMBERS;
 
   return (
     <section className="relative gradient-hero py-20 md:py-28 overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-2/3 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-2/3 bg-linear-to-r from-transparent via-primary/20 to-transparent" />
 
       <div className="container mx-auto px-4">
         <div className="mx-auto mb-14 max-w-2xl text-center">
@@ -42,8 +56,8 @@ export default function AboutTeam({ teamMembers }: AboutTeamProps) {
               <div className="relative shrink-0">
                 <div className="overflow-hidden rounded-3xl border-2 border-primary/20">
                   <Image
-                    src={lead.imageUrl || '/default-image.png'}
-                    alt={lead.imageAlt || lead.name}
+                    src={lead.imageUrl ?? '/default-image.png'}
+                    alt={lead.imageAlt ?? lead.name}
                     className="h-52 w-52 object-cover sm:h-60 sm:w-60"
                     width={240}
                     height={240}
@@ -84,8 +98,8 @@ export default function AboutTeam({ teamMembers }: AboutTeamProps) {
             >
               <div className="mx-auto mb-5 overflow-hidden rounded-2xl border border-border/60">
                 <Image
-                  src={member.imageUrl || '/default-image.png'}
-                  alt={member.imageAlt || member.name}
+                  src={member.imageUrl ?? '/default-image.png'}
+                  alt={member.imageAlt ?? member.name}
                   className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   width={320}
                   height={192}

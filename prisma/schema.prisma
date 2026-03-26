@@ -286,55 +286,6 @@ model Invoice {
 }
 
 // ============================================
-// CMS CONTENT
-// ============================================
-
-model AboutValue {
-  id          String   @id @default(cuid())
-  icon        String
-  title       String
-  description String
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([sortOrder])
-  @@index([isActive, sortOrder])
-}
-
-model Milestone {
-  id          String   @id @default(cuid())
-  year        String
-  title       String
-  description String
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([sortOrder])
-  @@index([isActive, sortOrder])
-}
-
-model TeamMember {
-  id        String   @id @default(cuid())
-  name      String
-  role      String
-  specialty String?
-  bio       String?
-  imageUrl  String?
-  imageAlt  String?
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([sortOrder])
-  @@index([isActive, sortOrder])
-}
-
-// ============================================
 // BLOG
 // ============================================
 
