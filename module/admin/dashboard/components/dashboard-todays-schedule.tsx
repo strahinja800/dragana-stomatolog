@@ -20,7 +20,7 @@ export function DashboardTodaysSchedule() {
   );
 
   return (
-    <Card className="border-border/50 shadow-sm">
+    <Card className="border-border/50 py-0 shadow-sm">
       <CardHeader className="border-b bg-muted/30 px-6 py-4">
         <CardTitle className="flex items-center gap-2 text-lg font-semibold">
           <CalendarClock className="size-5 text-primary" />
