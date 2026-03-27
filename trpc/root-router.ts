@@ -1,6 +1,5 @@
 import type { inferRouterOutputs } from '@trpc/server';
 
-import { aboutRouter } from '@/module/about/server/about-router';
 import { appointmentRouter } from '@/module/appointment/server/appointment-router';
 import { attachmentRouter } from '@/module/attachment/server/attachment-router';
 import { blogRouter } from '@/module/blog/server/blog-router';
@@ -19,7 +18,6 @@ export const appRouter = createTRPCRouter({
   patient: patientRouter,
   settings: settingsRouter,
   subscriptions: subscriptionsRouter,
-  about: aboutRouter,
   upload: uploadRouter,
 });
 

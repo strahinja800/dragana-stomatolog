@@ -1,19 +1,37 @@
 import { getIcon } from '@/module/public/about/lib/icon-map';
 
-interface AboutValue {
-  id: string;
-  icon: string;
-  title: string;
-  description: string;
-  sortOrder: number;
-  isActive: boolean;
-}
+const VALUES = [
+  {
+    id: '1',
+    icon: 'Target',
+    title: 'Preciznost',
+    description:
+      'Svaki zahvat izvodimo sa najvišim stepenom pažnje i preciznosti, koristeći najsavremeniju opremu i tehnike.',
+  },
+  {
+    id: '2',
+    icon: 'ShieldCheck',
+    title: 'Poverenje',
+    description:
+      'Gradimo dugoročne odnose sa pacijentima zasnovane na otvorenoj komunikaciji, iskrenosti i doslednosti.',
+  },
+  {
+    id: '3',
+    icon: 'Lightbulb',
+    title: 'Inovacija',
+    description:
+      'Kontinuirano pratimo najnovija dostignuća u stomatologiji kako bismo pružali tretmane koji su efikasni i bezbolni.',
+  },
+  {
+    id: '4',
+    icon: 'HandHeart',
+    title: 'Briga o pacijentu',
+    description:
+      'Svaki pacijent je jedinstven. Prilagođavamo pristup individualnim potrebama i brinemo o celokupnom iskustvu.',
+  },
+];
 
-interface AboutValuesProps {
-  values: AboutValue[];
-}
-
-export default function AboutValues({ values }: AboutValuesProps) {
+export default function AboutValues() {
   return (
     <section className="py-20 md:py-28">
       <div className="container mx-auto px-4">
@@ -29,7 +47,7 @@ export default function AboutValues({ values }: AboutValuesProps) {
         </div>
 
         <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-2 lg:gap-6">
-          {values.map((value, index) => {
+          {VALUES.map((value, index) => {
             const IconComponent = getIcon(value.icon);
             return (
               <article

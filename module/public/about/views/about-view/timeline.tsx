@@ -1,19 +1,44 @@
 import { cn } from '@/lib/utils';
 
-interface Milestone {
-  id: string;
-  year: string;
-  title: string;
-  description: string;
-  sortOrder: number;
-  isActive: boolean;
-}
+const MILESTONES = [
+  {
+    id: '1',
+    year: '2009',
+    title: 'Osnivanje ordinacije',
+    description:
+      'DENTALHOLIST otvara vrata sa jasnom vizijom — pružiti stomatološku negu koja spaja stručnost, pažnju i modernu tehnologiju.',
+  },
+  {
+    id: '2',
+    year: '2013',
+    title: 'Proširenje tima',
+    description:
+      'Ordinacija raste — pridružuju nam se prvi specijalisti i uvodi digitalna rendgen dijagnostika. Tim sada broji 4 stomatologa.',
+  },
+  {
+    id: '3',
+    year: '2017',
+    title: 'Sertifikat izvrsnosti',
+    description:
+      'Dobijamo nacionalno priznanje za kvalitet usluga u oblasti implantologije i estetske stomatologije.',
+  },
+  {
+    id: '4',
+    year: '2020',
+    title: 'Digitalna transformacija',
+    description:
+      'Uvodimo 3D skeniranje, CAD/CAM tehnologiju za izradu krunica i kompletno digitalno zakazivanje termina.',
+  },
+  {
+    id: '5',
+    year: '2024',
+    title: '15 godina poverenja',
+    description:
+      'Proslavljamo 15 godina rada sa timom od 7 specijalista i više od 10.000 zadovoljnih pacijenata.',
+  },
+];
 
-interface AboutTimelineProps {
-  milestones: Milestone[];
-}
-
-export default function AboutTimeline({ milestones }: AboutTimelineProps) {
+export default function AboutTimeline() {
   return (
     <section className="py-20 md:py-28">
       <div className="container mx-auto px-4">
@@ -30,9 +55,9 @@ export default function AboutTimeline({ milestones }: AboutTimelineProps) {
 
         <div className="mx-auto max-w-4xl">
           <div className="relative">
-            <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary/40 via-accent/30 to-primary/10 md:left-1/2 md:-translate-x-px" />
+            <div className="absolute left-6 top-0 bottom-0 w-px bg-linear-to-b from-primary/40 via-accent/30 to-primary/10 md:left-1/2 md:-translate-x-px" />
 
-            {milestones.map((milestone, index) => {
+            {MILESTONES.map((milestone, index) => {
               const isEven = index % 2 === 0;
 
               return (
@@ -76,8 +101,8 @@ export default function AboutTimeline({ milestones }: AboutTimelineProps) {
                           className={cn(
                             'hidden h-px flex-1 md:block',
                             isEven
-                              ? 'bg-gradient-to-l from-accent/40 to-transparent'
-                              : 'bg-gradient-to-r from-accent/40 to-transparent'
+                              ? 'bg-linear-to-l from-accent/40 to-transparent'
+                              : 'bg-linear-to-r from-accent/40 to-transparent'
                           )}
                         />
                       </div>
