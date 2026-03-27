@@ -56,7 +56,7 @@ export default function AboutTeam() {
               <div className="relative shrink-0">
                 <div className="overflow-hidden rounded-3xl border-2 border-primary/20">
                   <Image
-                    src={lead.imageUrl ?? '/default-image.png'}
+                    src={lead.imageUrl ?? '/assets/dentist-1.jpg'}
                     alt={lead.imageAlt ?? lead.name}
                     className="h-52 w-52 object-cover sm:h-60 sm:w-60"
                     width={240}
@@ -98,7 +98,7 @@ export default function AboutTeam() {
             >
               <div className="mx-auto mb-5 overflow-hidden rounded-2xl border border-border/60">
                 <Image
-                  src={member.imageUrl ?? '/default-image.png'}
+                  src={member.imageUrl ?? '/assets/dentist-1.jpg'}
                   alt={member.imageAlt ?? member.name}
                   className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   width={320}
