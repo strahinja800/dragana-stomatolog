@@ -153,7 +153,8 @@ export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
                         header.column.id === 'phone' && 'w-[130px]',
                         header.column.id === 'dateTime' && 'w-[180px]',
                         header.column.id === 'status' && 'w-[120px]',
-                        header.column.id === 'actions' && 'w-[80px] text-right'
+                        header.column.id === 'actions' &&
+                          'w-12 sticky right-0 z-10 bg-white dark:bg-background'
                       )}
                     >
                       {header.isPlaceholder
@@ -185,7 +186,13 @@ export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
                         className={cn(
                           cell.column.id === 'symptoms' &&
                             'hidden lg:table-cell',
-                          cell.column.id === 'actions' && 'text-right'
+                          cell.column.id === 'actions' &&
+                            cn(
+                              'sticky right-0',
+                              row.original.status === 'PENDING'
+                                ? 'bg-amber-50 dark:bg-amber-950/10 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/20'
+                                : 'bg-white dark:bg-background group-hover:bg-muted'
+                            )
                         )}
                       >
                         {flexRender(

@@ -32,7 +32,7 @@ export function AppointmentTableRowActions({
           <Button
             variant="ghost"
             size="icon"
-            className="size-8 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100"
+            className="size-8 mx-auto flex"
           >
             <MoreHorizontal className="size-4" />
             <span className="sr-only">Otvori meni</span>
@@ -69,7 +69,7 @@ export function AppointmentTableRowActions({
         <Button
           variant="ghost"
           size="icon"
-          className="size-8 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100"
+          className="size-8 mx-auto flex"
         >
           <MoreHorizontal className="size-4" />
           <span className="sr-only">Otvori meni</span>
