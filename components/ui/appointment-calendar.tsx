@@ -12,6 +12,10 @@ interface TimeSlot {
   isAvailable: boolean;
 }
 
+const EMPTY_TIME_SLOTS: TimeSlot[] = [];
+const EMPTY_DISABLED_DATES: number[] = [];
+const EMPTY_DISABLED_DAYS_OF_WEEK: number[] = [];
+
 interface AppointmentCalendarProps {
   selectedDate?: Date;
   selectedTime?: string | null;
@@ -26,6 +30,7 @@ interface AppointmentCalendarProps {
   isLoadingSlots?: boolean;
   locale?: string;
   className?: string;
+  density?: 'default' | 'compact';
 }
 
 function AppointmentCalendar({
@@ -33,17 +38,19 @@ function AppointmentCalendar({
   selectedTime,
   onDateSelect,
   onTimeSelect,
-  timeSlots = [],
-  disabledDates: disabledTimestamps = [],
-  disabledDaysOfWeek = [],
+  timeSlots = EMPTY_TIME_SLOTS,
+  disabledDates: disabledTimestamps = EMPTY_DISABLED_DATES,
+  disabledDaysOfWeek = EMPTY_DISABLED_DAYS_OF_WEEK,
   disabled = false,
   disablePastDates = true,
   isLoadingSlots = false,
   locale = 'sr-Latn',
   className,
+  density = 'default',
 }: AppointmentCalendarProps) {
   // Convert timestamps to Date objects for react-day-picker
   const disabledDateObjects = disabledTimestamps.map((ts) => new Date(ts));
+  const isCompact = density === 'compact';
 
   const calendarDisabledDates = [
     ...(disablePastDates ? [{ before: new Date() }] : []),
@@ -57,6 +64,7 @@ function AppointmentCalendar({
     <div
       className={cn(
         'overflow-hidden rounded-2xl border-2 border-border/50 bg-background/50 backdrop-blur-sm',
+        isCompact && 'rounded-xl border-border/40',
         className
       )}
     >
@@ -74,7 +82,8 @@ function AppointmentCalendar({
           modifiersClassNames={{
             booked: '[&>button]:line-through opacity-100',
           }}
-          className="bg-transparent  w-full"
+          density={density}
+          className={cn('w-full bg-transparent', isCompact && 'md:flex-1')}
           formatters={{
             formatWeekdayName: (date) =>
               date.toLocaleString(locale, { weekday: 'short' }),
@@ -86,10 +95,22 @@ function AppointmentCalendar({
           }}
         />
 
-        <div className="relative min-h-48 w-full">
+        <div
+          className={cn(
+            'relative min-h-48 w-full',
+            isCompact && 'min-h-40 md:w-[220px] md:min-w-[220px]'
+          )}
+        >
           <div className="absolute inset-0 grid gap-4">
-            <div className="space-y-2 px-4 pt-4">
-              <p className="text-center text-sm font-medium">
+            <div
+              className={cn('space-y-2 px-4 pt-4', isCompact && 'px-3 pt-3')}
+            >
+              <p
+                className={cn(
+                  'text-center text-sm font-medium',
+                  isCompact && 'text-xs'
+                )}
+              >
                 {!selectedDate
                   ? 'Izaberite datum'
                   : isLoadingSlots
@@ -100,14 +121,19 @@ function AppointmentCalendar({
               </p>
             </div>
             <ScrollArea className="h-full overflow-y-auto">
-              <div className="grid grid-cols-1 gap-2 px-4 pb-4">
+              <div
+                className={cn(
+                  'grid grid-cols-1 gap-2 px-4 pb-4',
+                  isCompact && 'gap-1.5 px-3 pb-3'
+                )}
+              >
                 {selectedDate &&
                   !isLoadingSlots &&
                   timeSlots.map((slot) => (
                     <Button
                       key={slot.time}
                       type="button"
-                      className="rounded-full"
+                      className={cn('rounded-full', isCompact && 'h-7 text-xs')}
                       size="sm"
                       variant={
                         selectedTime === slot.time ? 'default' : 'outline'
@@ -125,8 +151,18 @@ function AppointmentCalendar({
       </div>
 
       {(selectedDate || selectedTime) && (
-        <div className="border-t border-border/50 bg-background/30 px-4 py-3">
-          <div className="flex items-center gap-2 text-sm">
+        <div
+          className={cn(
+            'border-t border-border/50 bg-background/30 px-4 py-3',
+            isCompact && 'px-3 py-2.5'
+          )}
+        >
+          <div
+            className={cn(
+              'flex items-center gap-2 text-sm',
+              isCompact && 'text-xs'
+            )}
+          >
             {selectedDate && selectedTime ? (
               <>
                 <CircleCheckIcon className="size-5 stroke-green-600 dark:stroke-green-400" />

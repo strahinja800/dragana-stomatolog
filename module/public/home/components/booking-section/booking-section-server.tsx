@@ -82,7 +82,7 @@ export default async function BookingSectionServer() {
 
           <div className="lg:col-span-3">
             <HydrateClient loadingFallback={<BookingSectionSkeleton />}>
-              <BookingForm />
+              <BookingForm compact />
             </HydrateClient>
           </div>
         </div>
