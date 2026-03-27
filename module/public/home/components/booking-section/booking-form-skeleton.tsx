@@ -2,33 +2,41 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight, CheckCircle, Mail, Phone, User } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 
+const skeletonInputIcons = [
+  { key: 'name', icon: User },
+  { key: 'email', icon: Mail },
+  { key: 'phone', icon: Phone },
+];
+
 export function BookingSectionSkeleton() {
   return (
-    <div className="section-shell relative overflow-hidden border-border/40 p-4 md:p-8">
+    <div className="section-shell relative mx-auto max-w-[46rem] overflow-hidden border-border/40 p-4 md:p-6">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-accent/[0.08]" />
 
       <div className="relative z-10">
-        <div className="mb-6 text-center">
-          <h3 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">
+        <div className="mb-5 text-center">
+          <h3 className="mb-1.5 text-xl font-bold text-foreground md:text-2xl">
             Brzo zakazivanje
           </h3>
-          <p className="text-sm text-muted-foreground md:text-base">
+          <p className="text-sm text-muted-foreground md:text-sm">
             Popunite formu i dobijte potvrdu na email
           </p>
         </div>
 
-        <div className="space-y-5">
-          {[User, Mail, Phone].map((Icon, index) => (
-            <div key={index} className="relative">
-              <div className="flex items-center gap-3 rounded-2xl border border-border/50 bg-background/50 px-4 py-3.5 opacity-60">
-                <div className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                  {index + 1}
+        <div className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-2">
+            {skeletonInputIcons.map(({ key, icon: Icon }, index) => (
+              <div key={key} className="relative">
+                <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-background/50 px-3.5 py-3 opacity-60">
+                  <div className="flex size-5 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
+                    {index + 1}
+                  </div>
+                  <Icon className="size-5 text-muted-foreground" />
+                  <Skeleton className="h-4 w-32" />
                 </div>
-                <Icon className="size-5 text-muted-foreground" />
-                <Skeleton className="h-5 w-40" />
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
 
           <div>
             <div className="mb-2 flex items-center gap-3">
@@ -40,7 +48,7 @@ export function BookingSectionSkeleton() {
               </span>
             </div>
 
-            <div className="rounded-2xl border border-border/50 bg-background/50 p-4 opacity-60">
+            <div className="rounded-xl border border-border/50 bg-background/50 p-3 opacity-60">
               <div className="mb-4 flex items-center justify-between">
                 <Skeleton className="h-5 w-24" />
                 <div className="flex gap-2">
@@ -56,7 +64,7 @@ export function BookingSectionSkeleton() {
                 {Array.from({ length: 35 }).map((_, i) => (
                   <Skeleton
                     key={`cell-${i}`}
-                    className="mx-auto size-8 rounded-full"
+                    className="mx-auto size-7 rounded-full"
                   />
                 ))}
               </div>
@@ -85,7 +93,7 @@ export function BookingSectionSkeleton() {
               </span>
             </div>
 
-            <Skeleton className="h-20 w-full rounded-xl" />
+            <Skeleton className="h-16 w-full rounded-xl" />
           </div>
 
           <div className="pt-2">
@@ -93,8 +101,8 @@ export function BookingSectionSkeleton() {
               type="button"
               disabled
               className={cn(
-                'group relative h-14 w-full overflow-hidden rounded-2xl',
-                'gradient-primary text-base font-semibold text-white',
+                'group relative h-12 w-full overflow-hidden rounded-xl',
+                'gradient-primary text-sm font-semibold text-white',
                 'shadow-soft',
                 'disabled:cursor-not-allowed disabled:opacity-60'
               )}
@@ -107,7 +115,7 @@ export function BookingSectionSkeleton() {
           </div>
         </div>
 
-        <div className="mt-6 border-t border-border/30 pt-5">
+        <div className="mt-5 border-t border-border/30 pt-4">
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
             <div className="flex items-center gap-2.5 text-sm">
               <div className="flex size-8 items-center justify-center rounded-full bg-primary/10">

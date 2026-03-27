@@ -56,6 +56,8 @@ interface BookingFormProps {
   defaultPhone?: string;
   onSuccess?: () => void;
   hideHeader?: boolean;
+  compact?: boolean;
+  className?: string;
 }
 
 const today = startOfDay(new Date());
@@ -67,6 +69,8 @@ export default function BookingForm({
   defaultPhone = '',
   onSuccess: onSuccessCallback,
   hideHeader = false,
+  compact = false,
+  className,
 }: BookingFormProps = {}) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
@@ -186,7 +190,13 @@ export default function BookingForm({
 
   if (isSuccess) {
     return (
-      <div className="section-shell relative overflow-hidden border-border/40 p-4 md:p-8">
+      <div
+        className={cn(
+          'section-shell relative overflow-hidden border-border/40 p-4 md:p-8',
+          compact && 'mx-auto max-w-[46rem] p-4 md:p-6',
+          className
+        )}
+      >
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.05] via-transparent to-accent/[0.08]" />
 
         <div className="relative z-10 flex flex-col items-center justify-center py-12 text-center">
@@ -218,86 +228,117 @@ export default function BookingForm({
   }
 
   return (
-    <div className="section-shell relative overflow-hidden border-border/40 p-4 md:p-8">
+    <div
+      className={cn(
+        'section-shell relative overflow-hidden border-border/40 p-4 md:p-8',
+        compact && 'mx-auto max-w-[46rem] p-4 md:p-6',
+        className
+      )}
+    >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-accent/[0.08]" />
 
       <div className="relative z-10">
         {!hideHeader && (
-          <div className="mb-6 text-center animate-fade-up">
-            <h3 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">
+          <div
+            className={cn(
+              'animate-fade-up text-center',
+              compact ? 'mb-5' : 'mb-6'
+            )}
+          >
+            <h3
+              className={cn(
+                'font-bold text-foreground',
+                compact
+                  ? 'mb-1.5 text-xl md:text-2xl'
+                  : 'mb-2 text-2xl md:text-3xl'
+              )}
+            >
               Brzo zakazivanje
             </h3>
-            <p className="text-sm text-muted-foreground md:text-base">
+            <p
+              className={cn(
+                'text-sm text-muted-foreground',
+                compact ? 'md:text-sm' : 'md:text-base'
+              )}
+            >
               Popunite formu i dobićete potvrdu prijema na email
             </p>
           </div>
         )}
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-          <Controller
-            name="name"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <FloatingInput
-                id="booking-name"
-                label="Ime i prezime"
-                type="text"
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                icon={<User className="size-5" />}
-                step={1}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
-                disabled={!!patientId}
-                placeholder="Vaše ime i prezime"
-              />
-            )}
-          />
-
-          {!patientId && (
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className={cn(compact ? 'space-y-4' : 'space-y-5')}
+        >
+          <div className={cn(compact && 'grid gap-3 md:grid-cols-2')}>
             <Controller
-              name="email"
+              name="name"
               control={form.control}
               render={({ field, fieldState }) => (
                 <FloatingInput
-                  id="booking-email"
-                  label="Email adresa"
-                  type="email"
-                  value={field.value ?? ''}
+                  id="booking-name"
+                  label="Ime i prezime"
+                  type="text"
+                  value={field.value}
                   onChange={field.onChange}
                   onBlur={field.onBlur}
-                  icon={<Mail className="size-5" />}
-                  step={2}
+                  icon={<User className="size-5" />}
+                  step={1}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
-                  disabled={isPendingData}
-                  placeholder="vas@email.com"
+                  disabled={!!patientId}
+                  placeholder="Vaše ime i prezime"
+                  compact={compact}
                 />
               )}
             />
-          )}
 
-          <Controller
-            name="phone"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <FloatingInput
-                id="booking-phone"
-                label="Broj telefona"
-                type="tel"
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                icon={<Phone className="size-5" />}
-                step={patientId ? 2 : 3}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
-                disabled={!!patientId || isPendingData}
-                placeholder="060 123 4567"
+            {!patientId && (
+              <Controller
+                name="email"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FloatingInput
+                    id="booking-email"
+                    label="Email adresa"
+                    type="email"
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    icon={<Mail className="size-5" />}
+                    step={2}
+                    isInvalid={fieldState.invalid}
+                    errorMessage={fieldState.error?.message}
+                    disabled={isPendingData}
+                    placeholder="vas@email.com"
+                    compact={compact}
+                  />
+                )}
               />
             )}
-          />
+
+            <Controller
+              name="phone"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <FloatingInput
+                  id="booking-phone"
+                  label="Broj telefona"
+                  type="tel"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  icon={<Phone className="size-5" />}
+                  step={patientId ? 2 : 3}
+                  isInvalid={fieldState.invalid}
+                  errorMessage={fieldState.error?.message}
+                  disabled={!!patientId || isPendingData}
+                  placeholder="060 123 4567"
+                  compact={compact}
+                />
+              )}
+            />
+          </div>
 
           <div
             className="animate-fade-up"
@@ -322,6 +363,7 @@ export default function BookingForm({
               disabledDaysOfWeek={closedDaysOfWeek}
               disabled={isPendingData}
               isLoadingSlots={isLoadingTimeSlots}
+              density={compact ? 'compact' : 'default'}
             />
 
             {(form.formState.errors.date || form.formState.errors.time) && (
@@ -354,7 +396,10 @@ export default function BookingForm({
                   {...field}
                   id="booking-symptoms"
                   placeholder="Opišite vaše simptome ili razlog posete..."
-                  className="min-h-20 resize-none"
+                  className={cn(
+                    compact ? 'min-h-16' : 'min-h-20',
+                    'resize-none'
+                  )}
                   disabled={isPendingData}
                 />
               )}
@@ -369,8 +414,11 @@ export default function BookingForm({
               type="submit"
               disabled={isSubmitting || isPendingData}
               className={cn(
-                'group relative h-14 w-full overflow-hidden rounded-2xl',
-                'gradient-primary text-base font-semibold text-white',
+                'group relative w-full overflow-hidden font-semibold text-white',
+                compact
+                  ? 'h-12 rounded-xl text-sm'
+                  : 'h-14 rounded-2xl text-base',
+                'gradient-primary',
                 'shadow-soft hover:shadow-hover',
                 'transition-all duration-300',
                 'hover:scale-[1.02] active:scale-[0.98]',
@@ -399,7 +447,10 @@ export default function BookingForm({
         </form>
 
         <div
-          className="mt-6 border-t border-border/30 pt-5 animate-fade-up"
+          className={cn(
+            'mt-6 border-t border-border/30 pt-5 animate-fade-up',
+            compact && 'mt-5 pt-4'
+          )}
           style={{ animationDelay: '360ms', animationFillMode: 'both' }}
         >
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">

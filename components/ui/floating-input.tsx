@@ -17,6 +17,7 @@ interface FloatingInputProps {
   errorMessage?: string;
   disabled?: boolean;
   placeholder?: string;
+  compact?: boolean;
 }
 
 function FloatingInput({
@@ -32,6 +33,7 @@ function FloatingInput({
   errorMessage,
   disabled,
   placeholder,
+  compact = false,
 }: FloatingInputProps) {
   const isFilled = value.length > 0;
 
@@ -40,13 +42,23 @@ function FloatingInput({
       className="group animate-fade-up"
       style={{ animationDelay: `${step * 100}ms`, animationFillMode: 'both' }}
     >
-      <div className="mb-2 flex items-center gap-3">
-        <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+      <div
+        className={cn('flex items-center gap-3', compact ? 'mb-1.5' : 'mb-2')}
+      >
+        <span
+          className={cn(
+            'flex items-center justify-center rounded-full bg-primary/10 font-semibold text-primary',
+            compact ? 'size-5 text-[10px]' : 'size-6 text-xs'
+          )}
+        >
           {step}
         </span>
         <label
           htmlFor={id}
-          className="text-sm font-medium text-foreground/80 transition-colors group-focus-within:text-primary"
+          className={cn(
+            'font-medium text-foreground/80 transition-colors group-focus-within:text-primary',
+            compact ? 'text-xs' : 'text-sm'
+          )}
         >
           {label}
         </label>
@@ -55,7 +67,8 @@ function FloatingInput({
       <div className="relative">
         <div
           className={cn(
-            'absolute left-4 top-1/2 z-10 -translate-y-1/2 transition-all duration-300',
+            'absolute top-1/2 z-10 -translate-y-1/2 transition-all duration-300',
+            compact ? 'left-3.5' : 'left-4',
             'text-muted-foreground group-focus-within:text-primary',
             isInvalid && 'text-destructive'
           )}
@@ -73,10 +86,13 @@ function FloatingInput({
           placeholder={placeholder}
           aria-invalid={isInvalid}
           className={cn(
-            'peer h-12 w-full rounded-2xl pl-12 pr-4',
+            'peer w-full pr-4',
+            compact
+              ? 'h-11 rounded-xl pl-11 text-sm'
+              : 'h-12 rounded-2xl pl-12 text-base',
             'bg-background/50 backdrop-blur-sm',
             'border-2 border-border/50',
-            'text-base text-foreground placeholder:text-muted-foreground/60',
+            'text-foreground placeholder:text-muted-foreground/60',
             'transition-all duration-300',
             'focus:border-primary/50 focus:outline-none',
             'focus:bg-background/80 focus:shadow-[0_0_0_4px_rgba(3,144,159,0.14)]',
@@ -97,7 +113,12 @@ function FloatingInput({
       </div>
 
       {isInvalid && errorMessage && (
-        <p className="animate-fade-in mt-2 flex items-center gap-1.5 text-sm text-destructive">
+        <p
+          className={cn(
+            'animate-fade-in mt-2 flex items-center gap-1.5 text-destructive',
+            compact ? 'text-xs' : 'text-sm'
+          )}
+        >
           <span className="inline-block size-1 rounded-full bg-destructive" />
           {errorMessage}
         </p>

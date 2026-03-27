@@ -22,21 +22,26 @@ function Calendar({
   showOutsideDays = true,
   captionLayout = 'label',
   buttonVariant = 'ghost',
+  density = 'default',
   formatters,
   components,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>['variant'];
+  density?: 'default' | 'compact';
 }) {
   const defaultClassNames = getDefaultClassNames();
+  const isCompact = density === 'compact';
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
         'bg-background group/calendar p-3 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',
-        String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
-        String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
+        isCompact &&
+          'p-2.5 [--cell-size:--spacing(6.5)] sm:[--cell-size:--spacing(6.75)]',
+        'rtl:**:[.rdp-button\\_next>svg]:rotate-180',
+        'rtl:**:[.rdp-button\\_previous>svg]:rotate-180',
         className
       )}
       captionLayout={captionLayout}
@@ -49,9 +54,14 @@ function Calendar({
         root: cn('w-fit', defaultClassNames.root),
         months: cn(
           'flex gap-4 flex-col md:flex-row relative',
+          isCompact && 'gap-3',
           defaultClassNames.months
         ),
-        month: cn('flex flex-col w-full gap-4', defaultClassNames.month),
+        month: cn(
+          'flex flex-col w-full gap-4',
+          isCompact && 'gap-3',
+          defaultClassNames.month
+        ),
         nav: cn(
           'flex items-center gap-1 w-full absolute top-0 inset-x-0 justify-between',
           defaultClassNames.nav
@@ -59,19 +69,23 @@ function Calendar({
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
           'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none',
+          isCompact && 'size-[calc(var(--cell-size)-0.125rem)]',
           defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
           'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none',
+          isCompact && 'size-[calc(var(--cell-size)-0.125rem)]',
           defaultClassNames.button_next
         ),
         month_caption: cn(
           'flex items-center justify-center h-(--cell-size) w-full px-(--cell-size)',
+          isCompact && 'px-[calc(var(--cell-size)+0.375rem)]',
           defaultClassNames.month_caption
         ),
         dropdowns: cn(
           'w-full flex items-center text-sm font-medium justify-center h-(--cell-size) gap-1.5',
+          isCompact && 'text-xs sm:text-sm',
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
@@ -87,15 +101,21 @@ function Calendar({
           captionLayout === 'label'
             ? 'text-sm'
             : 'cn-calendar-caption-label rounded-(--cell-radius) flex items-center gap-1 text-sm  [&>svg]:text-muted-foreground [&>svg]:size-3.5',
+          isCompact && 'text-xs sm:text-sm',
           defaultClassNames.caption_label
         ),
         table: 'w-full border-collapse',
         weekdays: cn('flex', defaultClassNames.weekdays),
         weekday: cn(
           'text-muted-foreground rounded-(--cell-radius) flex-1 font-normal text-[0.8rem] select-none',
+          isCompact && 'text-[0.7rem]',
           defaultClassNames.weekday
         ),
-        week: cn('flex w-full mt-2', defaultClassNames.week),
+        week: cn(
+          'flex w-full mt-2',
+          isCompact && 'mt-1.5',
+          defaultClassNames.week
+        ),
         week_number_header: cn(
           'select-none w-(--cell-size)',
           defaultClassNames.week_number_header
@@ -122,6 +142,7 @@ function Calendar({
         ),
         today: cn(
           'bg-muted text-foreground rounded-(--cell-radius) data-[selected=true]:rounded-none',
+          'data-[selected=true]:bg-transparent',
           defaultClassNames.today
         ),
         outside: cn(
