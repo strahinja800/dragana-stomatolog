@@ -47,11 +47,11 @@ export function PublicNavbarMobile({
       <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <SheetContent
           side="right"
-          className="flex w-[86vw] max-w-sm flex-col gap-0 overflow-hidden border-l-0 p-0"
+          className="flex w-[86vw] max-w-sm flex-col gap-0 overflow-hidden border-0 data-[side=right]:border-l-0 p-0"
         >
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
 
-          <SheetHeader className="relative border-b border-border/50 bg-gradient-to-r from-primary/10 to-transparent px-6 py-5">
+          <SheetHeader className="relative border-b border-primary-strong/70 bg-primary/96 px-6 py-5 shadow-[0_14px_34px_-20px_rgba(1,111,126,0.95)] backdrop-blur-xl">
             <div className="flex items-center gap-3">
               <Image
                 src={logoIcon}

@@ -61,7 +61,7 @@ export function StatsCards({
         <Card
           key={stat.key}
           className={cn(
-            'group cursor-default overflow-hidden border-0 shadow-card transition-all duration-300',
+            'group cursor-default overflow-hidden border-0 py-0 shadow-card transition-all duration-300',
             'hover:-translate-y-1 hover:shadow-hover'
           )}
           style={{ animationDelay: `${index * 100}ms` }}
