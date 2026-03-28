@@ -28,13 +28,17 @@ import {
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
-const getBookingFormSchema = (requiresEmail: boolean) =>
+const getBookingFormSchema = (requiresEmail: boolean, requiresContactInfo: boolean) =>
   z.object({
-    name: z.string().min(1, 'Ime je obavezno'),
+    name: requiresContactInfo
+      ? z.string().min(1, 'Ime je obavezno')
+      : z.string().optional(),
     email: requiresEmail
       ? z.string().email('Unesite validnu email adresu')
       : z.string().optional(),
-    phone: z.string().min(1, 'Broj telefona je obavezan'),
+    phone: requiresContactInfo
+      ? z.string().min(1, 'Broj telefona je obavezan')
+      : z.string().optional(),
     date: z.date({ error: 'Datum je obavezan' }),
     time: z.string().min(1, 'Vreme je obavezno'),
     symptoms: z.string().optional(),
@@ -78,6 +82,7 @@ export default function BookingForm({
   );
 
   const requiresEmail = !patientId;
+  const requiresContactInfo = !patientId;
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -115,7 +120,7 @@ export default function BookingForm({
   };
 
   const form = useForm<BookingFormInput>({
-    resolver: zodResolver(getBookingFormSchema(requiresEmail)) as never,
+    resolver: zodResolver(getBookingFormSchema(requiresEmail, requiresContactInfo)) as never,
     defaultValues: {
       name: defaultName,
       email: defaultEmail,
@@ -270,30 +275,30 @@ export default function BookingForm({
           onSubmit={form.handleSubmit(onSubmit)}
           className={cn(compact ? 'space-y-4' : 'space-y-5')}
         >
-          <div className={cn(compact && 'grid gap-3 md:grid-cols-2')}>
-            <Controller
-              name="name"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <FloatingInput
-                  id="booking-name"
-                  label="Ime i prezime"
-                  type="text"
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  icon={<User className="size-5" />}
-                  step={1}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  disabled={!!patientId}
-                  placeholder="Vaše ime i prezime"
-                  compact={compact}
-                />
-              )}
-            />
+          {!patientId && (
+            <div className={cn(compact && 'grid gap-3 md:grid-cols-2')}>
+              <Controller
+                name="name"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FloatingInput
+                    id="booking-name"
+                    label="Ime i prezime"
+                    type="text"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    icon={<User className="size-5" />}
+                    step={1}
+                    isInvalid={fieldState.invalid}
+                    errorMessage={fieldState.error?.message}
+                    disabled={isPendingData}
+                    placeholder="Vaše ime i prezime"
+                    compact={compact}
+                  />
+                )}
+              />
 
-            {!patientId && (
               <Controller
                 name="email"
                 control={form.control}
@@ -315,30 +320,30 @@ export default function BookingForm({
                   />
                 )}
               />
-            )}
 
-            <Controller
-              name="phone"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <FloatingInput
-                  id="booking-phone"
-                  label="Broj telefona"
-                  type="tel"
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  icon={<Phone className="size-5" />}
-                  step={patientId ? 2 : 3}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  disabled={!!patientId || isPendingData}
-                  placeholder="060 123 4567"
-                  compact={compact}
-                />
-              )}
-            />
-          </div>
+              <Controller
+                name="phone"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FloatingInput
+                    id="booking-phone"
+                    label="Broj telefona"
+                    type="tel"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    icon={<Phone className="size-5" />}
+                    step={3}
+                    isInvalid={fieldState.invalid}
+                    errorMessage={fieldState.error?.message}
+                    disabled={isPendingData}
+                    placeholder="060 123 4567"
+                    compact={compact}
+                  />
+                )}
+              />
+            </div>
+          )}
 
           <div
             className="animate-fade-up"
@@ -346,7 +351,7 @@ export default function BookingForm({
           >
             <div className="mb-2 flex items-center gap-3">
               <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                {patientId ? 3 : 4}
+                {patientId ? 1 : 4}
               </span>
               <span className="text-sm font-medium text-foreground/80">
                 Izaberite datum i vreme
@@ -381,7 +386,7 @@ export default function BookingForm({
           >
             <div className="mb-2 flex items-center gap-3">
               <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                {patientId ? 4 : 5}
+                {patientId ? 2 : 5}
               </span>
               <span className="text-sm font-medium text-foreground/80">
                 Opišite simptome (opciono)
