@@ -28,13 +28,17 @@ import {
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
-const getBookingFormSchema = (requiresEmail: boolean) =>
+const getBookingFormSchema = (requiresEmail: boolean, requiresContactInfo: boolean) =>
   z.object({
-    name: z.string().min(1, 'Ime je obavezno'),
+    name: requiresContactInfo
+      ? z.string().min(1, 'Ime je obavezno')
+      : z.string().optional(),
     email: requiresEmail
       ? z.string().email('Unesite validnu email adresu')
       : z.string().optional(),
-    phone: z.string().min(1, 'Broj telefona je obavezan'),
+    phone: requiresContactInfo
+      ? z.string().min(1, 'Broj telefona je obavezan')
+      : z.string().optional(),
     date: z.date({ error: 'Datum je obavezan' }),
     time: z.string().min(1, 'Vreme je obavezno'),
     symptoms: z.string().optional(),
@@ -78,6 +82,7 @@ export default function BookingForm({
   );
 
   const requiresEmail = !patientId;
+  const requiresContactInfo = !patientId;
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -115,7 +120,7 @@ export default function BookingForm({
   };
 
   const form = useForm<BookingFormInput>({
-    resolver: zodResolver(getBookingFormSchema(requiresEmail)) as never,
+    resolver: zodResolver(getBookingFormSchema(requiresEmail, requiresContactInfo)) as never,
     defaultValues: {
       name: defaultName,
       email: defaultEmail,
