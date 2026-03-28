@@ -96,7 +96,7 @@ export function PatientsTable({ data, onDeletePatient }: PatientsTableProps) {
                     key={header.id}
                     className={cn(
                       header.column.id === 'actions' &&
-                        'w-12 sticky right-0 z-10 bg-white dark:bg-background'
+                        'w-16 sticky right-0 z-10 bg-white dark:bg-background'
                     )}
                   >
                     {header.isPlaceholder
@@ -123,7 +123,7 @@ export function PatientsTable({ data, onDeletePatient }: PatientsTableProps) {
                       key={cell.id}
                       className={cn(
                         cell.column.id === 'actions' &&
-                          'sticky right-0 bg-white dark:bg-background group-hover:bg-muted'
+                          'sticky right-0 z-10 bg-background group-hover:bg-muted/50 group-data-[state=selected]:bg-muted'
                       )}
                     >
                       {flexRender(
