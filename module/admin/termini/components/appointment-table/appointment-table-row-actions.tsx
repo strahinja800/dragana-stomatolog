@@ -29,11 +29,7 @@ export function AppointmentTableRowActions({
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-8 mx-auto flex"
-          >
+          <Button variant="ghost" size="icon" className="size-8 mx-auto flex">
             <MoreHorizontal className="size-4" />
             <span className="sr-only">Otvori meni</span>
           </Button>
@@ -66,11 +62,7 @@ export function AppointmentTableRowActions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-8 mx-auto flex"
-        >
+        <Button variant="ghost" size="icon" className="size-8 mx-auto flex">
           <MoreHorizontal className="size-4" />
           <span className="sr-only">Otvori meni</span>
         </Button>

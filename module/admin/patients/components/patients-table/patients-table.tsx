@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 
 import { columns, type Patient } from './patients-table-columns';
 import { PatientsTableToolbar } from './patients-table-toolbar';
@@ -91,7 +92,13 @@ export function PatientsTable({ data, onDeletePatient }: PatientsTableProps) {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    className={cn(
+                      header.column.id === 'actions' &&
+                        'w-16 sticky right-0 z-10 bg-white dark:bg-background'
+                    )}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -109,9 +116,16 @@ export function PatientsTable({ data, onDeletePatient }: PatientsTableProps) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  className="group"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        cell.column.id === 'actions' &&
+                          'sticky right-0 z-10 bg-background group-hover:bg-muted/50 group-data-[state=selected]:bg-muted'
+                      )}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
