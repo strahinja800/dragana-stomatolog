@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
+import { Prisma } from '@/lib/generated/prisma/client';
 import {
   createPatientSchema,
   getPatientByIdSchema,
@@ -212,28 +213,45 @@ export const patientRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
 
-      const patient = await ctx.prisma.patient.update({
-        where: { id },
-        data: {
-          ...(data.firstName !== undefined && { firstName: data.firstName }),
-          ...(data.lastName !== undefined && { lastName: data.lastName }),
-          ...(data.email !== undefined && { email: data.email || null }),
-          ...(data.phone !== undefined && { phone: data.phone || null }),
-          ...(data.dateOfBirth !== undefined && {
-            dateOfBirth: data.dateOfBirth || null,
-          }),
-          ...(data.gender !== undefined && { gender: data.gender || null }),
-          ...(data.allergies !== undefined && {
-            allergies: data.allergies || null,
-          }),
-          ...(data.medications !== undefined && {
-            medications: data.medications || null,
-          }),
-          ...(data.notes !== undefined && { notes: data.notes || null }),
-        },
-      });
+      try {
+        const patient = await ctx.prisma.patient.update({
+          where: { id },
+          data: {
+            ...(data.firstName !== undefined && { firstName: data.firstName }),
+            ...(data.lastName !== undefined && { lastName: data.lastName }),
+            ...(data.email !== undefined && { email: data.email || null }),
+            ...(data.phone !== undefined && { phone: data.phone || null }),
+            ...(data.dateOfBirth !== undefined && {
+              dateOfBirth: data.dateOfBirth || null,
+            }),
+            ...(data.gender !== undefined && { gender: data.gender || null }),
+            ...(data.allergies !== undefined && {
+              allergies: data.allergies || null,
+            }),
+            ...(data.medications !== undefined && {
+              medications: data.medications || null,
+            }),
+            ...(data.notes !== undefined && { notes: data.notes || null }),
+          },
+        });
 
-      return patient;
+        return patient;
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2002'
+        ) {
+          const metaStr = JSON.stringify(error.meta ?? '').toLowerCase();
+          const isEmail = metaStr.includes('email');
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: isEmail
+              ? 'Pacijent sa ovom email adresom već postoji'
+              : 'Pacijent sa ovim brojem telefona već postoji',
+          });
+        }
+        throw error;
+      }
     }),
 
   /**

@@ -22,6 +22,7 @@ import AppointmentTimeProposal, {
 } from '@/emails/appointment-time-proposal';
 import { sendEmail } from '@/lib/email/resend-client';
 import { emitAppointmentCreated } from '@/lib/events';
+import { Prisma } from '@/lib/generated/prisma/client';
 import {
   formatLocalTime,
   getCurrentLocalTimeMinutes,
@@ -213,12 +214,8 @@ export const appointmentRouter = createTRPCRouter({
         });
       }
 
-      // Create or find patient by phone
-      let patient = await ctx.prisma.patient.findFirst({
-        where: { phone: input.phone },
-      });
-
-      if (!patient) {
+      let patient;
+      try {
         patient = await ctx.prisma.patient.create({
           data: {
             firstName,
@@ -228,11 +225,21 @@ export const appointmentRouter = createTRPCRouter({
             isMain: false,
           },
         });
-      } else if (!patient.email) {
-        patient = await ctx.prisma.patient.update({
-          where: { id: patient.id },
-          data: { email: input.email },
-        });
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2002'
+        ) {
+          const metaStr = JSON.stringify(error.meta ?? '').toLowerCase();
+          const isEmail = metaStr.includes('email');
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: isEmail
+              ? 'Pacijent sa ovom email adresom već postoji'
+              : 'Pacijent sa ovim brojem telefona već postoji',
+          });
+        }
+        throw error;
       }
 
       // Create appointment
