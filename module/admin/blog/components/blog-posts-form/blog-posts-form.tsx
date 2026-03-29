@@ -240,18 +240,18 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
       <Drawer open={isOpen} onOpenChange={handleClose} direction="right">
         <DrawerContent className="h-screen data-[vaul-drawer-direction=right]:sm:max-w-3xl">
           <div className="flex h-full w-full flex-col">
-            <div className="flex-1 overflow-y-auto">
-              <DrawerHeader>
-                <DrawerTitle>
-                  {isEditMode ? 'Izmeni članak' : 'Novi članak'}
-                </DrawerTitle>
-                <DrawerDescription>
-                  {isEditMode
-                    ? 'Izmenite podatke postojećeg članka.'
-                    : 'Popunite formu za kreiranje novog članka.'}
-                </DrawerDescription>
-              </DrawerHeader>
+            <DrawerHeader className="border-b bg-background px-6 py-4">
+              <DrawerTitle className="text-lg font-semibold">
+                {isEditMode ? 'Izmeni članak' : 'Novi članak'}
+              </DrawerTitle>
+              <DrawerDescription>
+                {isEditMode
+                  ? 'Izmenite podatke postojećeg članka.'
+                  : 'Popunite formu za kreiranje novog članka.'}
+              </DrawerDescription>
+            </DrawerHeader>
 
+            <div className="flex-1 overflow-y-auto">
               {isEditMode && isLoadingPost ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -259,170 +259,183 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
               ) : (
                 <form
                   id="blog-post-form"
-                  className="px-4 pb-4"
+                  className="space-y-4 p-4"
                   onSubmit={handleSubmit(onSubmit)}
                 >
-                  <FieldGroup>
-                    {/* Naslov */}
-                    <Controller
-                      name="title"
-                      control={control}
-                      render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                          <FieldLabel>Naslov *</FieldLabel>
-                          <Tiptap
-                            placeholder="Unesite naslov članka..."
-                            className="h-28 py-2"
-                            toolbarPreset="minimal"
-                            content={field.value}
-                            onChange={field.onChange}
-                          />
-                          {fieldState.invalid && (
-                            <FieldError errors={[fieldState.error]} />
-                          )}
-                        </Field>
-                      )}
-                    />
-
-                    {/* Sadržaj */}
-                    <Controller
-                      name="content"
-                      control={control}
-                      render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                          <FieldLabel>Sadržaj *</FieldLabel>
-                          <Tiptap
-                            placeholder="Zapocnite pisanje..."
-                            className="min-h-[300px]"
-                            toolbarPreset="full"
-                            content={field.value}
-                            onChange={field.onChange}
-                          />
-                          {fieldState.invalid && (
-                            <FieldError errors={[fieldState.error]} />
-                          )}
-                        </Field>
-                      )}
-                    />
-
-                    {/* Istaknuta slika */}
-                    <Field>
-                      <FieldLabel>Istaknuta slika</FieldLabel>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageSelect}
-                        className="hidden"
+                  {/* Sadržaj članka */}
+                  <div className="rounded-lg border p-4">
+                    <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      Sadržaj
+                    </p>
+                    <FieldGroup>
+                      <Controller
+                        name="title"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel>Naslov *</FieldLabel>
+                            <Tiptap
+                              placeholder="Unesite naslov članka..."
+                              className="h-28 bg-white py-2"
+                              toolbarPreset="minimal"
+                              content={field.value}
+                              onChange={field.onChange}
+                            />
+                            {fieldState.invalid && (
+                              <FieldError errors={[fieldState.error]} />
+                            )}
+                          </Field>
+                        )}
                       />
 
-                      {previewUrl ? (
-                        <div className="group relative w-full h-48 rounded-lg overflow-hidden border border-border">
-                          <Image
-                            src={previewUrl}
-                            alt="Preview"
-                            fill
-                            className="object-cover"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => fileInputRef.current?.click()}
-                            >
-                              <Upload className="mr-2 h-4 w-4" />
-                              Zameni
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              onClick={handleRemoveImage}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Ukloni
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="flex w-full flex-col items-center gap-3 rounded-lg border-2 border-dashed border-muted-foreground/25 px-6 py-10 text-center transition-colors hover:border-muted-foreground/50 hover:bg-muted/50"
-                        >
-                          <div className="rounded-full bg-muted p-3">
-                            <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium">
-                              Dodaj istaknutu sliku
-                            </p>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              PNG, JPG ili WebP
-                            </p>
-                          </div>
-                        </button>
-                      )}
-                    </Field>
+                      <Controller
+                        name="content"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel>Sadržaj *</FieldLabel>
+                            <Tiptap
+                              placeholder="Zapocnite pisanje..."
+                              className="min-h-[300px] bg-white"
+                              toolbarPreset="full"
+                              content={field.value}
+                              onChange={field.onChange}
+                            />
+                            {fieldState.invalid && (
+                              <FieldError errors={[fieldState.error]} />
+                            )}
+                          </Field>
+                        )}
+                      />
+                    </FieldGroup>
+                  </div>
 
-                    {/* Alt tekst slike */}
-                    <Controller
-                      name="imageAlt"
-                      control={control}
-                      render={({ field }) => (
-                        <Field>
-                          <FieldLabel>
-                            Alt tekst slike{' '}
-                            <span className="text-xs text-muted-foreground">
-                              (opciono)
-                            </span>
-                          </FieldLabel>
-                          <Input
-                            placeholder="Opis slike za pristupačnost..."
-                            {...field}
-                            value={field.value ?? ''}
-                          />
-                        </Field>
-                      )}
-                    />
+                  {/* Metadata */}
+                  <div className="rounded-lg border p-4">
+                    <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      Podešavanja
+                    </p>
+                    <FieldGroup>
+                      {/* Istaknuta slika */}
+                      <Field>
+                        <FieldLabel>Istaknuta slika</FieldLabel>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageSelect}
+                          className="hidden"
+                        />
 
-                    {/* Status */}
-                    <Controller
-                      name="status"
-                      control={control}
-                      render={({ field }) => (
-                        <Field>
-                          <FieldLabel>Status</FieldLabel>
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
+                        {previewUrl ? (
+                          <div className="group relative h-48 w-full overflow-hidden rounded-lg border border-border">
+                            <Image
+                              src={previewUrl}
+                              alt="Preview"
+                              fill
+                              className="object-cover"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => fileInputRef.current?.click()}
+                              >
+                                <Upload className="mr-2 h-4 w-4" />
+                                Zameni
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleRemoveImage}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Ukloni
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex w-full flex-col items-center gap-3 rounded-lg border-2 border-dashed border-muted-foreground/25 px-6 py-10 text-center transition-colors hover:border-muted-foreground/50 hover:bg-muted/50"
                           >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Izaberi status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="DRAFT">Draft</SelectItem>
-                              <SelectItem value="PUBLISHED">
-                                Objavljen
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </Field>
-                      )}
-                    />
-                  </FieldGroup>
+                            <div className="rounded-full bg-muted p-3">
+                              <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium">
+                                Dodaj istaknutu sliku
+                              </p>
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                PNG, JPG ili WebP
+                              </p>
+                            </div>
+                          </button>
+                        )}
+                      </Field>
+
+                      {/* Alt tekst slike */}
+                      <Controller
+                        name="imageAlt"
+                        control={control}
+                        render={({ field }) => (
+                          <Field>
+                            <FieldLabel>
+                              Alt tekst slike{' '}
+                              <span className="text-xs text-muted-foreground">
+                                (opciono)
+                              </span>
+                            </FieldLabel>
+                            <Input
+                              placeholder="Opis slike za pristupačnost..."
+                              className="bg-white"
+                              {...field}
+                              value={field.value ?? ''}
+                            />
+                          </Field>
+                        )}
+                      />
+
+                      {/* Status */}
+                      <Controller
+                        name="status"
+                        control={control}
+                        render={({ field }) => (
+                          <Field>
+                            <FieldLabel>Status</FieldLabel>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger className="bg-white">
+                                <SelectValue placeholder="Izaberi status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="DRAFT">Draft</SelectItem>
+                                <SelectItem value="PUBLISHED">
+                                  Objavljen
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </Field>
+                        )}
+                      />
+                    </FieldGroup>
+                  </div>
                 </form>
               )}
             </div>
 
-            <DrawerFooter className="border-t pt-4">
+            <DrawerFooter className="border-t px-6 py-4">
               <div className="flex items-center justify-between gap-2">
                 {isEditMode && (
                   <Button
                     type="button"
                     variant="ghost"
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                     disabled={isPending}
                     onClick={() => setShowDeleteConfirm(true)}
                   >
