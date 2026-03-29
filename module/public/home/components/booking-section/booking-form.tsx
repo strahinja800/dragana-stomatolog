@@ -143,6 +143,14 @@ export default function BookingForm({
             queryKey: trpc.appointment.getTimeSlotsForDate.queryKey(),
           });
         },
+        onError: (error) => {
+          const message = error.message;
+          if (message.includes('email')) {
+            form.setError('email', { message });
+          } else if (message.includes('telefon')) {
+            form.setError('phone', { message });
+          }
+        },
       })
     );
 

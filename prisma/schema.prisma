@@ -167,8 +167,8 @@ model Patient {
   user        User?     @relation(fields: [userId], references: [id])
   firstName   String
   lastName    String
-  email       String?
-  phone       String?
+  email       String?   @unique
+  phone       String?   @unique
   dateOfBirth DateTime?
   gender      Gender?
   allergies   String?

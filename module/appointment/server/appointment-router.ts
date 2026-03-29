@@ -5,6 +5,8 @@ import crypto from 'crypto';
 import { addHours, addMinutes, endOfDay, startOfDay } from 'date-fns';
 import { z } from 'zod';
 
+import { Prisma } from '@/lib/generated/prisma/client';
+
 import AdminNewAppointment, {
   subject as adminNewAppointmentSubject,
 } from '@/emails/admin-new-appointment';
@@ -213,12 +215,31 @@ export const appointmentRouter = createTRPCRouter({
         });
       }
 
-      // Create or find patient by phone
-      let patient = await ctx.prisma.patient.findFirst({
+      // Check for existing patient by phone or email
+      const existingByPhone = await ctx.prisma.patient.findFirst({
         where: { phone: input.phone },
       });
 
-      if (!patient) {
+      if (existingByPhone) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'Pacijent sa ovim brojem telefona već postoji',
+        });
+      }
+
+      const existingByEmail = await ctx.prisma.patient.findFirst({
+        where: { email: input.email },
+      });
+
+      if (existingByEmail) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'Pacijent sa ovom email adresom već postoji',
+        });
+      }
+
+      let patient;
+      try {
         patient = await ctx.prisma.patient.create({
           data: {
             firstName,
@@ -228,11 +249,21 @@ export const appointmentRouter = createTRPCRouter({
             isMain: false,
           },
         });
-      } else if (!patient.email) {
-        patient = await ctx.prisma.patient.update({
-          where: { id: patient.id },
-          data: { email: input.email },
-        });
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2002'
+        ) {
+          const metaStr = JSON.stringify(error.meta ?? '').toLowerCase();
+          const isEmail = metaStr.includes('email');
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: isEmail
+              ? 'Pacijent sa ovom email adresom već postoji'
+              : 'Pacijent sa ovim brojem telefona već postoji',
+          });
+        }
+        throw error;
       }
 
       // Create appointment
