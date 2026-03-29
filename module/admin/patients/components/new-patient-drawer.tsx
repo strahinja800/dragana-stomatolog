@@ -134,6 +134,7 @@ export function NewPatientDrawer({
                   </Label>
                   <Input
                     id="firstName"
+                    className="bg-white"
                     {...register('firstName', { required: 'Ime je obavezno' })}
                     placeholder="Marko"
                   />
@@ -150,6 +151,7 @@ export function NewPatientDrawer({
                   </Label>
                   <Input
                     id="lastName"
+                    className="bg-white"
                     {...register('lastName', {
                       required: 'Prezime je obavezno',
                     })}
@@ -170,6 +172,7 @@ export function NewPatientDrawer({
                   <Input
                     id="email"
                     type="email"
+                    className="bg-white"
                     {...register('email')}
                     placeholder="marko@example.com"
                   />
@@ -179,6 +182,7 @@ export function NewPatientDrawer({
                   <Label htmlFor="phone">Telefon</Label>
                   <Input
                     id="phone"
+                    className="bg-white"
                     {...register('phone')}
                     placeholder="+381 60 123 4567"
                   />
@@ -192,6 +196,7 @@ export function NewPatientDrawer({
                   <Input
                     id="dateOfBirth"
                     type="date"
+                    className="bg-white"
                     {...register('dateOfBirth')}
                   />
                 </div>
@@ -204,7 +209,7 @@ export function NewPatientDrawer({
                       setSelectedGender(value as 'MALE' | 'FEMALE')
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Izaberite pol" />
                     </SelectTrigger>
                     <SelectContent>
@@ -220,6 +225,7 @@ export function NewPatientDrawer({
                 <Label htmlFor="notes">Napomene</Label>
                 <Textarea
                   id="notes"
+                  className="bg-white"
                   {...register('notes')}
                   placeholder="Dodatne napomene o pacijentu..."
                   rows={3}
