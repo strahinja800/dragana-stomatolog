@@ -5,8 +5,6 @@ import crypto from 'crypto';
 import { addHours, addMinutes, endOfDay, startOfDay } from 'date-fns';
 import { z } from 'zod';
 
-import { Prisma } from '@/lib/generated/prisma/client';
-
 import AdminNewAppointment, {
   subject as adminNewAppointmentSubject,
 } from '@/emails/admin-new-appointment';
@@ -24,6 +22,7 @@ import AppointmentTimeProposal, {
 } from '@/emails/appointment-time-proposal';
 import { sendEmail } from '@/lib/email/resend-client';
 import { emitAppointmentCreated } from '@/lib/events';
+import { Prisma } from '@/lib/generated/prisma/client';
 import {
   formatLocalTime,
   getCurrentLocalTimeMinutes,

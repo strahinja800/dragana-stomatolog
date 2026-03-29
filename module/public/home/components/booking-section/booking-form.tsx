@@ -28,7 +28,10 @@ import {
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
-const getBookingFormSchema = (requiresEmail: boolean, requiresContactInfo: boolean) =>
+const getBookingFormSchema = (
+  requiresEmail: boolean,
+  requiresContactInfo: boolean
+) =>
   z.object({
     name: requiresContactInfo
       ? z.string().min(1, 'Ime je obavezno')
@@ -120,7 +123,9 @@ export default function BookingForm({
   };
 
   const form = useForm<BookingFormInput>({
-    resolver: zodResolver(getBookingFormSchema(requiresEmail, requiresContactInfo)) as never,
+    resolver: zodResolver(
+      getBookingFormSchema(requiresEmail, requiresContactInfo)
+    ) as never,
     defaultValues: {
       name: defaultName,
       email: defaultEmail,
