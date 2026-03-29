@@ -214,29 +214,6 @@ export const appointmentRouter = createTRPCRouter({
         });
       }
 
-      // Check for existing patient by phone or email
-      const existingByPhone = await ctx.prisma.patient.findFirst({
-        where: { phone: input.phone },
-      });
-
-      if (existingByPhone) {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: 'Pacijent sa ovim brojem telefona već postoji',
-        });
-      }
-
-      const existingByEmail = await ctx.prisma.patient.findFirst({
-        where: { email: input.email },
-      });
-
-      if (existingByEmail) {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: 'Pacijent sa ovom email adresom već postoji',
-        });
-      }
-
       let patient;
       try {
         patient = await ctx.prisma.patient.create({
