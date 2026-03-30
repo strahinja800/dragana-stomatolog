@@ -84,13 +84,6 @@ export function LoginForm() {
     );
   };
 
-  const handleGoogleLogin = () => {
-    console.log('Google login');
-    toast.info('Google login', {
-      description: 'Google login će biti dostupan uskoro',
-    });
-  };
-
   return (
     <Card className="w-full sm:max-w-md">
       <CardHeader className="text-center">
@@ -113,26 +106,6 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={handleGoogleLogin}
-          disabled={isPending}
-        >
-          <Image src="/logos/google.svg" width={20} height={20} alt="Google" />
-          Nastavi sa Google nalogom
-        </Button>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">ili</span>
-          </div>
-        </div>
-
         <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
