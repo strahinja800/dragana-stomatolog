@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { sr } from 'date-fns/locale';
+import { enUS,sr } from 'date-fns/locale';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +13,9 @@ import { ExternalLink, User, Users } from '@/constants/icons';
 import { useTRPC } from '@/trpc/client';
 
 export function DashboardRecentPatients() {
+  const t = useTranslations('admin.dashboard');
+  const locale = useLocale();
+  const dateLocale = locale === 'sr' ? sr : enUS;
   const trpc = useTRPC();
   const { data: patients } = useSuspenseQuery(
     trpc.patient.getRecent.queryOptions()
@@ -23,7 +27,7 @@ export function DashboardRecentPatients() {
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center gap-2 text-lg font-semibold">
             <Users className="size-5 text-emerald-500" />
-            Skorašnji pacijenti
+            {t('recentPatients')}
           </span>
           <Button
             variant="ghost"
@@ -33,7 +37,7 @@ export function DashboardRecentPatients() {
           >
             <Link href="/admin/patients">
               <ExternalLink className="size-3.5" />
-              Svi pacijenti
+              {t('allPatients')}
             </Link>
           </Button>
         </CardTitle>
@@ -54,9 +58,9 @@ export function DashboardRecentPatients() {
                     {patient.firstName} {patient.lastName}
                   </p>
                   <p className="truncate text-xs text-muted-foreground">
-                    {patient.phone ?? 'Bez broja'} ·{' '}
+                    {patient.phone ?? t('noPhone')} ·{' '}
                     {format(new Date(patient.createdAt), 'd. MMM yyyy.', {
-                      locale: sr,
+                      locale: dateLocale,
                     })}
                   </p>
                 </div>

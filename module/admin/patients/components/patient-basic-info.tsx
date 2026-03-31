@@ -1,3 +1,10 @@
+'use client';
+
+import { useLocale, useTranslations } from 'next-intl';
+
+import { format } from 'date-fns';
+import { enUS, sr } from 'date-fns/locale';
+
 import {
   Card,
   CardContent,
@@ -46,64 +53,78 @@ function InfoField({
 }
 
 export function PatientBasicInfo({ patient }: PatientBasicInfoProps) {
+  const t = useTranslations('admin.patients');
+  const locale = useLocale();
+  const dateLocale = locale === 'sr' ? sr : enUS;
+
   const genderLabel =
     patient.gender === 'MALE'
-      ? 'Muški'
+      ? t('male')
       : patient.gender === 'FEMALE'
-        ? 'Ženski'
+        ? t('female')
         : null;
 
   const dateOfBirthLabel = patient.dateOfBirth
-    ? new Date(patient.dateOfBirth).toLocaleDateString('sr-RS')
+    ? format(new Date(patient.dateOfBirth), 'd. MMMM yyyy.', {
+        locale: dateLocale,
+      })
     : null;
 
   const statusLabel = patient.isMain
-    ? 'Glavni pacijent'
-    : 'Sekundarni pacijent';
+    ? t('primaryPatient')
+    : t('secondaryPatient');
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Osnovni podaci</CardTitle>
-        <CardDescription>Lične informacije pacijenta</CardDescription>
+        <CardTitle>{t('basicInfo')}</CardTitle>
+        <CardDescription>{t('basicInfoDescription')}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-2">
-        <InfoField icon={User} label="Ime" value={patient.firstName} />
-        <InfoField icon={User} label="Prezime" value={patient.lastName} />
+        <InfoField
+          icon={User}
+          label={t('firstName')}
+          value={patient.firstName}
+        />
+        <InfoField icon={User} label={t('lastName')} value={patient.lastName} />
         {patient.email && (
-          <InfoField icon={Mail} label="Email" value={patient.email} />
+          <InfoField icon={Mail} label={t('email')} value={patient.email} />
         )}
         {patient.phone && (
-          <InfoField icon={Phone} label="Telefon" value={patient.phone} />
+          <InfoField icon={Phone} label={t('phone')} value={patient.phone} />
         )}
         {dateOfBirthLabel && (
           <InfoField
             icon={Calendar}
-            label="Datum rođenja"
+            label={t('dateOfBirth')}
             value={dateOfBirthLabel}
           />
         )}
         {genderLabel && (
-          <InfoField icon={Users} label="Pol" value={genderLabel} />
+          <InfoField icon={Users} label={t('gender')} value={genderLabel} />
         )}
         {patient.allergies && (
           <InfoField
             icon={AlertCircle}
-            label="Alergije"
+            label={t('allergies')}
             value={patient.allergies}
           />
         )}
         {patient.medications && (
           <InfoField
             icon={Pill}
-            label="Terapija/Lekovi"
+            label={t('medications')}
             value={patient.medications}
           />
         )}
-        <InfoField icon={ShieldCheck} label="Status" value={statusLabel} />
+        <InfoField icon={ShieldCheck} label={t('status')} value={statusLabel} />
         {patient.notes && (
           <div className="md:col-span-2">
-            <InfoField icon={FileText} label="Napomene" value={patient.notes} />
+            <InfoField
+              icon={FileText}
+              label={t('notes')}
+              value={patient.notes}
+            />
           </div>
         )}
       </CardContent>

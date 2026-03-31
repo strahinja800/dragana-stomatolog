@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -30,12 +31,13 @@ import { logoNegativ } from '@/data/data';
 import { authClient } from '@/lib/auth-client';
 import { parseAuthError } from '@/module/auth/lib/auth-error-handler';
 import {
+  createRegisterSchema,
   type RegisterFormSchemaInputs,
-  registerSchema,
 } from '@/module/auth/types/auth-schema';
 import { useTRPC } from '@/trpc/client';
 
 export function RegisterForm() {
+  const t = useTranslations();
   const router = useRouter();
   const [serverError, setServerError] = useState<{
     message: string;
@@ -43,7 +45,7 @@ export function RegisterForm() {
   } | null>(null);
 
   const form = useForm<RegisterFormSchemaInputs>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(createRegisterSchema(t)),
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -71,8 +73,10 @@ export function RegisterForm() {
       },
       {
         onSuccess: async (response) => {
-          toast.success('Uspešna registracija!', {
-            description: `Dobrodošli, ${response.data.user.name}`,
+          toast.success(t('auth.register.successTitle'), {
+            description: t('auth.register.successDescription', {
+              name: response.data.user.name,
+            }),
           });
 
           try {
@@ -89,7 +93,7 @@ export function RegisterForm() {
         },
         onError: (ctx) => {
           console.log('Register error', ctx);
-          const error = parseAuthError(ctx);
+          const error = parseAuthError(ctx, t);
 
           setServerError({
             message: error.message,
@@ -118,10 +122,8 @@ export function RegisterForm() {
             DENTALHOLIST
           </span>
         </Link>
-        <CardTitle>Registrujte se</CardTitle>
-        <CardDescription>
-          Kreirajte nalog za pristup svim funkcijama
-        </CardDescription>
+        <CardTitle>{t('auth.register.title')}</CardTitle>
+        <CardDescription>{t('auth.register.description')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <form id="register-form" onSubmit={form.handleSubmit(onSubmit)}>
@@ -131,13 +133,15 @@ export function RegisterForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="register-firstName">Ime</FieldLabel>
+                  <FieldLabel htmlFor="register-firstName">
+                    {t('auth.register.firstNameLabel')}
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="register-firstName"
                     type="text"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Marko"
+                    placeholder={t('auth.register.firstNamePlaceholder')}
                     autoComplete="given-name"
                     disabled={isPending}
                   />
@@ -152,13 +156,15 @@ export function RegisterForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="register-lastName">Prezime</FieldLabel>
+                  <FieldLabel htmlFor="register-lastName">
+                    {t('auth.register.lastNameLabel')}
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="register-lastName"
                     type="text"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Marković"
+                    placeholder={t('auth.register.lastNamePlaceholder')}
                     autoComplete="family-name"
                     disabled={isPending}
                   />
@@ -178,21 +184,19 @@ export function RegisterForm() {
                 return (
                   <Field data-invalid={hasError}>
                     <FieldLabel htmlFor="register-email">
-                      Email adresa
+                      {t('auth.register.emailLabel')}
                     </FieldLabel>
                     <Input
                       {...field}
                       id="register-email"
                       type="email"
                       aria-invalid={hasError}
-                      placeholder="vas@email.com"
+                      placeholder={t('auth.register.emailPlaceholder')}
                       autoComplete="email"
                       disabled={isPending}
                       onChange={(e) => {
                         field.onChange(e);
-                        if (serverError?.isEmailError) {
-                          setServerError(null);
-                        }
+                        if (serverError?.isEmailError) setServerError(null);
                       }}
                     />
                     {fieldState.invalid && (
@@ -211,7 +215,9 @@ export function RegisterForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="register-password">Lozinka</FieldLabel>
+                  <FieldLabel htmlFor="register-password">
+                    {t('auth.register.passwordLabel')}
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="register-password"
@@ -234,7 +240,7 @@ export function RegisterForm() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="register-confirm-password">
-                    Potvrdite lozinku
+                    {t('auth.register.confirmPasswordLabel')}
                   </FieldLabel>
                   <Input
                     {...field}
@@ -261,15 +267,17 @@ export function RegisterForm() {
           className="w-full"
           disabled={isPending}
         >
-          {isPending ? 'Registracija...' : 'Registruj se'}
+          {isPending
+            ? t('auth.register.submittingButton')
+            : t('auth.register.submitButton')}
         </Button>
         <p className="text-center text-sm text-muted-foreground">
-          Već imate nalog?{' '}
+          {t('auth.register.hasAccount')}{' '}
           <Link
             href="/login"
             className="text-primary underline underline-offset-4 hover:text-primary/80"
           >
-            Prijavite se
+            {t('auth.register.loginLink')}
           </Link>
         </p>
       </CardFooter>

@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
+import { enUS,sr } from 'date-fns/locale';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +22,9 @@ type PendingAppointment = {
 };
 
 export function DashboardPendingAppointments() {
+  const t = useTranslations('admin.dashboard');
+  const locale = useLocale();
+  const dateLocale = locale === 'sr' ? sr : enUS;
   const trpc = useTRPC();
   const { data: pendingAppointments } = useSuspenseQuery(
     trpc.appointment.getPending.queryOptions()
@@ -34,7 +39,7 @@ export function DashboardPendingAppointments() {
         <CardHeader className="border-b bg-muted/30 px-6 py-4">
           <CardTitle className="flex items-center gap-2 text-lg font-semibold">
             <Clock className="size-5 text-amber-500" />
-            Termini na čekanju
+            {t('pendingAppointments')}
             <Button
               variant="ghost"
               size="sm"
@@ -43,7 +48,7 @@ export function DashboardPendingAppointments() {
             >
               <Link href="/admin/appointments">
                 <ExternalLink className="size-3.5" />
-                Svi termini
+                {t('allAppointments')}
               </Link>
             </Button>
           </CardTitle>
@@ -51,14 +56,14 @@ export function DashboardPendingAppointments() {
         <CardContent className="p-0">
           {pendingAppointments.length === 0 ? (
             <p className="px-6 py-8 text-center text-sm text-muted-foreground">
-              Nema termina na čekanju.
+              {t('noPendingAppointments')}
             </p>
           ) : (
             <ul className="divide-y divide-border/50">
               {pendingAppointments.map((appointment) => {
                 const patientName = appointment.patient
                   ? `${appointment.patient.firstName} ${appointment.patient.lastName}`.trim()
-                  : 'Nepoznat';
+                  : t('unknown');
 
                 return (
                   <li
@@ -71,9 +76,11 @@ export function DashboardPendingAppointments() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{patientName}</p>
                       <p className="truncate text-sm text-muted-foreground">
-                        {appointment.symptoms ?? 'Nepoznat'} ·{' '}
-                        {format(new Date(appointment.startTime), 'd. MMM')} u{' '}
-                        {format(new Date(appointment.startTime), 'HH:mm')}
+                        {appointment.symptoms ?? t('unknown')} ·{' '}
+                        {format(new Date(appointment.startTime), 'd. MMM', {
+                          locale: dateLocale,
+                        })}{' '}
+                        · {format(new Date(appointment.startTime), 'HH:mm')}
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">

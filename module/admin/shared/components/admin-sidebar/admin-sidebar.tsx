@@ -2,19 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
-import {
-  ADMIN_ACTIONS,
-  ADMIN_BRAND,
-  ADMIN_NAV_ITEMS,
-} from '@/constants/admin-navigation';
+import { ADMIN_BRAND, ADMIN_NAV_ITEMS } from '@/constants/admin-navigation';
 import { ExternalLink, LogOut, Stethoscope } from '@/constants/icons';
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const t = useTranslations('admin.nav');
 
   const handleSignOut = async () => {
     await authClient.signOut();
@@ -30,9 +28,7 @@ export function AdminSidebar() {
         </div>
         <div className="flex flex-col">
           <span className="text-sm font-semibold">{ADMIN_BRAND.name}</span>
-          <span className="text-xs text-muted-foreground">
-            {ADMIN_BRAND.subtitle}
-          </span>
+          <span className="text-xs text-muted-foreground">{t('subtitle')}</span>
         </div>
       </div>
 
@@ -60,7 +56,7 @@ export function AdminSidebar() {
                   isActive && 'text-primary-foreground'
                 )}
               />
-              {item.label}
+              {t(item.key)}
             </Link>
           );
         })}
@@ -75,7 +71,7 @@ export function AdminSidebar() {
         >
           <Link href="/">
             <ExternalLink className="size-5" />
-            {ADMIN_ACTIONS.backToSite}
+            {t('backToSite')}
           </Link>
         </Button>
         <Button
@@ -84,7 +80,7 @@ export function AdminSidebar() {
           onClick={handleSignOut}
         >
           <LogOut className="size-5" />
-          {ADMIN_ACTIONS.signOut}
+          {t('signOut')}
         </Button>
       </div>
     </aside>

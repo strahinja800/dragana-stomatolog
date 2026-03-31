@@ -1,51 +1,54 @@
+import { getTranslations } from 'next-intl/server';
+
 import { Award, Microscope, ShieldCheck, Users } from '@/constants/icons';
 
-const TRUST_POINTS = [
-  {
-    icon: Microscope,
-    title: 'Savremena tehnologija',
-    description:
-      'Digitalna dijagnostika, 3D skeniranje i najnovija oprema za precizne tretmane.',
-  },
-  {
-    icon: Award,
-    title: '15+ godina iskustva',
-    description:
-      'Stručni tim sa dugogodišnjim kliničkim iskustvom i međunarodnim edukacijama.',
-  },
-  {
-    icon: Users,
-    title: 'Individualni pristup',
-    description:
-      'Svaki pacijent dobija personalizovani plan terapije i potpunu posvećenost.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Garancija kvaliteta',
-    description:
-      'Koristimo premium materijale i pratimo najviše standarde u stomatologiji.',
-  },
-] as const;
+export default async function TrustSection() {
+  const t = await getTranslations('services.trust');
 
-export default function TrustSection() {
+  const trustPoints = [
+    {
+      key: 't1',
+      icon: Microscope,
+      title: t('t1Title'),
+      description: t('t1Description'),
+    },
+    {
+      key: 't2',
+      icon: Award,
+      title: t('t2Title'),
+      description: t('t2Description'),
+    },
+    {
+      key: 't3',
+      icon: Users,
+      title: t('t3Title'),
+      description: t('t3Description'),
+    },
+    {
+      key: 't4',
+      icon: ShieldCheck,
+      title: t('t4Title'),
+      description: t('t4Description'),
+    },
+  ];
+
   return (
     <section className="py-16 md:py-24">
       <div className="container mx-auto px-4">
         <div className="mx-auto mb-14 max-w-2xl text-center">
-          <span className="section-kicker">Zašto DENTALHOLIST</span>
+          <span className="section-kicker">{t('kicker')}</span>
           <h2 className="mt-5 font-heading text-3xl font-bold text-foreground md:text-5xl">
-            Zašto nas pacijenti biraju
+            {t('title')}
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
-            Kombinacija stručnosti, tehnologije i iskrene brige za svakog
-            pacijenta.
+            {t('description')}
           </p>
         </div>
 
         <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-2 lg:gap-6">
-          {TRUST_POINTS.map((point, index) => (
+          {trustPoints.map((point, index) => (
             <article
-              key={point.title}
+              key={point.key}
               className="group section-shell relative overflow-hidden p-7 transition-smooth hover:-translate-y-1 hover:shadow-hover-blue sm:p-8"
               style={{ animationDelay: `${index * 100}ms` }}
             >

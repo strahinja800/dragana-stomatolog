@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -30,6 +32,8 @@ export function PublicNavbarMobile({
   onOpen,
   onClose,
 }: PublicNavbarMobileProps) {
+  const t = useTranslations('nav');
+
   return (
     <>
       <div className="flex items-center gap-2 lg:hidden">
@@ -38,7 +42,7 @@ export function PublicNavbarMobile({
           type="button"
           onClick={onOpen}
           className="rounded-xl border border-white/30 bg-white/10 p-2.5 text-primary-foreground shadow-[0_8px_20px_-14px_rgba(0,0,0,0.48)] transition-smooth hover:border-accent/60 hover:bg-white/16 hover:text-white"
-          aria-label="Otvori meni"
+          aria-label={t('bookOnline')}
         >
           <Menu className="size-6" />
         </button>
@@ -62,7 +66,7 @@ export function PublicNavbarMobile({
               />
               <div className="sr-only">
                 <SheetTitle>DENTALHOLIST</SheetTitle>
-                <SheetDescription>Navigacija</SheetDescription>
+                <SheetDescription>Navigation</SheetDescription>
               </div>
             </div>
           </SheetHeader>
@@ -104,7 +108,7 @@ export function PublicNavbarMobile({
                       />
                     </div>
                     <span className="text-[15px] font-semibold">
-                      {item.label}
+                      {t(item.key)}
                     </span>
                   </Link>
                 );
@@ -119,7 +123,7 @@ export function PublicNavbarMobile({
               >
                 <Link href="/kontakt" onClick={onClose}>
                   <Calendar className="size-5 transition-transform duration-200 group-hover:scale-110" />
-                  Zakaži online
+                  {t('bookOnline')}
                 </Link>
               </Button>
             </div>
@@ -127,9 +131,12 @@ export function PublicNavbarMobile({
 
           <SheetFooter className="relative mt-auto border-t border-border/40 bg-muted/40 px-6 py-5">
             <div className="w-full space-y-3">
-              <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-                Kontakt informacije
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+                  {t('contact')}
+                </p>
+                <LanguageSwitcher variant="light" />
+              </div>
               <div className="space-y-2.5 text-sm">
                 <a
                   href="tel:+381111234567"

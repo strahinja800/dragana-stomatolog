@@ -1,15 +1,18 @@
 import Image from 'next/image';
+import { getTranslations } from 'next-intl/server';
 
 import { Award, Clock, Users } from '@/constants/icons';
 import { dentist1, dentist2 } from '@/data/data';
 
-const stats = [
-  { icon: Clock, value: '15+', label: 'godina iskustva' },
-  { icon: Users, value: '10k+', label: 'pacijenata' },
-  { icon: Award, value: '7', label: 'specijalista' },
-];
+export default async function AboutHero() {
+  const t = await getTranslations('about.hero');
 
-export default function AboutHero() {
+  const stats = [
+    { icon: Clock, value: t('stat1Value'), label: t('stat1Label') },
+    { icon: Users, value: t('stat2Value'), label: t('stat2Label') },
+    { icon: Award, value: t('stat3Value'), label: t('stat3Label') },
+  ];
+
   return (
     <section className="relative gradient-hero pt-34 pb-20 md:pt-40 md:pb-28 overflow-hidden">
       <div className="absolute top-20 right-0 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
@@ -18,18 +21,16 @@ export default function AboutHero() {
       <div className="container relative z-10 mx-auto px-4">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="space-y-8">
-            <span className="section-kicker">O nama</span>
+            <span className="section-kicker">{t('kicker')}</span>
 
             <h1 className="font-heading text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
-              DENTALHOLIST koncept{' '}
-              <span className="text-gradient">pažljive</span>, savremene
-              stomatologije
+              {t('titleStart')}{' '}
+              <span className="text-gradient">{t('titleHighlight')}</span>
+              {t('titleEnd')}
             </h1>
 
             <p className="max-w-lg text-lg leading-relaxed text-muted-foreground md:text-xl">
-              Od 2009. godine razvijamo praksu koja kombinuje vrhunsku
-              stručnost, transparentnu komunikaciju i premium iskustvo
-              pacijenta.
+              {t('description')}
             </p>
 
             <div className="grid grid-cols-3 gap-3 pt-2 sm:gap-4">
@@ -78,9 +79,9 @@ export default function AboutHero() {
             <div className="absolute -bottom-6 left-4 right-4 rounded-2xl border border-border/70 bg-card/96 p-4 shadow-hover backdrop-blur-sm sm:left-8 sm:right-8">
               <p className="text-center text-sm font-medium text-muted-foreground">
                 <span className="font-semibold text-foreground">
-                  Licencirani tim
+                  {t('teamBadge')}
                 </span>{' '}
-                sa međunarodnim edukacijama i premium protokolima
+                {t('teamBadgeDescription')}
               </p>
             </div>
           </div>

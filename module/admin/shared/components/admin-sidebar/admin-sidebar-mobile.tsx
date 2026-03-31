@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -11,11 +12,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import {
-  ADMIN_ACTIONS,
-  ADMIN_BRAND,
-  ADMIN_NAV_ITEMS,
-} from '@/constants/admin-navigation';
+import { ADMIN_BRAND, ADMIN_NAV_ITEMS } from '@/constants/admin-navigation';
 import { ExternalLink, LogOut, Stethoscope } from '@/constants/icons';
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
@@ -30,6 +27,7 @@ export function AdminSidebarMobile({
   onClose,
 }: AdminSidebarMobileProps) {
   const pathname = usePathname();
+  const t = useTranslations('admin.nav');
 
   const handleSignOut = async () => {
     await authClient.signOut();
@@ -49,7 +47,7 @@ export function AdminSidebarMobile({
               {ADMIN_BRAND.name}
             </SheetTitle>
             <SheetDescription className="text-xs">
-              {ADMIN_BRAND.subtitle}
+              {t('subtitle')}
             </SheetDescription>
           </div>
         </SheetHeader>
@@ -79,7 +77,7 @@ export function AdminSidebarMobile({
                     isActive && 'text-primary-foreground'
                   )}
                 />
-                {item.label}
+                {t(item.key)}
               </Link>
             );
           })}
@@ -94,7 +92,7 @@ export function AdminSidebarMobile({
           >
             <Link href="/" onClick={onClose}>
               <ExternalLink className="size-5" />
-              {ADMIN_ACTIONS.backToSite}
+              {t('backToSite')}
             </Link>
           </Button>
           <Button
@@ -103,7 +101,7 @@ export function AdminSidebarMobile({
             onClick={handleSignOut}
           >
             <LogOut className="size-5" />
-            {ADMIN_ACTIONS.signOut}
+            {t('signOut')}
           </Button>
         </div>
       </SheetContent>

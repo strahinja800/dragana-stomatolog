@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -37,6 +38,7 @@ export function NewRecordDialog({
   appointmentId,
   patientId,
 }: NewRecordDialogProps) {
+  const t = useTranslations('admin.patients');
   const [open, setOpen] = useState(false);
   const {
     register,
@@ -53,14 +55,12 @@ export function NewRecordDialog({
       onSuccess: () => {
         reset();
         setOpen(false);
-        toast.success('Medical record je uspešno sačuvan');
+        toast.success(t('recordSaveSuccess'));
         queryClient.invalidateQueries({ queryKey: ['patient'] });
       },
       onError: (error) => {
         const message =
-          error instanceof Error
-            ? error.message
-            : 'Greška pri čuvanju medical recorda';
+          error instanceof Error ? error.message : t('recordSaveError');
         toast.error(message);
       },
     })
@@ -82,27 +82,27 @@ export function NewRecordDialog({
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
           <Plus className="mr-2 h-4 w-4" />
-          Dodaj record
+          {t('addRecord')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Novi Medical Record</DialogTitle>
+          <DialogTitle>{t('newMedicalRecord')}</DialogTitle>
           <DialogDescription>
-            Unesite podatke o tretmanu i dijagnozi
+            {t('newMedicalRecordDescription')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="treatment">
-              Tretman <span className="text-destructive">*</span>
+              {t('treatment')} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="treatment"
               {...register('treatment', {
-                required: 'Tretman je obavezan',
+                required: t('treatmentRequired'),
               })}
-              placeholder="Npr. Plomba, Vađenje, Čišćenje..."
+              placeholder={t('treatmentPlaceholder')}
             />
             {errors.treatment && (
               <p className="text-sm text-destructive">
@@ -112,29 +112,29 @@ export function NewRecordDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tooth">Zub</Label>
+            <Label htmlFor="tooth">{t('tooth')}</Label>
             <Input
               id="tooth"
               {...register('tooth')}
-              placeholder="Npr. 16, 21..."
+              placeholder={t('toothPlaceholder')}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="diagnosis">Dijagnoza</Label>
+            <Label htmlFor="diagnosis">{t('diagnosis')}</Label>
             <Input
               id="diagnosis"
               {...register('diagnosis')}
-              placeholder="Npr. Karijes, Gingivitis..."
+              placeholder={t('diagnosisPlaceholder')}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Napomene</Label>
+            <Label htmlFor="notes">{t('notes')}</Label>
             <Textarea
               id="notes"
               {...register('notes')}
-              placeholder="Dodatne napomene..."
+              placeholder={t('recordNotesPlaceholder')}
               rows={3}
             />
           </div>
@@ -145,10 +145,10 @@ export function NewRecordDialog({
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Otkaži
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? 'Čuvanje...' : 'Sačuvaj'}
+              {isPending ? t('saving') : t('saveButton')}
             </Button>
           </div>
         </form>

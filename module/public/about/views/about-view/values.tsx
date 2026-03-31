@@ -1,53 +1,52 @@
+import { getTranslations } from 'next-intl/server';
+
 import { getIcon } from '@/module/public/about/lib/icon-map';
 
-const VALUES = [
-  {
-    id: '1',
-    icon: 'Target',
-    title: 'Preciznost',
-    description:
-      'Svaki zahvat izvodimo sa najvišim stepenom pažnje i preciznosti, koristeći najsavremeniju opremu i tehnike.',
-  },
-  {
-    id: '2',
-    icon: 'ShieldCheck',
-    title: 'Poverenje',
-    description:
-      'Gradimo dugoročne odnose sa pacijentima zasnovane na otvorenoj komunikaciji, iskrenosti i doslednosti.',
-  },
-  {
-    id: '3',
-    icon: 'Lightbulb',
-    title: 'Inovacija',
-    description:
-      'Kontinuirano pratimo najnovija dostignuća u stomatologiji kako bismo pružali tretmane koji su efikasni i bezbolni.',
-  },
-  {
-    id: '4',
-    icon: 'HandHeart',
-    title: 'Briga o pacijentu',
-    description:
-      'Svaki pacijent je jedinstven. Prilagođavamo pristup individualnim potrebama i brinemo o celokupnom iskustvu.',
-  },
-];
+export default async function AboutValues() {
+  const t = await getTranslations('about.values');
 
-export default function AboutValues() {
+  const values = [
+    {
+      id: '1',
+      icon: 'Target',
+      title: t('value1Title'),
+      description: t('value1Description'),
+    },
+    {
+      id: '2',
+      icon: 'ShieldCheck',
+      title: t('value2Title'),
+      description: t('value2Description'),
+    },
+    {
+      id: '3',
+      icon: 'Lightbulb',
+      title: t('value3Title'),
+      description: t('value3Description'),
+    },
+    {
+      id: '4',
+      icon: 'HandHeart',
+      title: t('value4Title'),
+      description: t('value4Description'),
+    },
+  ];
+
   return (
     <section className="py-20 md:py-28">
       <div className="container mx-auto px-4">
         <div className="mx-auto mb-14 max-w-2xl text-center">
-          <span className="section-kicker">Naše vrednosti</span>
+          <span className="section-kicker">{t('kicker')}</span>
           <h2 className="mt-5 font-heading text-3xl font-bold text-foreground md:text-5xl">
-            Principi po kojima radimo
+            {t('title')}
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
-            Svaki aspekt DENTALHOLIST pristupa je oblikovan vrednostima koje
-            negujemo od prvog dana.
+            {t('description')}
           </p>
         </div>
 
         <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-2 lg:gap-6">
-          {VALUES.map((value, index) => {
+          {values.map((value, index) => {
             const IconComponent = getIcon(value.icon);
             return (
               <article

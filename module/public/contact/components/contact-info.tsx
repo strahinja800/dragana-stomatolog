@@ -1,20 +1,48 @@
-import { CONTACT_INFO } from '@/constants/contact-page';
+import { getTranslations } from 'next-intl/server';
 
-export default function ContactInfo() {
+import { Clock, Mail, MapPin, Phone } from '@/constants/icons';
+
+export default async function ContactInfo() {
+  const t = await getTranslations('contact.info');
+
+  const contactItems = [
+    {
+      icon: Phone,
+      title: t('phoneTitle'),
+      content: t('phone'),
+      link: `tel:${t('phone').replace(/\s/g, '')}`,
+    },
+    {
+      icon: Mail,
+      title: t('emailTitle'),
+      content: t('email'),
+      link: `mailto:${t('email')}`,
+    },
+    {
+      icon: MapPin,
+      title: t('addressTitle'),
+      content: t('address'),
+      link: `https://maps.google.com/?q=${encodeURIComponent(t('address'))}`,
+    },
+    {
+      icon: Clock,
+      title: t('hoursTitle'),
+      content: t('hours'),
+      link: null as string | null,
+    },
+  ];
+
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-bold text-foreground md:text-3xl">
-          Kontakt informacije
+          {t('title')}
         </h2>
-        <p className="mt-3 text-muted-foreground">
-          Dostupni smo telefonom i email-om. Ukoliko želite, možete odmah
-          poslati upit kroz formu i dobiti odgovor u najkraćem roku.
-        </p>
+        <p className="mt-3 text-muted-foreground">{t('description')}</p>
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        {CONTACT_INFO.map((info, index) => (
+        {contactItems.map((info, index) => (
           <article key={index} className="section-shell p-6">
             <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl gradient-accent">
               <info.icon className="h-5 w-5 text-foreground" />
@@ -43,7 +71,7 @@ export default function ContactInfo() {
           allowFullScreen
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          title="Lokacija ordinacije"
+          title={t('mapTitle')}
         />
       </div>
     </div>

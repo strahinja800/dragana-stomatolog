@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -36,7 +37,7 @@ import {
   type Appointment,
   type AppointmentStatus,
   type AppointmentTableMeta,
-  columns,
+  useAppointmentColumns,
 } from './appointment-table-columns';
 import { AppointmentTableToolbar } from './appointment-table-toolbar';
 
@@ -45,6 +46,7 @@ interface AppointmentTableProps {
 }
 
 export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
+  const t = useTranslations('shared.pagination');
   const [confirmAppointment, setConfirmAppointment] =
     useState<Appointment | null>(null);
   const [rejectAppointment, setRejectAppointment] =
@@ -57,6 +59,7 @@ export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState('');
 
+  const columns = useAppointmentColumns();
   const trpc = useTRPC();
 
   const { data, isLoading } = useQuery(
@@ -216,7 +219,10 @@ export function AppointmentTable({ statusFilter }: AppointmentTableProps) {
             </TableBody>
           </Table>
         </div>
-        <DataTablePagination table={table} totalLabel="Ukupno termina:" />
+        <DataTablePagination
+          table={table}
+          totalLabel={t('totalAppointments')}
+        />
       </div>
 
       <ConfirmDialog

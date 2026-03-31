@@ -1,9 +1,14 @@
+'use client';
+
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { FileQuestion, Home } from '@/constants/icons';
 
 export default function NotFound() {
+  const t = useTranslations('notFound');
+
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden px-4 gradient-hero">
       {/* Decorative background elements */}
@@ -25,19 +30,19 @@ export default function NotFound() {
 
             {/* Title */}
             <h1 className="mb-3 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-              Stranica nije pronađena
+              {t('title')}
             </h1>
 
             {/* Description */}
             <p className="mb-8 text-base leading-relaxed text-muted-foreground">
-              Tražena stranica ne postoji ili je premeštena.
+              {t('description')}
             </p>
 
             {/* CTA Button */}
             <Button className="group gap-2.5 rounded-3xl px-10" asChild>
               <Link href="/">
                 <Home className="size-5 transition-transform duration-300 group-hover:scale-110" />
-                Nazad na početnu
+                {t('backButton')}
               </Link>
             </Button>
           </div>

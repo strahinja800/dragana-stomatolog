@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,12 +11,16 @@ import { AppointmentTable } from '@/module/admin/termini/components/appointment-
 type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
 type StatusFilter = 'ALL' | AppointmentStatus;
 
-const STATUS_TABS: { value: StatusFilter; label: string }[] = [
-  { value: 'ALL', label: 'Svi termini' },
-  { value: 'PENDING', label: 'Na čekanju' },
-  { value: 'CONFIRMED', label: 'Potvrđeni' },
-  { value: 'CANCELLED', label: 'Odbijeni' },
-];
+function generateStatusTabs(
+  t: ReturnType<typeof useTranslations>
+): { value: StatusFilter; label: string }[] {
+  return [
+    { value: 'ALL', label: t('all') },
+    { value: 'PENDING', label: t('pending') },
+    { value: 'CONFIRMED', label: t('confirmed') },
+    { value: 'CANCELLED', label: t('rejected') },
+  ];
+}
 
 function TableSkeleton() {
   return (
@@ -26,6 +31,8 @@ function TableSkeleton() {
 }
 
 export function AppointmentsView() {
+  const t = useTranslations('admin.appointments');
+  const STATUS_TABS = generateStatusTabs(t);
   const [activeTab, setActiveTab] = useState<StatusFilter>('ALL');
 
   return (
@@ -36,10 +43,10 @@ export function AppointmentsView() {
           <CalendarClock className="size-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Termini</h1>
-          <p className="text-sm text-muted-foreground">
-            Upravljajte zahtevima za termine i zakazivanjima
-          </p>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {t('title')}
+          </h1>
+          <p className="text-sm text-muted-foreground">{t('description')}</p>
         </div>
       </div>
 
@@ -51,7 +58,7 @@ export function AppointmentsView() {
         >
           <CardHeader className="border-b bg-muted/30 px-6 py-4">
             <CardTitle className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <span className="text-lg font-semibold">Pregled termina</span>
+              <span className="text-lg font-semibold">{t('allView')}</span>
               <TabsList className="grid w-full grid-cols-4 sm:w-auto">
                 {STATUS_TABS.map((tab) => (
                   <TabsTrigger

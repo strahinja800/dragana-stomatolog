@@ -3,6 +3,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import {
   type ColumnFiltersState,
@@ -27,7 +28,7 @@ import {
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 
-import { columns, type Patient } from './patients-table-columns';
+import { type Patient, usePatientsColumns } from './patients-table-columns';
 import { PatientsTableToolbar } from './patients-table-toolbar';
 
 interface PatientsTableProps {
@@ -36,10 +37,13 @@ interface PatientsTableProps {
 }
 
 export function PatientsTable({ data, onDeletePatient }: PatientsTableProps) {
+  const t = useTranslations('shared.pagination');
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState('');
+
+  const columns = usePatientsColumns();
 
   const table = useReactTable({
     data,
@@ -147,7 +151,7 @@ export function PatientsTable({ data, onDeletePatient }: PatientsTableProps) {
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} totalLabel="Ukupno pacijenata:" />
+      <DataTablePagination table={table} totalLabel={t('totalPatients')} />
     </div>
   );
 }

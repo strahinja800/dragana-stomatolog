@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -67,6 +68,7 @@ const emptyDefaults: BlogPostFormInput = {
 };
 
 export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
+  const t = useTranslations('admin.blog');
   const isOpen = blogPostId !== null;
   const isEditMode = blogPostId !== null && blogPostId !== 'new';
 
@@ -121,11 +123,11 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeyForAllPosts });
         queryClient.invalidateQueries({ queryKey: queryKeyForPost });
-        toast.success('Članak je uspešno kreiran.');
+        toast.success(t('createSuccess'));
         handleClose();
       },
       onError: () => {
-        toast.error('Došlo je do greške prilikom kreiranja članka.');
+        toast.error(t('createError'));
       },
     })
   );
@@ -135,11 +137,11 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeyForPost });
         queryClient.invalidateQueries({ queryKey: queryKeyForAllPosts });
-        toast.success('Članak je uspešno ažuriran.');
+        toast.success(t('updateSuccess'));
         handleClose();
       },
       onError: () => {
-        toast.error('Došlo je do greške prilikom ažuriranja članka.');
+        toast.error(t('updateError'));
       },
     })
   );
@@ -152,12 +154,12 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeyForAllPosts });
         queryClient.invalidateQueries({ queryKey: queryKeyForPost });
-        toast.success('Blog post je uspešno obrisan.');
+        toast.success(t('deleteSuccess'));
         setShowDeleteConfirm(false);
         handleClose();
       },
       onError: () => {
-        toast.error('Došlo je do greške prilikom brisanja blog posta.');
+        toast.error(t('deleteError'));
       },
     })
   );
@@ -172,7 +174,7 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Molimo izaberite sliku.');
+      toast.error(t('selectImageError'));
       return;
     }
 
@@ -186,7 +188,7 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
       setPreviewUrl(URL.createObjectURL(file));
       setRemovingImage(false);
     } catch {
-      toast.error('Greška pri čitanju fajla.');
+      toast.error(t('fileReadError'));
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
@@ -207,7 +209,7 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
         const result = await generateSlug({ title: data.title });
         slug = result.slug;
       } catch {
-        toast.error('Došlo je do greške prilikom generisanja slug-a.');
+        toast.error(t('slugGenerationError'));
         return;
       }
     }
@@ -242,12 +244,10 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
           <div className="flex h-full w-full flex-col">
             <DrawerHeader className="border-b bg-background px-6 py-4">
               <DrawerTitle className="text-lg font-semibold">
-                {isEditMode ? 'Izmeni članak' : 'Novi članak'}
+                {isEditMode ? t('editTitle') : t('createTitle')}
               </DrawerTitle>
               <DrawerDescription>
-                {isEditMode
-                  ? 'Izmenite podatke postojećeg članka.'
-                  : 'Popunite formu za kreiranje novog članka.'}
+                {isEditMode ? t('editDescription') : t('createDescription')}
               </DrawerDescription>
             </DrawerHeader>
 
@@ -265,7 +265,7 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
                   {/* Sadržaj članka */}
                   <div className="rounded-lg border p-4">
                     <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Sadržaj
+                      {t('contentSection')}
                     </p>
                     <FieldGroup>
                       <Controller
@@ -273,9 +273,9 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
                         control={control}
                         render={({ field, fieldState }) => (
                           <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel>Naslov *</FieldLabel>
+                            <FieldLabel>{t('titleLabel')} *</FieldLabel>
                             <Tiptap
-                              placeholder="Unesite naslov članka..."
+                              placeholder={t('titlePlaceholder')}
                               className="h-28 bg-white py-2"
                               toolbarPreset="minimal"
                               content={field.value}
@@ -293,9 +293,9 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
                         control={control}
                         render={({ field, fieldState }) => (
                           <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel>Sadržaj *</FieldLabel>
+                            <FieldLabel>{t('contentLabel')} *</FieldLabel>
                             <Tiptap
-                              placeholder="Zapocnite pisanje..."
+                              placeholder={t('contentPlaceholder')}
                               className="min-h-[300px] bg-white"
                               toolbarPreset="full"
                               content={field.value}
@@ -313,12 +313,12 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
                   {/* Metadata */}
                   <div className="rounded-lg border p-4">
                     <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Podešavanja
+                      {t('settingsSection')}
                     </p>
                     <FieldGroup>
                       {/* Istaknuta slika */}
                       <Field>
-                        <FieldLabel>Istaknuta slika</FieldLabel>
+                        <FieldLabel>{t('featuredImageLabel')}</FieldLabel>
                         <input
                           ref={fileInputRef}
                           type="file"
@@ -343,7 +343,7 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
                                 onClick={() => fileInputRef.current?.click()}
                               >
                                 <Upload className="mr-2 h-4 w-4" />
-                                Zameni
+                                {t('replaceButton')}
                               </Button>
                               <Button
                                 type="button"
@@ -352,7 +352,7 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
                                 onClick={handleRemoveImage}
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                Ukloni
+                                {t('removeButton')}
                               </Button>
                             </div>
                           </div>
@@ -367,10 +367,10 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
                             </div>
                             <div>
                               <p className="text-sm font-medium">
-                                Dodaj istaknutu sliku
+                                {t('addFeaturedImage')}
                               </p>
                               <p className="mt-1 text-xs text-muted-foreground">
-                                PNG, JPG ili WebP
+                                {t('imageFormats')}
                               </p>
                             </div>
                           </button>
@@ -384,13 +384,13 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
                         render={({ field }) => (
                           <Field>
                             <FieldLabel>
-                              Alt tekst slike{' '}
+                              {t('imageAltLabel')}{' '}
                               <span className="text-xs text-muted-foreground">
-                                (opciono)
+                                {t('imageAltOptional')}
                               </span>
                             </FieldLabel>
                             <Input
-                              placeholder="Opis slike za pristupačnost..."
+                              placeholder={t('imageAltPlaceholder')}
                               className="bg-white"
                               {...field}
                               value={field.value ?? ''}
@@ -405,18 +405,22 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
                         control={control}
                         render={({ field }) => (
                           <Field>
-                            <FieldLabel>Status</FieldLabel>
+                            <FieldLabel>{t('statusLabel')}</FieldLabel>
                             <Select
                               value={field.value}
                               onValueChange={field.onChange}
                             >
                               <SelectTrigger className="bg-white">
-                                <SelectValue placeholder="Izaberi status" />
+                                <SelectValue
+                                  placeholder={t('statusSelectPlaceholder')}
+                                />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="DRAFT">Draft</SelectItem>
+                                <SelectItem value="DRAFT">
+                                  {t('statusDraftOption')}
+                                </SelectItem>
                                 <SelectItem value="PUBLISHED">
-                                  Objavljen
+                                  {t('statusPublishedOption')}
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -440,19 +444,19 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
                     onClick={() => setShowDeleteConfirm(true)}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Obriši
+                    {t('deleteButton')}
                   </Button>
                 )}
                 <div className="ml-auto flex items-center gap-2">
                   <DrawerClose asChild>
-                    <Button variant="outline">Otkaži</Button>
+                    <Button variant="outline">{t('cancelButton')}</Button>
                   </DrawerClose>
                   <Button
                     type="submit"
                     form="blog-post-form"
                     disabled={isPending || (isEditMode && isLoadingPost)}
                   >
-                    {isEditMode ? 'Ažuriraj' : 'Sačuvaj'}
+                    {isEditMode ? t('updateButton') : t('saveButton')}
                   </Button>
                 </div>
               </div>
@@ -465,9 +469,9 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
         open={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}
         onConfirm={handleDelete}
-        title="Potvrda brisanja"
-        description="Da li ste sigurni da želite da obrišete ovaj blog post? Ova akcija se ne može poništiti."
-        confirmText="Obriši"
+        title={t('deleteConfirmTitle')}
+        description={t('deleteConfirmDescription')}
+        confirmText={t('deleteConfirmButton')}
         variant="destructive"
       />
     </>

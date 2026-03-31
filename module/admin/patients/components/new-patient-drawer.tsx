@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -51,6 +52,7 @@ export function NewPatientDrawer({
   open: openProp,
   onOpenChange,
 }: NewPatientDrawerProps = {}) {
+  const t = useTranslations('admin.patients');
   const [internalOpen, setInternalOpen] = useState(false);
 
   const open = openProp !== undefined ? openProp : internalOpen;
@@ -76,13 +78,11 @@ export function NewPatientDrawer({
         reset();
         setSelectedGender(undefined);
         setOpen(false);
-        toast.success('Pacijent je uspešno kreiran');
+        toast.success(t('createSuccess'));
       },
       onError: (error) => {
         const message =
-          error instanceof Error
-            ? error.message
-            : 'Greška pri kreiranju pacijenta';
+          error instanceof Error ? error.message : t('createError');
         toast.error(message);
       },
     })
@@ -111,17 +111,15 @@ export function NewPatientDrawer({
         <DrawerTrigger asChild>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            Novi pacijent
+            {t('newPatient')}
           </Button>
         </DrawerTrigger>
       )}
       <DrawerContent className="h-screen max-w-4xl">
         <div className="mx-auto h-full w-full max-w-2xl overflow-y-auto">
           <DrawerHeader>
-            <DrawerTitle>Novi pacijent</DrawerTitle>
-            <DrawerDescription>
-              Unesite podatke za kreiranje novog pacijenta
-            </DrawerDescription>
+            <DrawerTitle>{t('newPatient')}</DrawerTitle>
+            <DrawerDescription>{t('newPatientDescription')}</DrawerDescription>
           </DrawerHeader>
 
           <form onSubmit={handleSubmit(onSubmit)} className="px-4">
@@ -130,12 +128,14 @@ export function NewPatientDrawer({
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">
-                    Ime <span className="text-destructive">*</span>
+                    {t('firstName')} <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="firstName"
                     className="bg-white"
-                    {...register('firstName', { required: 'Ime je obavezno' })}
+                    {...register('firstName', {
+                      required: t('firstNameRequired'),
+                    })}
                     placeholder="Marko"
                   />
                   {errors.firstName && (
@@ -147,13 +147,13 @@ export function NewPatientDrawer({
 
                 <div className="space-y-2">
                   <Label htmlFor="lastName">
-                    Prezime <span className="text-destructive">*</span>
+                    {t('lastName')} <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="lastName"
                     className="bg-white"
                     {...register('lastName', {
-                      required: 'Prezime je obavezno',
+                      required: t('lastNameRequired'),
                     })}
                     placeholder="Petrović"
                   />
@@ -168,7 +168,7 @@ export function NewPatientDrawer({
               {/* Email i Telefon */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('email')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -179,7 +179,7 @@ export function NewPatientDrawer({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Telefon</Label>
+                  <Label htmlFor="phone">{t('phone')}</Label>
                   <Input
                     id="phone"
                     className="bg-white"
@@ -192,7 +192,7 @@ export function NewPatientDrawer({
               {/* Datum rođenja i Pol */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth">Datum rođenja</Label>
+                  <Label htmlFor="dateOfBirth">{t('dateOfBirth')}</Label>
                   <Input
                     id="dateOfBirth"
                     type="date"
@@ -202,7 +202,7 @@ export function NewPatientDrawer({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="gender">Pol</Label>
+                  <Label htmlFor="gender">{t('gender')}</Label>
                   <Select
                     value={selectedGender}
                     onValueChange={(value) =>
@@ -210,11 +210,11 @@ export function NewPatientDrawer({
                     }
                   >
                     <SelectTrigger className="bg-white">
-                      <SelectValue placeholder="Izaberite pol" />
+                      <SelectValue placeholder={t('selectGender')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="MALE">Muški</SelectItem>
-                      <SelectItem value="FEMALE">Ženski</SelectItem>
+                      <SelectItem value="MALE">{t('male')}</SelectItem>
+                      <SelectItem value="FEMALE">{t('female')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -222,12 +222,12 @@ export function NewPatientDrawer({
 
               {/* Napomene */}
               <div className="space-y-2">
-                <Label htmlFor="notes">Napomene</Label>
+                <Label htmlFor="notes">{t('notes')}</Label>
                 <Textarea
                   id="notes"
                   className="bg-white"
                   {...register('notes')}
-                  placeholder="Dodatne napomene o pacijentu..."
+                  placeholder={t('notesPlaceholder')}
                   rows={3}
                 />
               </div>
@@ -235,10 +235,10 @@ export function NewPatientDrawer({
 
             <DrawerFooter>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Kreiranje...' : 'Kreiraj pacijenta'}
+                {isSubmitting ? t('creating') : t('createButton')}
               </Button>
               <DrawerClose asChild>
-                <Button variant="outline">Otkaži</Button>
+                <Button variant="outline">{t('cancel')}</Button>
               </DrawerClose>
             </DrawerFooter>
           </form>

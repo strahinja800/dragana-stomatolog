@@ -1,11 +1,22 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
 
 import { getSessionCookie } from 'better-auth/cookies';
+
+import { routing } from './i18n/routing';
 
 const protectedRoutes = ['/admin', '/profile'];
 const authRoutes = ['/login', '/register'];
 
-export default async function proxy(request: NextRequest) {
+const intlMiddleware = createMiddleware(routing);
+
+export default function middleware(request: NextRequest) {
+  // 1. Apply i18n middleware first to set locale
+  const intlResponse = intlMiddleware(request);
+  if (intlResponse.status !== 200) {
+    return intlResponse;
+  }
+
   const path = request.nextUrl.pathname;
   const sessionCookie = getSessionCookie(request);
 
@@ -26,7 +37,7 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  return NextResponse.next();
+  return intlResponse;
 }
 
 export const config = {

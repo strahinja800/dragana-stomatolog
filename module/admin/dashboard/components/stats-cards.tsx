@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { CalendarClock, Clock, TrendingUp, Users } from '@/constants/icons';
 import { cn } from '@/lib/utils';
@@ -11,43 +13,45 @@ interface StatsCardsProps {
   newPatientsThisMonth: number;
 }
 
-const stats = [
-  {
-    key: 'todayAppointments' as const,
-    label: 'Današnji termini',
-    icon: CalendarClock,
-    color: 'text-primary',
-    bgColor: 'bg-primary/10',
-  },
-  {
-    key: 'pendingAppointments' as const,
-    label: 'Na čekanju',
-    icon: Clock,
-    color: 'text-amber-500',
-    bgColor: 'bg-amber-500/10',
-  },
-  {
-    key: 'totalPatients' as const,
-    label: 'Ukupno pacijenata',
-    icon: Users,
-    color: 'text-emerald-500',
-    bgColor: 'bg-emerald-500/10',
-  },
-  {
-    key: 'newPatientsThisMonth' as const,
-    label: 'Novi pacijenti (ovaj mesec)',
-    icon: TrendingUp,
-    color: 'text-violet-500',
-    bgColor: 'bg-violet-500/10',
-  },
-] as const;
-
 export function StatsCards({
   todayAppointments,
   pendingAppointments,
   totalPatients,
   newPatientsThisMonth,
 }: StatsCardsProps) {
+  const t = useTranslations('admin.dashboard');
+
+  const stats = [
+    {
+      key: 'todayAppointments' as const,
+      label: t('statTodayAppointments'),
+      icon: CalendarClock,
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
+    },
+    {
+      key: 'pendingAppointments' as const,
+      label: t('statPending'),
+      icon: Clock,
+      color: 'text-amber-500',
+      bgColor: 'bg-amber-500/10',
+    },
+    {
+      key: 'totalPatients' as const,
+      label: t('statTotalPatients'),
+      icon: Users,
+      color: 'text-emerald-500',
+      bgColor: 'bg-emerald-500/10',
+    },
+    {
+      key: 'newPatientsThisMonth' as const,
+      label: t('statNewPatients'),
+      icon: TrendingUp,
+      color: 'text-violet-500',
+      bgColor: 'bg-violet-500/10',
+    },
+  ] as const;
+
   const values = {
     todayAppointments,
     pendingAppointments,
@@ -80,7 +84,7 @@ export function StatsCards({
                 {stat.label}
               </p>
               <p className="text-2xl font-bold tracking-tight">
-                {values[stat.key]}
+                {values[stat.key].toLocaleString()}
               </p>
             </div>
           </CardContent>

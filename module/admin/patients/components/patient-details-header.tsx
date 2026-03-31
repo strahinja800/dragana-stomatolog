@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -31,7 +32,7 @@ interface PatientDetailsHeaderProps {
 export function PatientDetailsHeader({ patient }: PatientDetailsHeaderProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-
+  const t = useTranslations('admin.patients');
   const router = useRouter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -44,21 +45,21 @@ export function PatientDetailsHeader({ patient }: PatientDetailsHeaderProps) {
 
   const genderLabel =
     patient.gender === 'MALE'
-      ? 'Muški'
+      ? t('male')
       : patient.gender === 'FEMALE'
-        ? 'Ženski'
+        ? t('female')
         : null;
 
   const { mutate: deletePatient, isPending: isDeleting } = useMutation(
     trpc.patient.delete.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['patient'] });
-        toast.success('Pacijent je obrisan');
+        toast.success(t('deleteSuccess'));
         router.push('/admin/patients');
       },
       onError: (error) => {
         const message =
-          error instanceof Error ? error.message : 'Greška pri brisanju';
+          error instanceof Error ? error.message : t('deleteError');
         toast.error(message);
         setDeleteOpen(false);
       },
@@ -72,7 +73,7 @@ export function PatientDetailsHeader({ patient }: PatientDetailsHeaderProps) {
           <Link href="/admin/patients">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Nazad na listu
+              {t('backToList')}
             </Button>
           </Link>
           <div className="flex items-center gap-2">
@@ -82,7 +83,7 @@ export function PatientDetailsHeader({ patient }: PatientDetailsHeaderProps) {
               onClick={() => setEditOpen(true)}
             >
               <Pencil className="mr-2 h-4 w-4" />
-              Izmeni
+              {t('editButton')}
             </Button>
             <Button
               variant="destructive"
@@ -91,7 +92,7 @@ export function PatientDetailsHeader({ patient }: PatientDetailsHeaderProps) {
               disabled={isDeleting}
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              Obriši
+              {t('deleteButton')}
             </Button>
           </div>
         </div>
@@ -109,7 +110,7 @@ export function PatientDetailsHeader({ patient }: PatientDetailsHeaderProps) {
                 {patient.firstName} {patient.lastName}
               </h1>
               <Badge variant={patient.isMain ? 'default' : 'secondary'}>
-                {patient.isMain ? 'Glavni pacijent' : 'Sekundarni pacijent'}
+                {patient.isMain ? t('primaryPatient') : t('secondaryPatient')}
               </Badge>
             </div>
 
@@ -148,10 +149,10 @@ export function PatientDetailsHeader({ patient }: PatientDetailsHeaderProps) {
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         onConfirm={() => deletePatient({ id: patient.id })}
-        title="Brisanje pacijenta"
-        description="Da li ste sigurni da želite da obrišete ovog pacijenta? Pacijenti sa terminima ne mogu biti obrisani."
-        confirmText="Obriši"
-        cancelText="Otkaži"
+        title={t('deletePatientTitle')}
+        description={t('deletePatientDescription')}
+        confirmText={t('deleteButton')}
+        cancelText={t('cancelButton')}
         variant="destructive"
       />
     </>

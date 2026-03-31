@@ -1,55 +1,53 @@
+import { getTranslations } from 'next-intl/server';
+
 import { cn } from '@/lib/utils';
 
-const MILESTONES = [
-  {
-    id: '1',
-    year: '2009',
-    title: 'Osnivanje ordinacije',
-    description:
-      'DENTALHOLIST otvara vrata sa jasnom vizijom — pružiti stomatološku negu koja spaja stručnost, pažnju i modernu tehnologiju.',
-  },
-  {
-    id: '2',
-    year: '2013',
-    title: 'Proširenje tima',
-    description:
-      'Ordinacija raste — pridružuju nam se prvi specijalisti i uvodi digitalna rendgen dijagnostika. Tim sada broji 4 stomatologa.',
-  },
-  {
-    id: '3',
-    year: '2017',
-    title: 'Sertifikat izvrsnosti',
-    description:
-      'Dobijamo nacionalno priznanje za kvalitet usluga u oblasti implantologije i estetske stomatologije.',
-  },
-  {
-    id: '4',
-    year: '2020',
-    title: 'Digitalna transformacija',
-    description:
-      'Uvodimo 3D skeniranje, CAD/CAM tehnologiju za izradu krunica i kompletno digitalno zakazivanje termina.',
-  },
-  {
-    id: '5',
-    year: '2024',
-    title: '15 godina poverenja',
-    description:
-      'Proslavljamo 15 godina rada sa timom od 7 specijalista i više od 10.000 zadovoljnih pacijenata.',
-  },
-];
+export default async function AboutTimeline() {
+  const t = await getTranslations('about.timeline');
 
-export default function AboutTimeline() {
+  const milestones = [
+    {
+      id: '1',
+      year: t('milestone1Year'),
+      title: t('milestone1Title'),
+      description: t('milestone1Description'),
+    },
+    {
+      id: '2',
+      year: t('milestone2Year'),
+      title: t('milestone2Title'),
+      description: t('milestone2Description'),
+    },
+    {
+      id: '3',
+      year: t('milestone3Year'),
+      title: t('milestone3Title'),
+      description: t('milestone3Description'),
+    },
+    {
+      id: '4',
+      year: t('milestone4Year'),
+      title: t('milestone4Title'),
+      description: t('milestone4Description'),
+    },
+    {
+      id: '5',
+      year: t('milestone5Year'),
+      title: t('milestone5Title'),
+      description: t('milestone5Description'),
+    },
+  ];
+
   return (
     <section className="py-20 md:py-28">
       <div className="container mx-auto px-4">
         <div className="mx-auto mb-14 max-w-2xl text-center">
-          <span className="section-kicker">Naša istorija</span>
+          <span className="section-kicker">{t('kicker')}</span>
           <h2 className="mt-5 font-heading text-3xl font-bold text-foreground md:text-5xl">
-            Put razvoja i poverenja
+            {t('title')}
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
-            Od skromnih početaka do tima od 7 specijalista, naš put je definisao
-            svaki osmeh koji smo oblikovali.
+            {t('description')}
           </p>
         </div>
 
@@ -57,7 +55,7 @@ export default function AboutTimeline() {
           <div className="relative">
             <div className="absolute left-6 top-0 bottom-0 w-px bg-linear-to-b from-primary/40 via-accent/30 to-primary/10 md:left-1/2 md:-translate-x-px" />
 
-            {MILESTONES.map((milestone, index) => {
+            {milestones.map((milestone, index) => {
               const isEven = index % 2 === 0;
 
               return (

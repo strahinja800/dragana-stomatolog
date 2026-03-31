@@ -1,11 +1,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Award, GraduationCap, Star } from '@/constants/icons';
 import { dentist1 } from '@/data/data';
 
-export default function LeadDoctorSection() {
+export default async function LeadDoctorSection() {
+  const t = await getTranslations('home.leadDoctor');
+
   return (
     <section className="py-16 md:py-24">
       <div className="container mx-auto px-4">
@@ -29,10 +32,10 @@ export default function LeadDoctorSection() {
                 </div>
                 <div>
                   <p className="font-heading text-lg font-bold text-foreground">
-                    15+ godina
+                    {t('experienceValue')}
                   </p>
                   <p className="text-xs tracking-[0.12em] text-muted-foreground uppercase">
-                    kliničkog iskustva
+                    {t('experienceLabel')}
                   </p>
                 </div>
               </div>
@@ -41,54 +44,53 @@ export default function LeadDoctorSection() {
                   <Star key={i} className="h-4 w-4 fill-accent text-accent" />
                 ))}
                 <span className="ml-2 text-sm font-medium text-muted-foreground">
-                  Ocena 5.0
+                  {t('rating')}
                 </span>
               </div>
             </div>
           </div>
 
           <div className="space-y-6">
-            <span className="section-kicker">Glavni Stomatolog</span>
+            <span className="section-kicker">{t('kicker')}</span>
             <div>
               <h2 className="text-3xl font-bold text-foreground md:text-5xl">
-                Dr. Ana Jovanović
+                {t('name')}
               </h2>
               <p className="mt-2 font-semibold tracking-wide text-primary uppercase">
-                Specijalista estetske stomatologije
+                {t('specialty')}
               </p>
             </div>
 
-            <p className="text-lg text-muted-foreground">
-              Sa više od 15 godina iskustva, dr Ana vodi tim fokusiran na
-              preciznu i nežnu stomatologiju. Svaki plan terapije je
-              personalizovan i oslonjen na savremenu dijagnostiku.
-            </p>
+            <p className="text-lg text-muted-foreground">{t('bio')}</p>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl border border-border/70 bg-card/80 p-4">
                 <div className="mb-2 flex items-center gap-2 text-primary">
                   <GraduationCap className="h-5 w-5" />
-                  <p className="font-semibold text-foreground">Edukacija</p>
+                  <p className="font-semibold text-foreground">
+                    {t('educationTitle')}
+                  </p>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Stomatološki fakultet Univerziteta u Beogradu + međunarodne
-                  edukacije.
+                  {t('educationText')}
                 </p>
               </div>
               <div className="rounded-2xl border border-border/70 bg-card/80 p-4">
                 <div className="mb-2 flex items-center gap-2 text-primary">
                   <Award className="h-5 w-5" />
-                  <p className="font-semibold text-foreground">Fokus</p>
+                  <p className="font-semibold text-foreground">
+                    {t('focusTitle')}
+                  </p>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Estetska i restaurativna stomatologija uz dugoročno praćenje.
+                  {t('focusText')}
                 </p>
               </div>
             </div>
 
             <Button asChild className="btn-shimmer rounded-full px-6">
               <Link href="/o-nama">
-                Upoznajte ceo tim
+                {t('meetTeamButton')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

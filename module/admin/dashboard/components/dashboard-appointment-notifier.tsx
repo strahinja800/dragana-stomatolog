@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
@@ -9,6 +10,7 @@ import { toast } from 'sonner';
 import { useTRPC } from '@/trpc/client';
 
 export function DashboardAppointmentNotifier() {
+  const t = useTranslations('admin.dashboard');
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -26,10 +28,10 @@ export function DashboardAppointmentNotifier() {
           timeZone: 'Europe/Belgrade',
         });
 
-        toast('Novi zahtev za termin', {
+        toast(t('newAppointmentRequest'), {
           description: `${event.patientName} — ${formatted}`,
           action: {
-            label: 'Pogledaj',
+            label: t('view'),
             onClick: () => router.push('/admin'),
           },
           duration: 10000,

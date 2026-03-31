@@ -1,9 +1,12 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 
 import { Button } from '@/components/ui/button';
 import { ArrowRight, MapPin, Phone } from '@/constants/icons';
 
-export default function CtaServices() {
+export default async function CtaServices() {
+  const t = await getTranslations('services.cta');
+
   return (
     <section id="zakazivanje-usluge" className="pb-16 md:pb-24">
       <div className="container mx-auto px-4">
@@ -13,11 +16,10 @@ export default function CtaServices() {
 
           <div className="relative z-10 mx-auto max-w-3xl text-center">
             <h2 className="font-heading text-3xl font-bold text-primary-foreground md:text-4xl lg:text-5xl">
-              Pronađite idealni tretman za vas
+              {t('title')}
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-primary-foreground/88">
-              Zakažite konsultaciju i dobijte personalizovani plan terapije
-              prema vašem kliničkom stanju i cilju. Besplatan prvi pregled.
+              {t('description')}
             </p>
 
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -28,7 +30,7 @@ export default function CtaServices() {
                 asChild
               >
                 <Link href="/kontakt">
-                  Zakaži konsultaciju
+                  {t('bookButton')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -40,16 +42,16 @@ export default function CtaServices() {
               >
                 <a href="tel:+381111234567">
                   <Phone className="mr-2 h-5 w-5" />
-                  Pozovi odmah
+                  {t('callButton')}
                 </a>
               </Button>
             </div>
 
             <div className="mt-8 flex items-center justify-center gap-2 text-sm text-primary-foreground/70">
               <MapPin className="h-4 w-4" />
-              <span>Beograd, Srbija</span>
+              <span>{t('location')}</span>
               <span className="mx-2 text-primary-foreground/30">|</span>
-              <span>Pon-Pet 08:00 - 20:00</span>
+              <span>{t('hours')}</span>
             </div>
           </div>
         </div>

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale } from 'next-intl';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { sr } from 'date-fns/locale';
+import { enUS, sr } from 'date-fns/locale';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -48,6 +49,8 @@ export function RescheduleDialog({
   const [newTime, setNewTime] = useState('');
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
+  const locale = useLocale();
+  const dateLocale = locale === 'sr' ? sr : enUS;
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -111,7 +114,7 @@ export function RescheduleDialog({
                     new Date(appointment.startTime),
                     "d. MMMM 'u' HH:mm",
                     {
-                      locale: sr,
+                      locale: dateLocale,
                     }
                   )}
                 </span>
@@ -135,7 +138,7 @@ export function RescheduleDialog({
                 >
                   <CalendarDays className="mr-2 size-4" />
                   {newDate
-                    ? format(newDate, 'd. MMMM yyyy.', { locale: sr })
+                    ? format(newDate, 'd. MMMM yyyy.', { locale: dateLocale })
                     : 'Izaberite datum'}
                 </Button>
               </PopoverTrigger>
@@ -174,8 +177,8 @@ export function RescheduleDialog({
             <div className="rounded-lg border bg-muted/30 p-3">
               <p className="text-sm text-muted-foreground">Novi termin:</p>
               <p className="font-medium">
-                {format(newDate, 'EEEE, d. MMMM yyyy.', { locale: sr })} u{' '}
-                {newTime}
+                {format(newDate, 'EEEE, d. MMMM yyyy.', { locale: dateLocale })}{' '}
+                u {newTime}
               </p>
             </div>
           )}

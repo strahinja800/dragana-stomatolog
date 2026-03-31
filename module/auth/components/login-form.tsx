@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryState } from 'nuqs';
@@ -30,17 +31,18 @@ import { logoNegativ } from '@/data/data';
 import { authClient } from '@/lib/auth-client';
 import { parseAuthError } from '@/module/auth/lib/auth-error-handler';
 import {
+  createLoginSchema,
   type LoginFormSchemaInputs,
-  loginSchema,
 } from '@/module/auth/types/auth-schema';
 
 export function LoginForm() {
+  const t = useTranslations();
   const router = useRouter();
   const [redirectUrl] = useQueryState('redirect');
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<LoginFormSchemaInputs>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(createLoginSchema(t)),
     defaultValues: {
       email: '',
       password: '',
@@ -59,24 +61,22 @@ export function LoginForm() {
       },
       {
         onSuccess: async () => {
-          toast.success('Uspešna prijava!', {
-            description: 'Dobrodošli nazad',
+          toast.success(t('auth.login.successTitle'), {
+            description: t('auth.login.successDescription'),
           });
 
-          // Ako postoji redirect URL, koristi ga
           if (redirectUrl?.startsWith('/')) {
             router.push(redirectUrl);
             return;
           }
 
-          // Inače, redirektuj na osnovu uloge
           const session = await authClient.getSession();
           const role = session.data?.user?.role;
           const destination = role === 'admin' ? '/admin' : '/profile';
           router.push(destination);
         },
         onError: (ctx) => {
-          const error = parseAuthError(ctx);
+          const error = parseAuthError(ctx, t);
           setServerError(error.message);
           toast.error(error.message);
         },
@@ -100,10 +100,8 @@ export function LoginForm() {
             DENTALHOLIST
           </span>
         </Link>
-        <CardTitle>Prijavite se</CardTitle>
-        <CardDescription>
-          Unesite svoje podatke za pristup nalogu
-        </CardDescription>
+        <CardTitle>{t('auth.login.title')}</CardTitle>
+        <CardDescription>{t('auth.login.description')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
@@ -113,20 +111,20 @@ export function LoginForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid || !!serverError}>
-                  <FieldLabel htmlFor="login-email">Email adresa</FieldLabel>
+                  <FieldLabel htmlFor="login-email">
+                    {t('auth.login.emailLabel')}
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="login-email"
                     type="email"
                     aria-invalid={fieldState.invalid || !!serverError}
-                    placeholder="vas@email.com"
+                    placeholder={t('auth.login.emailPlaceholder')}
                     autoComplete="email"
                     disabled={isPending}
                     onChange={(e) => {
                       field.onChange(e);
-                      if (serverError) {
-                        setServerError(null);
-                      }
+                      if (serverError) setServerError(null);
                     }}
                   />
                   {fieldState.invalid && (
@@ -141,7 +139,9 @@ export function LoginForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid || !!serverError}>
-                  <FieldLabel htmlFor="login-password">Lozinka</FieldLabel>
+                  <FieldLabel htmlFor="login-password">
+                    {t('auth.login.passwordLabel')}
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="login-password"
@@ -152,9 +152,7 @@ export function LoginForm() {
                     disabled={isPending}
                     onChange={(e) => {
                       field.onChange(e);
-                      if (serverError) {
-                        setServerError(null);
-                      }
+                      if (serverError) setServerError(null);
                     }}
                   />
                   {fieldState.invalid && (
@@ -176,15 +174,17 @@ export function LoginForm() {
           className="w-full"
           disabled={isPending}
         >
-          {isPending ? 'Prijavljivanje...' : 'Prijavi se'}
+          {isPending
+            ? t('auth.login.submittingButton')
+            : t('auth.login.submitButton')}
         </Button>
         <p className="text-center text-sm text-muted-foreground">
-          Nemate nalog?{' '}
+          {t('auth.login.noAccount')}{' '}
           <Link
             href="/register"
             className="text-primary underline underline-offset-4 hover:text-primary/80"
           >
-            Registrujte se
+            {t('auth.login.registerLink')}
           </Link>
         </p>
       </CardFooter>

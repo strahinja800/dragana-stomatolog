@@ -1,18 +1,20 @@
+import { getTranslations } from 'next-intl/server';
+
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Clock, MapPin, Phone } from '@/constants/icons';
 
-export default function LocationSection() {
+export default async function LocationSection() {
+  const t = await getTranslations('home.location');
+
   return (
     <section className="pb-16 md:pb-24">
       <div className="container mx-auto px-4">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <span className="section-kicker">Lokacija</span>
+          <span className="section-kicker">{t('kicker')}</span>
           <h2 className="mt-4 text-3xl font-bold text-foreground md:text-5xl">
-            Posetite nas u centru Beograda
+            {t('title')}
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            Udoban prostor, moderna oprema i tim koji vas dočekuje bez žurbe.
-          </p>
+          <p className="mt-4 text-muted-foreground">{t('description')}</p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
@@ -25,7 +27,7 @@ export default function LocationSection() {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Lokacija ordinacije"
+              title={t('mapTitle')}
             />
           </div>
 
@@ -36,11 +38,13 @@ export default function LocationSection() {
                   <MapPin className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Adresa</h3>
+                  <h3 className="font-semibold text-foreground">
+                    {t('addressTitle')}
+                  </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Bulevar Kralja Aleksandra 123
+                    {t('addressLine1')}
                     <br />
-                    11000 Beograd, Srbija
+                    {t('addressLine2')}
                   </p>
                 </div>
               </div>
@@ -52,11 +56,13 @@ export default function LocationSection() {
                   <Phone className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Telefon</h3>
+                  <h3 className="font-semibold text-foreground">
+                    {t('phoneTitle')}
+                  </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    +381 11 123 4567
+                    {t('phone1')}
                     <br />
-                    +381 63 123 4567
+                    {t('phone2')}
                   </p>
                 </div>
               </div>
@@ -68,11 +74,13 @@ export default function LocationSection() {
                   <Clock className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Radno vreme</h3>
+                  <h3 className="font-semibold text-foreground">
+                    {t('hoursTitle')}
+                  </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Pon - Pet: 08:00 - 20:00
+                    {t('hours1')}
                     <br />
-                    Sub: 09:00 - 14:00
+                    {t('hours2')}
                   </p>
                 </div>
               </div>
@@ -84,7 +92,7 @@ export default function LocationSection() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Prikaži rutu
+                {t('directionsButton')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>

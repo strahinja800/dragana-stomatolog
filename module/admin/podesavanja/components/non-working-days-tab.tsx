@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import {
   useMutation,
@@ -8,7 +9,7 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { sr } from 'date-fns/locale';
+import { enUS, sr } from 'date-fns/locale';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,9 @@ import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
 export function NonWorkingDaysTab() {
+  const t = useTranslations('admin.settings');
+  const locale = useLocale();
+  const dateLocale = locale === 'sr' ? sr : enUS;
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -48,15 +52,14 @@ export function NonWorkingDaysTab() {
     trpc.settings.createNonWorkingDay.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [['settings']] });
-        toast.success('Neradni dan dodat');
+        toast.success(t('addSuccess'));
         setIsDialogOpen(false);
         setSelectedDate(undefined);
         setReason('');
       },
       onError: (error) => {
-        toast.error('Greška', {
-          description:
-            error instanceof Error ? error.message : 'Nepoznata greška',
+        toast.error(t('addError'), {
+          description: error instanceof Error ? error.message : t('addError'),
         });
       },
     })
@@ -66,13 +69,12 @@ export function NonWorkingDaysTab() {
     trpc.settings.deleteNonWorkingDay.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [['settings']] });
-        toast.success('Neradni dan obrisan');
+        toast.success(t('deleteSuccess'));
         setDeletingId(null);
       },
       onError: (error) => {
-        toast.error('Greška', {
-          description:
-            error instanceof Error ? error.message : 'Nepoznata greška',
+        toast.error(t('addError'), {
+          description: error instanceof Error ? error.message : t('addError'),
         });
         setDeletingId(null);
       },
@@ -99,20 +101,18 @@ export function NonWorkingDaysTab() {
     <Card className="overflow-hidden border-border/50 shadow-sm">
       <CardHeader className="border-b bg-muted/30 px-6 py-4">
         <CardTitle className="flex items-center justify-between text-lg font-semibold">
-          <span>Neradni dani i praznici</span>
+          <span>{t('nonWorkingDaysTitle')}</span>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-2">
                 <CalendarPlus className="size-4" />
-                Dodaj dan
+                {t('addDay')}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Dodaj neradni dan</DialogTitle>
-                <DialogDescription>
-                  Izaberite datum i opciono unesite razlog
-                </DialogDescription>
+                <DialogTitle>{t('addDayTitle')}</DialogTitle>
+                <DialogDescription>{t('addDayDescription')}</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4 py-4">
@@ -132,12 +132,12 @@ export function NonWorkingDaysTab() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="reason">Razlog (opciono)</Label>
+                  <Label htmlFor="reason">{t('reasonOptional')}</Label>
                   <Input
                     id="reason"
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
-                    placeholder="npr. Državni praznik, Godišnji odmor..."
+                    placeholder={t('reasonPlaceholder')}
                   />
                 </div>
               </div>
@@ -148,7 +148,7 @@ export function NonWorkingDaysTab() {
                   onClick={() => setIsDialogOpen(false)}
                   disabled={isCreating}
                 >
-                  Otkaži
+                  {t('cancel')}
                 </Button>
                 <Button
                   onClick={handleCreate}
@@ -156,7 +156,7 @@ export function NonWorkingDaysTab() {
                   className="gap-2"
                 >
                   {isCreating && <Loader2 className="size-4 animate-spin" />}
-                  Sačuvaj
+                  {t('save')}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -170,12 +170,9 @@ export function NonWorkingDaysTab() {
             <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted">
               <CalendarPlus className="size-6 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground">
-              Nema definisanih neradnih dana
-            </p>
+            <p className="text-muted-foreground">{t('noDays')}</p>
             <p className="mt-1 text-sm text-muted-foreground/70">
-              Kliknite &quot;Dodaj dan&quot; za dodavanje praznika ili drugih
-              neradnih dana
+              {t('noDaysHint')}
             </p>
           </div>
         ) : (
@@ -192,14 +189,16 @@ export function NonWorkingDaysTab() {
                       {format(new Date(day.date), 'd')}
                     </span>
                     <span className="text-[10px] uppercase tracking-wider">
-                      {format(new Date(day.date), 'MMM', { locale: sr })}
+                      {format(new Date(day.date), 'MMM', {
+                        locale: dateLocale,
+                      })}
                     </span>
                   </div>
 
                   <div>
                     <p className="font-medium">
                       {format(new Date(day.date), 'EEEE, d. MMMM yyyy.', {
-                        locale: sr,
+                        locale: dateLocale,
                       })}
                     </p>
                     {day.reason && (

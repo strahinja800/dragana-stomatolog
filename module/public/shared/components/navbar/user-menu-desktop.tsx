@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -23,14 +24,15 @@ type UserMenuDesktopProps = {
 };
 
 export function UserMenuDesktop({ user, onSignOut }: UserMenuDesktopProps) {
+  const t = useTranslations('userMenu');
   const firstName = user.name.split(' ')[0];
   const initials = user.initials;
   const isAdmin = user.role === 'admin';
   const dashboardHref = isAdmin ? '/admin' : '/profile';
-  const dashboardLabel = isAdmin ? 'Admin panel' : 'Moj profil';
+  const dashboardLabel = isAdmin ? t('adminPanel') : t('myProfile');
   const dashboardDescription = isAdmin
-    ? 'Upravljaj sajtom'
-    : 'Pregledaj i uredi podatke';
+    ? t('adminDescription')
+    : t('profileDescription');
 
   return (
     <div className="hidden lg:block">
@@ -68,7 +70,6 @@ export function UserMenuDesktop({ user, onSignOut }: UserMenuDesktopProps) {
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95'
           )}
         >
-          {/* User Info Header */}
           <div className="flex items-center gap-3 px-2 py-3">
             <Avatar size="lg" className="ring-2 ring-primary/20">
               {user.image && <AvatarImage src={user.image} alt={user.name} />}
@@ -88,7 +89,6 @@ export function UserMenuDesktop({ user, onSignOut }: UserMenuDesktopProps) {
 
           <DropdownMenuSeparator className="my-2" />
 
-          {/* Menu Items */}
           <DropdownMenuItem
             asChild
             className="group/item gap-3 px-3 py-2.5 rounded-lg cursor-pointer focus:bg-accent"
@@ -112,7 +112,6 @@ export function UserMenuDesktop({ user, onSignOut }: UserMenuDesktopProps) {
 
           <DropdownMenuSeparator className="my-2" />
 
-          {/* Sign Out */}
           <DropdownMenuItem
             onClick={onSignOut}
             className="group/logout gap-3 px-3 py-2.5 rounded-lg cursor-pointer"
@@ -120,7 +119,7 @@ export function UserMenuDesktop({ user, onSignOut }: UserMenuDesktopProps) {
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted group-focus/logout:bg-primary/10">
               <LogOut className="h-4 w-4 text-muted-foreground group-focus/logout:text-primary" />
             </div>
-            <span className="text-sm font-medium">Odjavi se</span>
+            <span className="text-sm font-medium">{t('logout')}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

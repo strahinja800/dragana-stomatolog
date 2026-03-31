@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import { BookOpen } from '@/constants/icons';
 
 import BlogViewCard from './blog-view-card';
@@ -18,17 +20,17 @@ interface BlogViewGridProps {
 }
 
 export default function BlogViewGrid({ posts }: BlogViewGridProps) {
+  const t = useTranslations('home.blog');
+
   if (posts.length === 0) {
     return (
       <section className="pb-16 md:pb-24">
         <div className="container mx-auto px-4 text-center">
           <BookOpen className="mx-auto mb-4 h-16 w-16 text-muted-foreground/30" />
           <h2 className="mb-2 text-2xl font-semibold text-foreground">
-            Nema objavljenih članaka
+            {t('noArticles')}
           </h2>
-          <p className="text-muted-foreground">
-            Uskoro ćemo objaviti nove članke. Pratite nas!
-          </p>
+          <p className="text-muted-foreground">{t('noArticlesDescription')}</p>
         </div>
       </section>
     );
