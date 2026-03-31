@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { enUS,sr } from 'date-fns/locale';
+import { enUS, sr } from 'date-fns/locale';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

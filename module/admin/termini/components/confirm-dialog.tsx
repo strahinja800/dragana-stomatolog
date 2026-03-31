@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { enUS,sr } from 'date-fns/locale';
+import { enUS, sr } from 'date-fns/locale';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';

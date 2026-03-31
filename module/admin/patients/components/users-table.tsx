@@ -3,7 +3,7 @@
 import { useLocale } from 'next-intl';
 
 import { format } from 'date-fns';
-import { enUS,sr } from 'date-fns/locale';
+import { enUS, sr } from 'date-fns/locale';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { format } from 'date-fns';
-import { enUS,sr } from 'date-fns/locale';
+import { enUS, sr } from 'date-fns/locale';
 
 import { ArrowLeft } from '@/constants/icons';
 
