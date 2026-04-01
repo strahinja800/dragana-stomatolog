@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
-import { LanguageSwitcher } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -16,8 +15,6 @@ import { Calendar, Mail, MapPin, Menu, Phone } from '@/constants/icons';
 import { NAV_LINKS } from '@/constants/navigations';
 import { logoIcon } from '@/data/data';
 import { cn } from '@/lib/utils';
-
-import UserMenu from './user-menu';
 
 type PublicNavbarMobileProps = {
   pathname: string;
@@ -36,24 +33,29 @@ export function PublicNavbarMobile({
 
   return (
     <>
-      <div className="flex items-center gap-2 lg:hidden">
-        <UserMenu />
-        <button
-          type="button"
-          onClick={onOpen}
-          className="rounded-xl border border-white/30 bg-white/10 p-2.5 text-primary-foreground shadow-[0_8px_20px_-14px_rgba(0,0,0,0.48)] transition-smooth hover:border-accent/60 hover:bg-white/16 hover:text-white"
-          aria-label={t('bookOnline')}
-        >
-          <Menu className="size-6" />
-        </button>
-      </div>
+      <Link
+        href="/kontakt"
+        className="flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-[0_4px_12px_rgba(79,209,197,0.25)] transition-smooth hover:bg-accent/90 lg:hidden"
+      >
+        <Calendar className="size-4" />
+        <span>{t('bookOnline')}</span>
+      </Link>
+
+      <button
+        type="button"
+        onClick={onOpen}
+        className="rounded-xl border border-white/30 bg-white/10 p-2.5 text-primary-foreground shadow-[0_8px_20px_-14px_rgba(0,0,0,0.48)] transition-smooth hover:border-accent/60 hover:bg-white/16 hover:text-white lg:hidden"
+        aria-label={t('bookOnline')}
+      >
+        <Menu className="size-5" />
+      </button>
 
       <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <SheetContent
           side="right"
-          className="flex w-[86vw] max-w-sm flex-col gap-0 overflow-hidden border-0 data-[side=right]:border-l-0 p-0"
+          className="flex w-[86vw] max-w-sm flex-col gap-0 overflow-hidden border-0 p-0 data-[side=right]:border-l-0"
         >
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
+          <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/10 via-transparent to-accent/10" />
 
           <SheetHeader className="relative border-b border-primary-strong/70 bg-primary/96 px-6 py-5 shadow-[0_14px_34px_-20px_rgba(1,111,126,0.95)] backdrop-blur-xl">
             <div className="flex items-center gap-3">
@@ -131,12 +133,9 @@ export function PublicNavbarMobile({
 
           <SheetFooter className="relative mt-auto border-t border-border/40 bg-muted/40 px-6 py-5">
             <div className="w-full space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-                  {t('contact')}
-                </p>
-                <LanguageSwitcher variant="light" />
-              </div>
+              <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+                {t('contact')}
+              </p>
               <div className="space-y-2.5 text-sm">
                 <a
                   href="tel:+381111234567"

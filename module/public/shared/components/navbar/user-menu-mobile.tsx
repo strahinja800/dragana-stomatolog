@@ -45,10 +45,10 @@ export function UserMenuMobile({ user, onSignOut }: UserMenuMobileProps) {
     <div className="lg:hidden">
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
-          <button className="rounded-full shadow-[0_8px_20px_-14px_rgba(0,0,0,0.48)] focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-primary">
-            <Avatar className="ring-2 ring-white/45">
+          <button className="rounded-full focus:outline-none focus:ring-1 focus:ring-accent">
+            <Avatar size="sm" className="ring-1 ring-white/30">
               {user.image && <AvatarImage src={user.image} alt={user.name} />}
-              <AvatarFallback className="bg-accent text-foreground font-semibold">
+              <AvatarFallback className="bg-accent text-foreground text-xs font-semibold">
                 {initials}
               </AvatarFallback>
             </Avatar>

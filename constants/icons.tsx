@@ -53,6 +53,7 @@ export {
   FileQuestion,
   FileText,
   Gem,
+  Globe,
   GraduationCap,
   GripVertical,
   HandHeart,
