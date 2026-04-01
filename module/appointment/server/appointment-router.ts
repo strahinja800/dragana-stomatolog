@@ -31,6 +31,7 @@ import {
   parseLocalTime,
 } from '@/lib/timezone';
 import {
+  bookAppointmentSchema,
   confirmAppointmentSchema,
   createAppointmentForPatientSchema,
   createAppointmentSchema,
@@ -40,7 +41,13 @@ import {
   rejectAppointmentSchema,
   rescheduleAppointmentSchema,
 } from '@/module/appointment/types/appointment-schemas';
-import { adminProcedure, createTRPCRouter, publicProcedure } from '@/trpc/init';
+import { resolvePatient } from '@/module/patient/server/patient-service';
+import {
+  adminProcedure,
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from '@/trpc/init';
 
 const DEFAULT_SLOT_DURATION = 30; // minutes
 
@@ -338,6 +345,103 @@ export const appointmentRouter = createTRPCRouter({
       });
 
       return { success: true };
+    }),
+
+  // ============================================
+  // PROTECTED MUTATIONS (logged-in patients)
+  // ============================================
+
+  book: protectedProcedure
+    .input(bookAppointmentSchema)
+    .mutation(async ({ ctx, input }) => {
+      const startTime = parseLocalTime(input.date, input.time);
+      const endTime = addMinutes(startTime, DEFAULT_SLOT_DURATION);
+
+      const appointment = await ctx.prisma.$transaction(async (tx) => {
+        const existingAppointment = await tx.appointment.findFirst({
+          where: {
+            startTime: { gte: startTime, lt: endTime },
+            status: { in: ['CONFIRMED', 'PENDING'] },
+          },
+        });
+
+        if (existingAppointment) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: 'Ovaj termin je već zauzet',
+          });
+        }
+
+        const patient = await resolvePatient(
+          tx,
+          ctx.session.user,
+          input.profile
+        );
+
+        return tx.appointment.create({
+          data: {
+            patientId: patient.id,
+            startTime,
+            endTime,
+            email: patient.email ?? ctx.session.user.email,
+            phone: patient.phone,
+            symptoms: input.symptoms,
+            status: 'PENDING',
+            isExternal: true,
+            reminderSent: false,
+          },
+          include: { patient: true },
+        });
+      });
+
+      const patientName =
+        `${appointment.patient.firstName} ${appointment.patient.lastName}`.trim();
+
+      const emailResult = await sendEmail({
+        to: appointment.email ?? ctx.session.user.email,
+        subject: bookingReceivedSubject,
+        react: React.createElement(AppointmentBookingReceived, {
+          patientName,
+          startTime,
+        }),
+      });
+
+      if (!emailResult.success) {
+        console.error('[appointment.book] Booking received email failed', {
+          appointmentId: appointment.id,
+          reason: emailResult.message,
+        });
+      }
+
+      const clinicEmail = process.env.CLINIC_EMAIL;
+      if (clinicEmail) {
+        const adminEmailResult = await sendEmail({
+          to: clinicEmail,
+          subject: adminNewAppointmentSubject,
+          react: React.createElement(AdminNewAppointment, {
+            patientName,
+            startTime,
+            phone: appointment.phone ?? null,
+            symptoms: input.symptoms ?? null,
+          }),
+        });
+
+        if (!adminEmailResult.success) {
+          console.error('[appointment.book] Admin notification email failed', {
+            appointmentId: appointment.id,
+            reason: adminEmailResult.message,
+          });
+        }
+      }
+
+      emitAppointmentCreated({
+        appointmentId: appointment.id,
+        patientName,
+        serviceName: null,
+        startTime: startTime.toISOString(),
+      });
+
+      return appointment;
     }),
 
   // ============================================
