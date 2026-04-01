@@ -1,5 +1,7 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
+
 import { CircleCheckIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -44,10 +46,16 @@ function AppointmentCalendar({
   disabled = false,
   disablePastDates = true,
   isLoadingSlots = false,
-  locale = 'sr-Latn',
+  locale: localeProp,
   className,
   density = 'default',
 }: AppointmentCalendarProps) {
+  const locale = useLocale();
+  const t = useTranslations('home.booking');
+
+  // Map next-intl locale to Intl.Locale
+  const intlLocale = locale === 'sr' ? 'sr-Latn' : 'en-US';
+
   // Convert timestamps to Date objects for react-day-picker
   const disabledDateObjects = disabledTimestamps.map((ts) => new Date(ts));
   const isCompact = density === 'compact';
@@ -86,9 +94,9 @@ function AppointmentCalendar({
           className={cn('w-full bg-transparent', isCompact && 'md:flex-1')}
           formatters={{
             formatWeekdayName: (date) =>
-              date.toLocaleString(locale, { weekday: 'short' }),
+              date.toLocaleString(intlLocale, { weekday: 'short' }),
             formatCaption: (date) =>
-              date.toLocaleString(locale, {
+              date.toLocaleString(intlLocale, {
                 month: 'long',
                 year: 'numeric',
               }),
@@ -112,12 +120,12 @@ function AppointmentCalendar({
                 )}
               >
                 {!selectedDate
-                  ? 'Izaberite datum'
+                  ? t('calendarSelectDate')
                   : isLoadingSlots
-                    ? 'Učitavanje...'
+                    ? t('calendarLoading')
                     : timeSlots.length === 0
-                      ? 'Nema slobodnih termina'
-                      : 'Dostupni termini'}
+                      ? t('calendarNoSlots')
+                      : t('calendarAvailableSlots')}
               </p>
             </div>
             <ScrollArea className="h-full overflow-y-auto">

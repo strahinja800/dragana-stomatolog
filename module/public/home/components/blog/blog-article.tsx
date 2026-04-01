@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { format } from 'date-fns';
-import { sr } from 'date-fns/locale';
+import { enUS, sr } from 'date-fns/locale';
 
 import { BookOpen, ChevronRight } from '@/constants/icons';
 
@@ -26,6 +27,10 @@ interface Props {
 }
 
 export function BlogArticle({ posts }: Props) {
+  const t = useTranslations('home.blog');
+  const locale = useLocale();
+  const dateLocale = locale === 'sr' ? sr : enUS;
+
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {posts.map((post) => (
@@ -51,7 +56,7 @@ export function BlogArticle({ posts }: Props) {
           <div className="p-6">
             <span className="text-sm text-muted-foreground">
               {format(post.publishedAt ?? post.createdAt, 'd. MMMM yyyy.', {
-                locale: sr,
+                locale: dateLocale,
               })}
             </span>
             <h3 className="mt-2 mb-2 line-clamp-2 text-2xl font-semibold text-foreground transition-colors group-hover:text-primary">
@@ -66,7 +71,7 @@ export function BlogArticle({ posts }: Props) {
               href={`/blog/${post.slug}`}
               className="inline-flex items-center text-sm font-semibold text-primary transition-all hover:gap-2"
             >
-              Pročitaj više
+              {t('readMore')}
               <ChevronRight className="ml-1 h-4 w-4" />
             </Link>
           </div>

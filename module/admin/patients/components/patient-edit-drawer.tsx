@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -52,6 +53,7 @@ export function PatientEditDrawer({
   open,
   onOpenChange,
 }: PatientEditDrawerProps) {
+  const t = useTranslations('admin.patients');
   const [selectedGender, setSelectedGender] = useState<
     'MALE' | 'FEMALE' | undefined
   >(patient.gender ?? undefined);
@@ -89,13 +91,11 @@ export function PatientEditDrawer({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['patient'] });
         onOpenChange(false);
-        toast.success('Pacijent je uspešno ažuriran');
+        toast.success(t('updateSuccess'));
       },
       onError: (error) => {
         const message =
-          error instanceof Error
-            ? error.message
-            : 'Greška pri ažuriranju pacijenta';
+          error instanceof Error ? error.message : t('updateError');
         toast.error(message);
       },
     })
@@ -121,9 +121,9 @@ export function PatientEditDrawer({
       <DrawerContent className="h-screen max-w-4xl">
         <div className="mx-auto h-full w-full max-w-2xl overflow-y-auto">
           <DrawerHeader>
-            <DrawerTitle>Izmeni pacijenta</DrawerTitle>
+            <DrawerTitle>{t('editTitle')}</DrawerTitle>
             <DrawerDescription>
-              Ažurirajte podatke pacijenta {patient.firstName}{' '}
+              {t('editPatientDescription')} {patient.firstName}{' '}
               {patient.lastName}
             </DrawerDescription>
           </DrawerHeader>
@@ -133,11 +133,13 @@ export function PatientEditDrawer({
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">
-                    Ime <span className="text-destructive">*</span>
+                    {t('firstName')} <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="firstName"
-                    {...register('firstName', { required: 'Ime je obavezno' })}
+                    {...register('firstName', {
+                      required: t('firstNameRequired'),
+                    })}
                   />
                   {errors.firstName && (
                     <p className="text-sm text-destructive">
@@ -148,12 +150,12 @@ export function PatientEditDrawer({
 
                 <div className="space-y-2">
                   <Label htmlFor="lastName">
-                    Prezime <span className="text-destructive">*</span>
+                    {t('lastName')} <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="lastName"
                     {...register('lastName', {
-                      required: 'Prezime je obavezno',
+                      required: t('lastNameRequired'),
                     })}
                   />
                   {errors.lastName && (
@@ -166,19 +168,19 @@ export function PatientEditDrawer({
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('email')}</Label>
                   <Input id="email" type="email" {...register('email')} />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Telefon</Label>
+                  <Label htmlFor="phone">{t('phone')}</Label>
                   <Input id="phone" {...register('phone')} />
                 </div>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth">Datum rođenja</Label>
+                  <Label htmlFor="dateOfBirth">{t('dateOfBirth')}</Label>
                   <Input
                     id="dateOfBirth"
                     type="date"
@@ -187,7 +189,7 @@ export function PatientEditDrawer({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="gender">Pol</Label>
+                  <Label htmlFor="gender">{t('gender')}</Label>
                   <Select
                     value={selectedGender}
                     onValueChange={(value) =>
@@ -195,11 +197,11 @@ export function PatientEditDrawer({
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Izaberite pol" />
+                      <SelectValue placeholder={t('selectGender')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="MALE">Muški</SelectItem>
-                      <SelectItem value="FEMALE">Ženski</SelectItem>
+                      <SelectItem value="MALE">{t('male')}</SelectItem>
+                      <SelectItem value="FEMALE">{t('female')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -207,30 +209,30 @@ export function PatientEditDrawer({
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="allergies">Alergije</Label>
+                  <Label htmlFor="allergies">{t('allergies')}</Label>
                   <Input
                     id="allergies"
                     {...register('allergies')}
-                    placeholder="Npr. Penicilin..."
+                    placeholder={t('allergiesPlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="medications">Terapija/Lekovi</Label>
+                  <Label htmlFor="medications">{t('medications')}</Label>
                   <Input
                     id="medications"
                     {...register('medications')}
-                    placeholder="Npr. Aspirin..."
+                    placeholder={t('medicationsPlaceholder')}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="notes">Napomene</Label>
+                <Label htmlFor="notes">{t('notes')}</Label>
                 <Textarea
                   id="notes"
                   {...register('notes')}
-                  placeholder="Dodatne napomene o pacijentu..."
+                  placeholder={t('notesPlaceholder')}
                   rows={3}
                 />
               </div>
@@ -238,10 +240,10 @@ export function PatientEditDrawer({
 
             <DrawerFooter>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Čuvanje...' : 'Sačuvaj izmene'}
+                {isSubmitting ? t('saving') : t('saveButton')}
               </Button>
               <DrawerClose asChild>
-                <Button variant="outline">Otkaži</Button>
+                <Button variant="outline">{t('cancel')}</Button>
               </DrawerClose>
             </DrawerFooter>
           </form>

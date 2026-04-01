@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { type Table } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
@@ -29,20 +31,21 @@ interface BlogPostsTableToolbarProps {
   setGlobalFilter: (value: string) => void;
 }
 
-const columnLabels: Record<string, string> = {
-  title: 'Naslov',
-  status: 'Status',
-  publishedAt: 'Datum objave',
-};
-
 export function BlogPostsTableToolbar({
   table,
   globalFilter,
   setGlobalFilter,
 }: BlogPostsTableToolbarProps) {
+  const t = useTranslations('admin.blog');
   const isFiltered =
     globalFilter.length > 0 ||
     table.getColumn('status')?.getFilterValue() !== undefined;
+
+  const columnLabels: Record<string, string> = {
+    title: t('columnTitle'),
+    status: t('columnStatus'),
+    publishedAt: t('columnPublishedAt'),
+  };
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -50,7 +53,7 @@ export function BlogPostsTableToolbar({
         <div className="relative flex-1 sm:max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Pretraži članke..."
+            placeholder={t('searchPlaceholder')}
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="bg-white pl-8"
@@ -67,12 +70,12 @@ export function BlogPostsTableToolbar({
           }
         >
           <SelectTrigger className="w-[140px] bg-white">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t('statusPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Svi</SelectItem>
-            <SelectItem value="DRAFT">Draft</SelectItem>
-            <SelectItem value="PUBLISHED">Objavljeni</SelectItem>
+            <SelectItem value="all">{t('statusAll')}</SelectItem>
+            <SelectItem value="DRAFT">{t('statusDraft')}</SelectItem>
+            <SelectItem value="PUBLISHED">{t('statusPublished')}</SelectItem>
           </SelectContent>
         </Select>
         {isFiltered && (
@@ -84,7 +87,7 @@ export function BlogPostsTableToolbar({
             }}
             className="h-8 px-2 lg:px-3"
           >
-            Poništi
+            {t('resetButton')}
             <X className="ml-2 h-4 w-4" />
           </Button>
         )}
@@ -93,11 +96,11 @@ export function BlogPostsTableToolbar({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="ml-auto bg-white">
             <SlidersHorizontal className="mr-2 h-4 w-4" />
-            Kolone
+            {t('columnsButton')}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[150px]">
-          <DropdownMenuLabel>Prikaži kolone</DropdownMenuLabel>
+          <DropdownMenuLabel>{t('showColumns')}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {table
             .getAllColumns()

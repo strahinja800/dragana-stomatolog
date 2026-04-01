@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server';
+
 import { startOfDay } from 'date-fns';
 
 import {
@@ -12,27 +14,16 @@ import { prefetch, trpc } from '@/trpc/server';
 import BookingForm from './booking-form';
 import { BookingSectionSkeleton } from './booking-form-skeleton';
 
-const features = [
-  {
-    icon: CalendarCheck,
-    text: 'Online zakazivanje dostupno 24/7',
-  },
-  {
-    icon: MailCheck,
-    text: 'Email potvrda i podsetnik 24h pre pregleda',
-  },
-  {
-    icon: ShieldCheck,
-    text: 'Bezbedno čuvanje podataka pacijenata',
-  },
-  {
-    icon: Clock,
-    text: 'Brza potvrda termina od strane tima',
-  },
-];
-
 export default async function BookingSectionServer() {
   const today = startOfDay(new Date());
+  const t = await getTranslations('home.booking');
+
+  const features = [
+    { icon: CalendarCheck, text: t('feature1') },
+    { icon: MailCheck, text: t('feature2') },
+    { icon: ShieldCheck, text: t('feature3') },
+    { icon: Clock, text: t('feature4') },
+  ];
 
   void prefetch(trpc.appointment.getNonWorkingDays.queryOptions());
   void prefetch(
@@ -53,15 +44,12 @@ export default async function BookingSectionServer() {
       <div className="container relative z-10 mx-auto px-4">
         <div className="grid items-start gap-10 lg:grid-cols-5 lg:gap-16">
           <div className="space-y-6 text-center lg:col-span-2 lg:text-left">
-            <span className="section-kicker">Brzo Zakazivanje</span>
+            <span className="section-kicker">{t('kicker')}</span>
             <h2 className="text-3xl font-bold text-foreground md:text-5xl">
-              Zakažite pregled bez poziva i čekanja
+              {t('title')}
             </h2>
 
-            <p className="text-lg text-muted-foreground">
-              Rezervišite termin online u nekoliko klikova. Nakon potvrde,
-              dobijate email sa detaljima i automatski podsetnik pre dolaska.
-            </p>
+            <p className="text-lg text-muted-foreground">{t('description')}</p>
 
             <ul className="space-y-3.5 pt-2">
               {features.map((feature) => (

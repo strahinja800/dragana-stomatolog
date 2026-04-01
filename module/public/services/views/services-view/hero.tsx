@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server';
+
 import { Sparkles, Star } from '@/constants/icons';
 
 import CtaServices from './cta-services';
@@ -5,7 +7,9 @@ import FeaturedServices from './featured-services';
 import ServicesGrid from './services-grid';
 import TrustSection from './trust-section';
 
-export default function ServicesHero() {
+export default async function ServicesHero() {
+  const t = await getTranslations('services.hero');
+
   return (
     <>
       <section className="gradient-hero relative overflow-hidden pt-34 pb-20 md:pt-40 md:pb-28">
@@ -20,17 +24,16 @@ export default function ServicesHero() {
           <div className="mx-auto max-w-4xl text-center animate-fade-up">
             <span className="section-kicker">
               <Sparkles className="h-3.5 w-3.5" />
-              Naše usluge
+              {t('kicker')}
             </span>
 
             <h1 className="mt-6 font-heading text-4xl font-bold text-foreground md:text-5xl lg:text-6xl">
-              Kompletna stomatološka nega{' '}
-              <span className="text-gradient">sa premium pristupom</span>
+              {t('title')}{' '}
+              <span className="text-gradient">{t('titleHighlight')}</span>
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              Od preventive do kompleksnih rehabilitacija, svaka terapija je
-              vođena individualnim planom i jasnom komunikacijom.
+              {t('description')}
             </p>
 
             <div className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground">
@@ -43,12 +46,12 @@ export default function ServicesHero() {
                     />
                   ))}
                 </div>
-                <span className="font-medium">5.0 ocena</span>
+                <span className="font-medium">{t('rating')}</span>
               </div>
               <span className="h-4 w-px bg-border" />
-              <span>8 specijalnosti</span>
+              <span>{t('specialties')}</span>
               <span className="hidden h-4 w-px bg-border sm:block" />
-              <span className="hidden sm:inline">10.000+ pacijenata</span>
+              <span className="hidden sm:inline">{t('patients')}</span>
             </div>
           </div>
         </div>

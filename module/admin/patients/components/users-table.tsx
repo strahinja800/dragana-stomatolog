@@ -1,7 +1,9 @@
 'use client';
 
+import { useLocale } from 'next-intl';
+
 import { format } from 'date-fns';
-import { sr } from 'date-fns/locale';
+import { enUS, sr } from 'date-fns/locale';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -48,6 +50,9 @@ function getInitials(name: string): string {
 }
 
 export function UsersTable({ users }: UsersTableProps) {
+  const locale = useLocale();
+  const dateLocale = locale === 'sr' ? sr : enUS;
+
   return (
     <Card className="border-0 shadow-card">
       <CardHeader className="border-b">
@@ -125,7 +130,7 @@ export function UsersTable({ users }: UsersTableProps) {
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {format(new Date(user.createdAt), 'd. MMM yyyy.', {
-                      locale: sr,
+                      locale: dateLocale,
                     })}
                   </TableCell>
                   <TableCell>

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import { useQuery } from '@tanstack/react-query';
 
@@ -22,6 +23,7 @@ interface PatientDetailsViewProps {
 }
 
 export function PatientDetailsView({ patientId }: PatientDetailsViewProps) {
+  const t = useTranslations('admin.patients');
   const trpc = useTRPC();
 
   const { data: patientData, isLoading: patientLoading } = useQuery(
@@ -43,16 +45,14 @@ export function PatientDetailsView({ patientId }: PatientDetailsViewProps) {
           <Link href="/admin/patients">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Nazad na listu
+              {t('backToList')}
             </Button>
           </Link>
         </div>
         <Card>
           <CardHeader>
-            <CardTitle>Pacijent nije pronađen</CardTitle>
-            <CardDescription>
-              Pacijent sa ovim ID-jem ne postoji u bazi.
-            </CardDescription>
+            <CardTitle>{t('patientNotFound')}</CardTitle>
+            <CardDescription>{t('patientNotFoundDescription')}</CardDescription>
           </CardHeader>
         </Card>
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 
@@ -10,6 +11,7 @@ import { BookOpen, ExternalLink } from '@/constants/icons';
 import { useTRPC } from '@/trpc/client';
 
 export function DashboardBlogStatus() {
+  const t = useTranslations('admin.dashboard');
   const trpc = useTRPC();
   const published = useSuspenseQuery(
     trpc.blog.getPublishedCount.queryOptions()
@@ -22,7 +24,7 @@ export function DashboardBlogStatus() {
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center gap-2 text-lg font-semibold">
             <BookOpen className="size-5 text-violet-500" />
-            Blog status
+            {t('blogStatus')}
           </span>
           <Button
             asChild
@@ -32,7 +34,7 @@ export function DashboardBlogStatus() {
           >
             <Link href="/admin/blog" className="inline-flex items-center">
               <ExternalLink className="size-3.5" />
-              <span>Upravljaj blogom</span>
+              <span>{t('manageBlog')}</span>
             </Link>
           </Button>
         </CardTitle>
@@ -44,14 +46,16 @@ export function DashboardBlogStatus() {
               {published.data.published}
             </span>
             <span className="mt-1 text-sm text-muted-foreground">
-              Objavljeno
+              {t('published')}
             </span>
           </div>
           <div className="flex flex-col items-center justify-center rounded-xl bg-amber-500/10 py-6">
             <span className="text-3xl font-bold text-amber-600 dark:text-amber-400">
               {drafts.data.drafts}
             </span>
-            <span className="mt-1 text-sm text-muted-foreground">Nacrti</span>
+            <span className="mt-1 text-sm text-muted-foreground">
+              {t('drafts')}
+            </span>
           </div>
         </div>
       </CardContent>

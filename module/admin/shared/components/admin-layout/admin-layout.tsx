@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { ADMIN_BRAND } from '@/constants/admin-navigation';
@@ -15,6 +16,7 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const t = useTranslations('admin.nav');
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -23,7 +25,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* Mobile Menu Button */}
       <div className="fixed left-0 right-0 top-0 z-50 flex h-16 items-center justify-between border-b border-border/50 bg-card/80 px-4 backdrop-blur-lg lg:hidden">
-        <span className="text-sm font-semibold">{ADMIN_BRAND.mobileTitle}</span>
+        <span className="text-sm font-semibold">
+          {ADMIN_BRAND.name} {t('mobileTitle').replace('DENTALHOLIST ', '')}
+        </span>
         <Button
           variant="ghost"
           size="icon"

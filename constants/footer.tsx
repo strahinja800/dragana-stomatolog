@@ -8,35 +8,27 @@ import {
   Phone,
 } from '@/constants/icons';
 
-export const FOOTER_SERVICES = [
-  'Preventivna stomatologija',
-  'Estetska stomatologija',
-  'Implantologija',
-  'Ortodoncija',
-  'Parodontologija',
-];
-
-export const FOOTER_QUICK_LINKS = [
-  { href: '/', label: 'Početna' },
-  { href: '/usluge', label: 'Usluge' },
-  { href: '/o-nama', label: 'O nama' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/kontakt', label: 'Kontakt' },
-];
+export const FOOTER_SERVICE_KEYS = [
+  'preventiva',
+  'estetska',
+  'implantologija',
+  'ortodoncija',
+  'parodontologija',
+] as const;
 
 export const FOOTER_SOCIAL_LINKS = [
   {
-    label: 'Facebook',
+    labelKey: 'footerSocial.facebook',
     icon: Facebook,
     href: 'https://www.facebook.com/dentalholist',
   },
   {
-    label: 'Instagram',
+    labelKey: 'footerSocial.instagram',
     icon: Instagram,
     href: 'https://www.instagram.com/dentalholist',
   },
   {
-    label: 'LinkedIn',
+    labelKey: 'footerSocial.linkedin',
     icon: Linkedin,
     href: 'https://www.linkedin.com/company/dentalholist',
   },
@@ -66,9 +58,3 @@ export const FOOTER_CONTACT = [
     lines: ['Pon - Pet: 08:00 - 20:00', 'Sub: 09:00 - 14:00'],
   },
 ];
-
-export const FOOTER_BRAND = {
-  name: 'DENTALHOLIST KONCEPT',
-  description:
-    'Premium stomatološka ordinacija sa holističkim pristupom, online zakazivanjem i pažljivo vođenim iskustvom pacijenata.',
-};

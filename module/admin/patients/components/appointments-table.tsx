@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { enUS, sr } from 'date-fns/locale';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
@@ -39,22 +42,23 @@ export function AppointmentsTable({
     null
   );
 
+  const t = useTranslations('admin.patients');
+  const locale = useLocale();
+  const dateLocale = locale === 'sr' ? sr : enUS;
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
   const { mutate: deleteAppointment, isPending: isDeleting } = useMutation(
     trpc.appointment.delete.mutationOptions({
       onSuccess: () => {
-        toast.success('Termin je uspešno obrisan');
+        toast.success(t('appointmentDeleteSuccess'));
         setDeleteDialogOpen(false);
         setAppointmentToDelete(null);
         queryClient.invalidateQueries({ queryKey: ['patient'] });
       },
       onError: (error) => {
         const message =
-          error instanceof Error
-            ? error.message
-            : 'Greška pri brisanju termina';
+          error instanceof Error ? error.message : t('appointmentDeleteError');
         toast.error(message);
       },
     })
@@ -77,11 +81,13 @@ export function AppointmentsTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Datum</TableHead>
-            <TableHead>Vreme</TableHead>
-            <TableHead>Simptomi</TableHead>
-            <TableHead>Zapisi</TableHead>
-            <TableHead className="w-20">Akcije</TableHead>
+            <TableHead>{t('appointmentsTableDate')}</TableHead>
+            <TableHead>{t('appointmentsTableTime')}</TableHead>
+            <TableHead>{t('appointmentsTableSymptoms')}</TableHead>
+            <TableHead>{t('appointmentsTableRecords')}</TableHead>
+            <TableHead className="w-20">
+              {t('appointmentsTableActions')}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -96,14 +102,9 @@ export function AppointmentsTable({
                 onClick={() => onSelectAppointment(appointment.id)}
               >
                 <TableCell className="font-medium">
-                  {startDate.toLocaleDateString('sr-RS')}
+                  {format(startDate, 'd. MMMM yyyy.', { locale: dateLocale })}
                 </TableCell>
-                <TableCell>
-                  {startDate.toLocaleTimeString('sr-RS', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </TableCell>
+                <TableCell>{format(startDate, 'HH:mm')}</TableCell>
                 <TableCell>{appointment.symptoms || '—'}</TableCell>
                 <TableCell>
                   <Badge
@@ -111,8 +112,8 @@ export function AppointmentsTable({
                     className="text-xs"
                   >
                     {records.length > 0
-                      ? `${records.length} ${records.length === 1 ? 'zapis' : 'zapisa'}`
-                      : 'Nema zapisa'}
+                      ? `${records.length} ${records.length === 1 ? t('appointmentRecord') : t('appointmentRecords')}`
+                      : t('appointmentNoRecords')}
                   </Badge>
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
@@ -136,10 +137,10 @@ export function AppointmentsTable({
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleConfirmDelete}
-        title="Brisanje termina"
-        description="Da li ste sigurni da želite da obrišete ovaj termin? Svi zapisi vezani za ovaj termin će takođe biti obrisani."
-        confirmText="Obriši"
-        cancelText="Otkaži"
+        title={t('appointmentDeleteTitle')}
+        description={t('appointmentDeleteDescription')}
+        confirmText={t('deleteButton')}
+        cancelText={t('cancelButton')}
         variant="destructive"
       />
     </div>

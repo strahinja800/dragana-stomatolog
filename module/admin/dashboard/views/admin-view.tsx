@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { DashboardAppointmentNotifier } from '@/module/admin/dashboard/components/dashboard-appointment-notifier';
@@ -12,6 +14,7 @@ import { StatsCards } from '@/module/admin/dashboard/components/stats-cards';
 import { useTRPC } from '@/trpc/client';
 
 export function AdminView() {
+  const t = useTranslations('admin.dashboard');
   const trpc = useTRPC();
   const { data: todayAppointments } = useSuspenseQuery(
     trpc.appointment.getToday.queryOptions()
@@ -29,10 +32,8 @@ export function AdminView() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Kontrolna tabla</h1>
-          <p className="mt-1 text-muted-foreground">
-            Pregled ordinacije i brze akcije
-          </p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="mt-1 text-muted-foreground">{t('description')}</p>
         </div>
         <DashboardQuickActions />
       </div>

@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { format } from 'date-fns';
-import { sr } from 'date-fns/locale';
+import { enUS, sr } from 'date-fns/locale';
 
 import { ArrowLeft } from '@/constants/icons';
 
@@ -22,6 +23,10 @@ interface BlogPostViewHeroProps {
 }
 
 export default function BlogPostViewHero({ post }: BlogPostViewHeroProps) {
+  const t = useTranslations('home.blog');
+  const locale = useLocale();
+  const dateLocale = locale === 'sr' ? sr : enUS;
+
   return (
     <section className="gradient-hero pt-34 pb-16 md:pt-40 md:pb-20">
       <div className="container mx-auto px-4">
@@ -31,12 +36,12 @@ export default function BlogPostViewHero({ post }: BlogPostViewHeroProps) {
             className="inline-flex items-center text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Nazad na blog
+            {t('backToBlog')}
           </Link>
 
           <p className="mt-4 text-sm text-muted-foreground">
             {format(post.publishedAt ?? post.createdAt, 'EEEE, d. MMMM yyyy.', {
-              locale: sr,
+              locale: dateLocale,
             })}
           </p>
 

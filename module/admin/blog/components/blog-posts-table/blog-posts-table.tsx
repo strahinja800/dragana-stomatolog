@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import {
   type ColumnFiltersState,
@@ -25,7 +26,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-import { type BlogPostRow, columns } from './blog-posts-table-columns';
+import {
+  type BlogPostRow,
+  useBlogPostsColumns,
+} from './blog-posts-table-columns';
 import { BlogPostsTableToolbar } from './blog-posts-table-toolbar';
 
 interface BlogPostsTableProps {
@@ -34,10 +38,13 @@ interface BlogPostsTableProps {
 }
 
 export function BlogPostsTable({ data, onEditPost }: BlogPostsTableProps) {
+  const t = useTranslations('shared.pagination');
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState('');
+
+  const columns = useBlogPostsColumns();
 
   const table = useReactTable({
     data,
@@ -120,7 +127,7 @@ export function BlogPostsTable({ data, onEditPost }: BlogPostsTableProps) {
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} totalLabel="Ukupno članaka:" />
+      <DataTablePagination table={table} totalLabel={t('totalPosts')} />
     </div>
   );
 }

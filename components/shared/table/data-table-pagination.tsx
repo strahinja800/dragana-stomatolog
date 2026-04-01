@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { type Table } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
@@ -25,16 +27,18 @@ interface DataTablePaginationProps<TData> {
 
 export function DataTablePagination<TData>({
   table,
-  totalLabel = 'Ukupno:',
+  totalLabel,
 }: DataTablePaginationProps<TData>) {
+  const t = useTranslations('shared.pagination');
+  const label = totalLabel ?? t('total');
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
-        {totalLabel} {table.getFilteredRowModel().rows.length}
+        {label} {table.getFilteredRowModel().rows.length}
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Redova po stranici</p>
+          <p className="text-sm font-medium">{t('rowsPerPage')}</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -54,7 +58,7 @@ export function DataTablePagination<TData>({
           </Select>
         </div>
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Stranica {table.getState().pagination.pageIndex + 1} od{' '}
+          {t('pageOf')} {table.getState().pagination.pageIndex + 1} {t('of')}{' '}
           {table.getPageCount()}
         </div>
         <div className="flex items-center space-x-2">
@@ -64,7 +68,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
-            <span className="sr-only">Prva stranica</span>
+            <span className="sr-only">{t('firstPage')}</span>
             <ChevronsLeft className="h-4 w-4" />
           </Button>
           <Button
@@ -73,7 +77,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <span className="sr-only">Prethodna stranica</span>
+            <span className="sr-only">{t('previousPage')}</span>
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
@@ -82,7 +86,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            <span className="sr-only">Sledeća stranica</span>
+            <span className="sr-only">{t('nextPage')}</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button
@@ -91,7 +95,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >
-            <span className="sr-only">Poslednja stranica</span>
+            <span className="sr-only">{t('lastPage')}</span>
             <ChevronsRight className="h-4 w-4" />
           </Button>
         </div>

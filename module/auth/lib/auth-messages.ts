@@ -35,6 +35,29 @@ export const authMessagesSr: Record<string, string> = {
 };
 
 /**
+ * Lista svih poznatih error kodova za proveru u parseAuthError
+ */
+export const authErrorCodes = [
+  'USER_NOT_FOUND',
+  'USER_ALREADY_EXISTS',
+  'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL',
+  'INVALID_PASSWORD',
+  'INVALID_EMAIL',
+  'INVALID_EMAIL_OR_PASSWORD',
+  'CREDENTIAL_ACCOUNT_NOT_FOUND',
+  'INVALID_CREDENTIALS',
+  'SESSION_EXPIRED',
+  'SESSION_NOT_FOUND',
+  'TOO_MANY_ATTEMPTS',
+  'INVALID_TOKEN',
+  'TOKEN_EXPIRED',
+  'EMAIL_NOT_VERIFIED',
+  'EMAIL_ALREADY_VERIFIED',
+  'SOCIAL_ACCOUNT_ALREADY_LINKED',
+  'ACCOUNT_NOT_LINKED',
+] as const;
+
+/**
  * Error kodovi vezani za email polje
  * Koristi se za inline prikaz errora ispod email inputa
  */

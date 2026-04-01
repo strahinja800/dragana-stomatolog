@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { toast } from 'sonner';
 
@@ -21,10 +22,11 @@ export function NewAppointmentDrawer({
   patientPhone,
 }: NewAppointmentDrawerProps) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations('admin.patients');
 
   const handleSuccess = () => {
     setOpen(false);
-    toast.success('Termin je uspešno zakazan');
+    toast.success(t('appointmentBooked'));
   };
 
   return (
@@ -32,7 +34,7 @@ export function NewAppointmentDrawer({
       <DrawerTrigger asChild>
         <Button size="sm">
           <Plus className="mr-2 h-4 w-4" />
-          Dodaj termin
+          {t('addAppointment')}
         </Button>
       </DrawerTrigger>
       <DrawerContent className="left-auto right-0 top-0 mt-0 h-screen w-full max-w-2xl rounded-none">

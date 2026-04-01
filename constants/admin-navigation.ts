@@ -8,27 +8,27 @@ import {
 
 export const ADMIN_NAV_ITEMS = [
   {
-    label: 'Kontrolna tabla',
+    key: 'dashboard',
     href: '/admin',
     icon: LayoutDashboard,
   },
   {
-    label: 'Termini',
+    key: 'appointments',
     href: '/admin/termini',
     icon: CalendarClock,
   },
   {
-    label: 'Pacijenti',
+    key: 'patients',
     href: '/admin/patients',
     icon: Users,
   },
   {
-    label: 'Blog',
+    key: 'blog',
     href: '/admin/blog',
     icon: FileText,
   },
   {
-    label: 'Podešavanja',
+    key: 'settings',
     href: '/admin/settings',
     icon: Settings,
   },
@@ -36,11 +36,4 @@ export const ADMIN_NAV_ITEMS = [
 
 export const ADMIN_BRAND = {
   name: 'DENTALHOLIST',
-  subtitle: 'Admin Panel',
-  mobileTitle: 'DENTALHOLIST Admin',
-};
-
-export const ADMIN_ACTIONS = {
-  signOut: 'Odjavi se',
-  backToSite: 'Povratak na sajt',
 };

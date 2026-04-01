@@ -1,15 +1,24 @@
+import { getTranslations } from 'next-intl/server';
+
 import { defaultConfig, statusConfig } from './response-config';
 
 interface Props {
-  searchParams: { status?: string };
+  searchParams: Promise<{ status?: string }>;
 }
 
-export default function AppointmentResponsePage({ searchParams }: Props) {
-  const { status } = searchParams;
+export default async function AppointmentResponsePage({ searchParams }: Props) {
+  const { status } = await searchParams;
+  const t = await getTranslations('appointmentResponse');
+
   const config =
     status && status in statusConfig
       ? statusConfig[status as keyof typeof statusConfig]
       : defaultConfig;
+
+  const statusKey =
+    status && status in statusConfig
+      ? (status as keyof typeof statusConfig)
+      : 'invalid';
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
@@ -21,9 +30,9 @@ export default function AppointmentResponsePage({ searchParams }: Props) {
           {config.icon}
         </div>
         <h1 className="mb-3 text-2xl font-semibold text-gray-900">
-          {config.title}
+          {t(`${statusKey}.title`)}
         </h1>
-        <p className="text-gray-500">{config.message}</p>
+        <p className="text-gray-500">{t(`${statusKey}.message`)}</p>
       </div>
     </div>
   );

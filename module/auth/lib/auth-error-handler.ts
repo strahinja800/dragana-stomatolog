@@ -1,5 +1,5 @@
 import {
-  authMessagesSr,
+  authErrorCodes,
   EMAIL_RELATED_ERRORS,
   PASSWORD_RELATED_ERRORS,
 } from './auth-messages';
@@ -18,16 +18,21 @@ interface ParsedAuthError {
   isPasswordError: boolean;
 }
 
-const DEFAULT_ERROR_MESSAGE = 'Došlo je do greške, pokušajte ponovo';
+type TFn = (key: string) => string;
 
 /**
  * Parsira Better Auth error response i vraća lokalizovanu poruku
  */
-export function parseAuthError(ctx: AuthErrorContext): ParsedAuthError {
+export function parseAuthError(ctx: AuthErrorContext, t: TFn): ParsedAuthError {
   const code = ctx.error?.code ?? null;
-  const message = code
-    ? (authMessagesSr[code] ?? ctx.error?.message ?? DEFAULT_ERROR_MESSAGE)
-    : (ctx.error?.message ?? DEFAULT_ERROR_MESSAGE);
+  const defaultMessage = t('auth.errors.default');
+
+  const isKnownCode = code
+    ? authErrorCodes.includes(code as (typeof authErrorCodes)[number])
+    : false;
+  const message = isKnownCode
+    ? t(`auth.errors.${code}`)
+    : (ctx.error?.message ?? defaultMessage);
 
   return {
     message,
@@ -35,11 +40,4 @@ export function parseAuthError(ctx: AuthErrorContext): ParsedAuthError {
     isEmailError: code ? EMAIL_RELATED_ERRORS.includes(code) : false,
     isPasswordError: code ? PASSWORD_RELATED_ERRORS.includes(code) : false,
   };
-}
-
-/**
- * Vraća lokalizovanu poruku za dati error kod
- */
-export function getAuthErrorMessage(code: string): string {
-  return authMessagesSr[code] ?? DEFAULT_ERROR_MESSAGE;
 }

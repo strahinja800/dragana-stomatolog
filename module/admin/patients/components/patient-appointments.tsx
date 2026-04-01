@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import {
   Card,
@@ -30,6 +31,7 @@ export function PatientAppointments({
   appointments,
   allMedicalRecords,
 }: PatientAppointmentsProps) {
+  const t = useTranslations('admin.patients');
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<
     string | null
   >(null);
@@ -54,9 +56,9 @@ export function PatientAppointments({
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Termini</CardTitle>
+              <CardTitle>{t('appointments')}</CardTitle>
               <CardDescription>
-                Zakazani i prošli termini pacijenta ({appointments.length})
+                {t('appointmentsDescription')} ({appointments.length})
               </CardDescription>
             </div>
             <NewAppointmentDrawer
@@ -69,7 +71,7 @@ export function PatientAppointments({
         <CardContent>
           {appointments.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Nema zakazanih termina.
+              {t('noAppointments')}
             </p>
           ) : (
             <AppointmentsTable

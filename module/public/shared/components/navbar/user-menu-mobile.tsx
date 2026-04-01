@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -27,12 +28,13 @@ type UserMenuMobileProps = {
 };
 
 export function UserMenuMobile({ user, onSignOut }: UserMenuMobileProps) {
+  const t = useTranslations('userMenu');
   const [open, setOpen] = useState(false);
 
   const initials = user.initials;
   const isAdmin = user.role === 'admin';
   const dashboardHref = isAdmin ? '/admin' : '/profile';
-  const dashboardLabel = isAdmin ? 'Admin panel' : 'Profil';
+  const dashboardLabel = isAdmin ? t('adminPanel') : t('profile');
 
   const handleSignOut = () => {
     setOpen(false);
@@ -87,7 +89,7 @@ export function UserMenuMobile({ user, onSignOut }: UserMenuMobileProps) {
               onClick={handleSignOut}
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Odjavi se
+              {t('logout')}
             </Button>
           </div>
         </DrawerContent>

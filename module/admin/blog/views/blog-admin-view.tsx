@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { parseAsString, useQueryState } from 'nuqs';
 
@@ -11,6 +13,7 @@ import type { BlogPostRow } from '@/module/admin/blog/components/blog-posts-tabl
 import { useTRPC } from '@/trpc/client';
 
 export default function BlogAdminView() {
+  const t = useTranslations('admin.blog');
   const trpc = useTRPC();
 
   const [blogPostId, setBlogPostId] = useQueryState(
@@ -30,14 +33,12 @@ export default function BlogAdminView() {
     <div className="space-y-8">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Blog</h1>
-          <p className="mt-1 text-muted-foreground">
-            Pregled i upravljanje blog postovima.
-          </p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="mt-1 text-muted-foreground">{t('description')}</p>
         </div>
         <Button onClick={() => setBlogPostId('new')}>
           <Plus className="mr-2 h-4 w-4" />
-          Novi blog post
+          {t('newPost')}
         </Button>
       </div>
 

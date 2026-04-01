@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import {
   useMutation,
@@ -62,6 +63,7 @@ const defaultForm: ServiceTypeForm = {
 };
 
 export function ServiceTypesTab() {
+  const t = useTranslations('admin.settings');
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -84,13 +86,13 @@ export function ServiceTypesTab() {
     trpc.settings.createServiceType.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [['settings']] });
-        toast.success('Usluga kreirana');
+        toast.success(t('serviceCreated'));
         closeDialog();
       },
       onError: (error) => {
-        toast.error('Greška', {
+        toast.error(t('serviceError'), {
           description:
-            error instanceof Error ? error.message : 'Nepoznata greška',
+            error instanceof Error ? error.message : t('serviceError'),
         });
       },
     })
@@ -100,15 +102,15 @@ export function ServiceTypesTab() {
     trpc.settings.updateServiceType.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [['settings']] });
-        toast.success('Usluga ažurirana');
+        toast.success(t('serviceUpdated'));
         if (isDialogOpen) {
           closeDialog();
         }
       },
       onError: (error) => {
-        toast.error('Greška', {
+        toast.error(t('serviceError'), {
           description:
-            error instanceof Error ? error.message : 'Nepoznata greška',
+            error instanceof Error ? error.message : t('serviceError'),
         });
       },
     })
@@ -118,13 +120,13 @@ export function ServiceTypesTab() {
     trpc.settings.deleteServiceType.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [['settings']] });
-        toast.success('Usluga obrisana');
+        toast.success(t('serviceDeleted'));
         setDeleteId(null);
       },
       onError: (error) => {
-        toast.error('Greška', {
+        toast.error(t('serviceError'), {
           description:
-            error instanceof Error ? error.message : 'Nepoznata greška',
+            error instanceof Error ? error.message : t('serviceError'),
         });
       },
     })
@@ -148,7 +150,9 @@ export function ServiceTypesTab() {
 
   const handleSubmit = () => {
     if (!form.name.trim()) {
-      toast.error('Naziv je obavezan');
+      toast.error(t('serviceError'), {
+        description: t('serviceName'),
+      });
       return;
     }
 
@@ -188,10 +192,10 @@ export function ServiceTypesTab() {
       <Card className="overflow-hidden border-border/50 shadow-sm">
         <CardHeader className="border-b bg-muted/30 px-6 py-4">
           <CardTitle className="flex items-center justify-between text-lg font-semibold">
-            <span>Tipovi usluga</span>
+            <span>{t('serviceTypesTitle')}</span>
             <Button size="sm" className="gap-2" onClick={openCreate}>
               <Plus className="size-4" />
-              Dodaj uslugu
+              {t('addService')}
             </Button>
           </CardTitle>
         </CardHeader>
@@ -202,24 +206,26 @@ export function ServiceTypesTab() {
               <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted">
                 <Clock className="size-6 text-muted-foreground" />
               </div>
-              <p className="text-muted-foreground">
-                Nema definisanih tipova usluga
-              </p>
+              <p className="text-muted-foreground">{t('noServices')}</p>
               <p className="mt-1 text-sm text-muted-foreground/70">
-                Kliknite &quot;Dodaj uslugu&quot; za kreiranje nove usluge
+                {t('noServicesHint')}
               </p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-[200px]">Naziv</TableHead>
-                  <TableHead className="w-[100px]">Trajanje</TableHead>
-                  <TableHead className="hidden md:table-cell">Opis</TableHead>
-                  <TableHead className="w-[100px] text-center">
-                    Status
+                  <TableHead className="w-[200px]">{t('name')}</TableHead>
+                  <TableHead className="w-[100px]">{t('duration')}</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    {t('descriptionColumn')}
                   </TableHead>
-                  <TableHead className="w-[100px] text-right">Akcije</TableHead>
+                  <TableHead className="w-[100px] text-center">
+                    {t('status')}
+                  </TableHead>
+                  <TableHead className="w-[100px] text-right">
+                    {t('actions')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -251,7 +257,7 @@ export function ServiceTypesTab() {
                         )}
                         onClick={() => toggleActive(service)}
                       >
-                        {service.isActive ? 'Aktivan' : 'Neaktivan'}
+                        {service.isActive ? t('active') : t('inactive')}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -287,28 +293,28 @@ export function ServiceTypesTab() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? 'Izmeni uslugu' : 'Nova usluga'}
+              {isEditing ? t('editService') : t('newService')}
             </DialogTitle>
             <DialogDescription>
               {isEditing
-                ? 'Izmenite podatke o usluzi'
-                : 'Unesite podatke za novu uslugu'}
+                ? t('editServiceDescription')
+                : t('newServiceDescription')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Naziv usluge *</Label>
+              <Label htmlFor="name">{t('serviceName')} *</Label>
               <Input
                 id="name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="npr. Čišćenje kamenca"
+                placeholder={t('serviceNamePlaceholder')}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="duration">Trajanje (minuti)</Label>
+              <Label htmlFor="duration">{t('durationMinutes')}</Label>
               <Input
                 id="duration"
                 type="number"
@@ -326,14 +332,14 @@ export function ServiceTypesTab() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Opis (opciono)</Label>
+              <Label htmlFor="description">{t('descriptionOptional')}</Label>
               <Textarea
                 id="description"
                 value={form.description}
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
                 }
-                placeholder="Kratak opis usluge..."
+                placeholder={t('descriptionPlaceholder')}
                 className="min-h-20 resize-none"
               />
             </div>
@@ -341,10 +347,10 @@ export function ServiceTypesTab() {
             <div className="flex items-center justify-between rounded-lg border p-3">
               <div>
                 <Label htmlFor="isActive" className="font-medium">
-                  Aktivna usluga
+                  {t('activeService')}
                 </Label>
                 <p className="text-sm text-muted-foreground">
-                  Neaktivne usluge neće biti prikazane
+                  {t('activeHint')}
                 </p>
               </div>
               <Switch
@@ -363,7 +369,7 @@ export function ServiceTypesTab() {
               onClick={closeDialog}
               disabled={isPending}
             >
-              Otkaži
+              {t('cancel')}
             </Button>
             <Button
               onClick={handleSubmit}
@@ -371,7 +377,7 @@ export function ServiceTypesTab() {
               className="gap-2"
             >
               {isPending && <Loader2 className="size-4 animate-spin" />}
-              {isEditing ? 'Sačuvaj' : 'Kreiraj'}
+              {isEditing ? t('saveButton') : t('createButton')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -381,13 +387,15 @@ export function ServiceTypesTab() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Obrisati uslugu?</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteServiceTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Ova akcija je nepovratna. Usluga će biti trajno obrisana.
+              {t('deleteServiceDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Otkaži</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>
+              {t('cancel')}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteId && handleDelete(deleteId)}
               disabled={isDeleting}
@@ -396,10 +404,10 @@ export function ServiceTypesTab() {
               {isDeleting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />
-                  Brisanje...
+                  {t('deleteButton')}
                 </>
               ) : (
-                'Obriši'
+                t('deleteButton')
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

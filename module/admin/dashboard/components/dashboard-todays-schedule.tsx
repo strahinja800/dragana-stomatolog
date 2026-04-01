@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -15,6 +16,8 @@ import { useTRPC } from '@/trpc/client';
 
 export function DashboardTodaysSchedule() {
   const trpc = useTRPC();
+  const t = useTranslations('admin.dashboard');
+  const tStatus = useTranslations();
   const { data: appointments } = useSuspenseQuery(
     trpc.appointment.getToday.queryOptions()
   );
@@ -24,13 +27,13 @@ export function DashboardTodaysSchedule() {
       <CardHeader className="border-b bg-muted/30 px-6 py-4">
         <CardTitle className="flex items-center gap-2 text-lg font-semibold">
           <CalendarClock className="size-5 text-primary" />
-          Današnji raspored
+          {t('todaysSchedule')}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         {appointments.length === 0 ? (
           <p className="px-6 py-8 text-center text-sm text-muted-foreground">
-            Nema zakazanih termina za danas.
+            {t('noAppointmentsToday')}
           </p>
         ) : (
           <ul className="divide-y divide-border/50">
@@ -39,7 +42,7 @@ export function DashboardTodaysSchedule() {
               const statusConfig = APPOINTMENT_STATUS_CONFIG[status];
               const patientName = appointment.patient
                 ? `${appointment.patient.firstName} ${appointment.patient.lastName}`.trim()
-                : 'Nepoznat';
+                : t('unknownPatient');
 
               return (
                 <li key={appointment.id}>
@@ -53,7 +56,7 @@ export function DashboardTodaysSchedule() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{patientName}</p>
                       <p className="truncate text-sm text-muted-foreground">
-                        {appointment.serviceType?.name ?? '—'}
+                        {appointment.serviceType?.name ?? t('unknownService')}
                       </p>
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-1.5">
@@ -71,7 +74,7 @@ export function DashboardTodaysSchedule() {
                           statusConfig.className
                         )}
                       >
-                        {statusConfig.label}
+                        {tStatus(statusConfig.labelKey)}
                       </Badge>
                     </div>
                   </Link>

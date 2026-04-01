@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -11,6 +12,7 @@ import { PatientsTable } from '@/module/admin/patients/components/patients-table
 import { useTRPC } from '@/trpc/client';
 
 export function PatientsView() {
+  const t = useTranslations('admin.patients');
   const trpc = useTRPC();
   const [patientToDelete, setPatientToDelete] = useState<string | null>(null);
 
@@ -22,14 +24,12 @@ export function PatientsView() {
     trpc.patient.delete.mutationOptions({
       onSuccess: () => {
         setPatientToDelete(null);
-        toast.success('Pacijent je uspešno obrisan');
+        toast.success(t('deleteSuccess'));
         refetch();
       },
       onError: (error) => {
         const message =
-          error instanceof Error
-            ? error.message
-            : 'Greška pri brisanju pacijenta';
+          error instanceof Error ? error.message : t('deleteError');
         toast.error(message);
       },
     })
@@ -47,10 +47,8 @@ export function PatientsView() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Pacijenti</h1>
-          <p className="mt-1 text-muted-foreground">
-            Pregled i upravljanje svim registrovanim pacijentima.
-          </p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="mt-1 text-muted-foreground">{t('description')}</p>
         </div>
         <NewPatientDrawer />
       </div>
@@ -63,9 +61,9 @@ export function PatientsView() {
         open={!!patientToDelete}
         onOpenChange={(open) => !open && setPatientToDelete(null)}
         onConfirm={confirmDelete}
-        title="Potvrda brisanja"
-        description="Da li ste sigurni da želite da obrišete ovog pacijenta? Ova akcija će obrisati i sve termine i medicinske zapise povezane sa ovim pacijentom. Ova akcija se ne može poništiti."
-        confirmText="Obriši"
+        title={t('deleteConfirmTitle')}
+        description={t('deleteConfirmDescription')}
+        confirmText={t('deleteButton')}
         variant="destructive"
       />
     </div>

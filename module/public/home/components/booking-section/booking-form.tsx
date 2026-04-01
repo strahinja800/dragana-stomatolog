@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useMemo } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -27,25 +29,6 @@ import {
 } from '@/constants/icons';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
-
-const getBookingFormSchema = (
-  requiresEmail: boolean,
-  requiresContactInfo: boolean
-) =>
-  z.object({
-    name: requiresContactInfo
-      ? z.string().min(1, 'Ime je obavezno')
-      : z.string().optional(),
-    email: requiresEmail
-      ? z.string().email('Unesite validnu email adresu')
-      : z.string().optional(),
-    phone: requiresContactInfo
-      ? z.string().min(1, 'Broj telefona je obavezan')
-      : z.string().optional(),
-    date: z.date({ error: 'Datum je obavezan' }),
-    time: z.string().min(1, 'Vreme je obavezno'),
-    symptoms: z.string().optional(),
-  });
 
 type BookingFormInput = {
   name: string;
@@ -79,6 +62,7 @@ export default function BookingForm({
   compact = false,
   className,
 }: BookingFormProps = {}) {
+  const t = useTranslations('home.booking');
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     () => today
@@ -88,6 +72,25 @@ export default function BookingForm({
   const requiresContactInfo = !patientId;
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const schema = useMemo(
+    () =>
+      z.object({
+        name: requiresContactInfo
+          ? z.string().min(1, t('validationName'))
+          : z.string().optional(),
+        email: requiresEmail
+          ? z.string().email(t('validationEmail'))
+          : z.string().optional(),
+        phone: requiresContactInfo
+          ? z.string().min(1, t('validationPhone'))
+          : z.string().optional(),
+        date: z.date({ message: t('validationDate') }),
+        time: z.string().min(1, t('validationTime')),
+        symptoms: z.string().optional(),
+      }),
+    [t, requiresContactInfo, requiresEmail]
+  );
 
   const {
     data: nonWorkingDays,
@@ -123,9 +126,7 @@ export default function BookingForm({
   };
 
   const form = useForm<BookingFormInput>({
-    resolver: zodResolver(
-      getBookingFormSchema(requiresEmail, requiresContactInfo)
-    ) as never,
+    resolver: zodResolver(schema) as never,
     defaultValues: {
       name: defaultName,
       email: defaultEmail,
@@ -223,11 +224,10 @@ export default function BookingForm({
           </div>
 
           <h3 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">
-            Zahtev je uspešno poslat
+            {t('successTitle')}
           </h3>
           <p className="mb-6 max-w-sm text-muted-foreground">
-            Poslali smo potvrdu prijema na vaš email. Uskoro vam stižu i detalji
-            termina.
+            {t('successDescription')}
           </p>
 
           <button
@@ -238,7 +238,7 @@ export default function BookingForm({
             }}
             className="text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
-            Zakažite još jedan termin
+            {t('bookAnother')}
           </button>
         </div>
       </div>
@@ -271,7 +271,7 @@ export default function BookingForm({
                   : 'mb-2 text-2xl md:text-3xl'
               )}
             >
-              Brzo zakazivanje
+              {t('formTitle')}
             </h3>
             <p
               className={cn(
@@ -279,7 +279,7 @@ export default function BookingForm({
                 compact ? 'md:text-sm' : 'md:text-base'
               )}
             >
-              Popunite formu i dobićete potvrdu prijema na email
+              {t('formDescription')}
             </p>
           </div>
         )}
@@ -296,7 +296,7 @@ export default function BookingForm({
                 render={({ field, fieldState }) => (
                   <FloatingInput
                     id="booking-name"
-                    label="Ime i prezime"
+                    label={t('fieldName')}
                     type="text"
                     value={field.value}
                     onChange={field.onChange}
@@ -306,7 +306,7 @@ export default function BookingForm({
                     isInvalid={fieldState.invalid}
                     errorMessage={fieldState.error?.message}
                     disabled={isPendingData}
-                    placeholder="Vaše ime i prezime"
+                    placeholder={t('fieldNamePlaceholder')}
                     compact={compact}
                   />
                 )}
@@ -318,7 +318,7 @@ export default function BookingForm({
                 render={({ field, fieldState }) => (
                   <FloatingInput
                     id="booking-email"
-                    label="Email adresa"
+                    label={t('fieldEmail')}
                     type="email"
                     value={field.value ?? ''}
                     onChange={field.onChange}
@@ -340,7 +340,7 @@ export default function BookingForm({
                 render={({ field, fieldState }) => (
                   <FloatingInput
                     id="booking-phone"
-                    label="Broj telefona"
+                    label={t('fieldPhone')}
                     type="tel"
                     value={field.value}
                     onChange={field.onChange}
@@ -367,7 +367,7 @@ export default function BookingForm({
                 {patientId ? 1 : 4}
               </span>
               <span className="text-sm font-medium text-foreground/80">
-                Izaberite datum i vreme
+                {t('fieldDateTime')}
               </span>
             </div>
 
@@ -402,7 +402,7 @@ export default function BookingForm({
                 {patientId ? 2 : 5}
               </span>
               <span className="text-sm font-medium text-foreground/80">
-                Opišite simptome (opciono)
+                {t('fieldSymptoms')}
               </span>
             </div>
 
@@ -413,7 +413,7 @@ export default function BookingForm({
                 <Textarea
                   {...field}
                   id="booking-symptoms"
-                  placeholder="Opišite vaše simptome ili razlog posete..."
+                  placeholder={t('fieldSymptomsPlaceholder')}
                   className={cn(
                     compact ? 'min-h-16' : 'min-h-20',
                     'resize-none'
@@ -451,11 +451,11 @@ export default function BookingForm({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="size-5 animate-spin" />
-                    <span>Slanje...</span>
+                    <span>{t('submittingButton')}</span>
                   </>
                 ) : (
                   <>
-                    <span>Zakažite sada</span>
+                    <span>{t('submitButton')}</span>
                     <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
                   </>
                 )}
@@ -477,16 +477,14 @@ export default function BookingForm({
                 <CheckCircle className="size-4 text-primary" />
               </div>
               <span className="text-muted-foreground">
-                Email potvrda prijema
+                {t('emailConfirmation')}
               </span>
             </div>
             <div className="flex items-center gap-2.5 text-sm">
               <div className="flex size-8 items-center justify-center rounded-full bg-primary/10">
                 <CheckCircle className="size-4 text-primary" />
               </div>
-              <span className="text-muted-foreground">
-                Podsetnik 24h pre termina
-              </span>
+              <span className="text-muted-foreground">{t('reminderNote')}</span>
             </div>
           </div>
         </div>

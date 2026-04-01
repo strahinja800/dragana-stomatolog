@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 
 import {
   ChevronLeftIcon,
@@ -70,6 +71,7 @@ function PaginationPrevious({
   className,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
+  const t = useTranslations('shared.pagination');
   return (
     <PaginationLink
       aria-label="Go to previous page"
@@ -78,7 +80,7 @@ function PaginationPrevious({
       {...props}
     >
       <ChevronLeftIcon data-icon="inline-start" />
-      <span className="hidden sm:block">Previous</span>
+      <span className="hidden sm:block">{t('previous')}</span>
     </PaginationLink>
   );
 }
@@ -87,6 +89,7 @@ function PaginationNext({
   className,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
+  const t = useTranslations('shared.pagination');
   return (
     <PaginationLink
       aria-label="Go to next page"
@@ -94,7 +97,7 @@ function PaginationNext({
       className={cn('pr-2!', className)}
       {...props}
     >
-      <span className="hidden sm:block">Next</span>
+      <span className="hidden sm:block">{t('next')}</span>
       <ChevronRightIcon data-icon="inline-end" />
     </PaginationLink>
   );
@@ -104,6 +107,7 @@ function PaginationEllipsis({
   className,
   ...props
 }: React.ComponentProps<'span'>) {
+  const t = useTranslations('shared.pagination');
   return (
     <span
       aria-hidden
@@ -115,7 +119,7 @@ function PaginationEllipsis({
       {...props}
     >
       <MoreHorizontalIcon />
-      <span className="sr-only">More pages</span>
+      <span className="sr-only">{t('morePages')}</span>
     </span>
   );
 }

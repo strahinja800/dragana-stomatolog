@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,6 +12,7 @@ import { UserMenuDesktop } from './user-menu-desktop';
 import { UserMenuMobile } from './user-menu-mobile';
 
 export default function UserMenu() {
+  const t = useTranslations('userMenu');
   const { data: session, isPending } = authClient.useSession();
 
   const handleSignOut = async () => {
@@ -30,7 +32,7 @@ export default function UserMenu() {
       >
         <Link href="/login">
           <LogIn className="size-4" />
-          Prijavi se
+          {t('login')}
         </Link>
       </Button>
     );
@@ -43,7 +45,7 @@ export default function UserMenu() {
     .slice(0, 2);
 
   const user = {
-    name: session.user.name || 'Korisnik',
+    name: session.user.name || t('defaultUser'),
     initials: initials,
     email: session.user.email || '',
     image: session.user.image,

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -52,6 +53,7 @@ export function AppointmentDetailsDrawer({
   open,
   onOpenChange,
 }: AppointmentDetailsDrawerProps) {
+  const t = useTranslations('admin.patients');
   const [view, setView] = useState<'list' | 'add-record'>('list');
   const [recordToDelete, setRecordToDelete] = useState<string | null>(null);
 
@@ -70,12 +72,12 @@ export function AppointmentDetailsDrawer({
       onSuccess: () => {
         reset();
         setView('list');
-        toast.success('Zapis je uspešno sačuvan');
+        toast.success(t('recordSaveSuccess'));
         queryClient.invalidateQueries({ queryKey: ['patient'] });
       },
       onError: (error) => {
         const message =
-          error instanceof Error ? error.message : 'Greška pri čuvanju zapisa';
+          error instanceof Error ? error.message : t('recordSaveError');
         toast.error(message);
       },
     })
@@ -85,12 +87,12 @@ export function AppointmentDetailsDrawer({
     trpc.medicalRecord.delete.mutationOptions({
       onSuccess: () => {
         setRecordToDelete(null);
-        toast.success('Zapis je obrisan');
+        toast.success(t('deleteRecordSuccess'));
         queryClient.invalidateQueries({ queryKey: ['patient'] });
       },
       onError: (error) => {
         const message =
-          error instanceof Error ? error.message : 'Greška pri brisanju zapisa';
+          error instanceof Error ? error.message : t('deleteRecordError');
         toast.error(message);
       },
     })
@@ -141,9 +143,9 @@ export function AppointmentDetailsDrawer({
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
                   <div>
-                    <DrawerTitle>Novi zapis</DrawerTitle>
+                    <DrawerTitle>{t('newRecord')}</DrawerTitle>
                     <DrawerDescription>
-                      Termin:{' '}
+                      {t('appointmentForLabel')}{' '}
                       {startDate.toLocaleDateString('sr-RS', {
                         day: '2-digit',
                         month: '2-digit',
@@ -187,7 +189,7 @@ export function AppointmentDetailsDrawer({
                       {appointment.symptoms && (
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                            Simptomi
+                            {t('symptoms')}
                           </p>
                           <p className="mt-1 text-sm">{appointment.symptoms}</p>
                         </div>
@@ -195,7 +197,7 @@ export function AppointmentDetailsDrawer({
                       {appointment.notes && (
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                            Napomena
+                            {t('symptomNote')}
                           </p>
                           <p className="mt-1 text-sm">{appointment.notes}</p>
                         </div>
@@ -206,7 +208,9 @@ export function AppointmentDetailsDrawer({
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold">Medicinski zapisi</p>
+                      <p className="text-sm font-semibold">
+                        {t('medicalRecords')}
+                      </p>
                       <Badge
                         variant={records.length > 0 ? 'default' : 'outline'}
                         className="text-xs"
@@ -218,7 +222,7 @@ export function AppointmentDetailsDrawer({
 
                   {records.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
-                      Nema zapisa za ovaj termin.
+                      {t('noRecords')}
                     </p>
                   ) : (
                     <div className="space-y-3">
@@ -230,19 +234,23 @@ export function AppointmentDetailsDrawer({
                           <div className="mb-2 flex items-start justify-between gap-2">
                             <div className="grid flex-1 gap-1.5">
                               <div>
-                                <span className="font-medium">Tretman: </span>
+                                <span className="font-medium">
+                                  {t('treatmentLabel')}{' '}
+                                </span>
                                 {record.treatment}
                               </div>
                               {record.tooth && (
                                 <div>
-                                  <span className="font-medium">Zub: </span>
+                                  <span className="font-medium">
+                                    {t('toothLabel')}{' '}
+                                  </span>
                                   {record.tooth}
                                 </div>
                               )}
                               {record.diagnosis && (
                                 <div>
                                   <span className="font-medium">
-                                    Dijagnoza:{' '}
+                                    {t('diagnosisLabel')}{' '}
                                   </span>
                                   {record.diagnosis}
                                 </div>
@@ -264,7 +272,9 @@ export function AppointmentDetailsDrawer({
                           </div>
                           {record.notes && (
                             <p className="mt-1 text-muted-foreground">
-                              <span className="font-medium">Napomena: </span>
+                              <span className="font-medium">
+                                {t('noteLabel')}{' '}
+                              </span>
                               {record.notes}
                             </p>
                           )}
@@ -281,14 +291,15 @@ export function AppointmentDetailsDrawer({
                 >
                   <div className="space-y-2">
                     <Label htmlFor="treatment">
-                      Tretman <span className="text-destructive">*</span>
+                      {t('treatment')}{' '}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="treatment"
                       {...register('treatment', {
-                        required: 'Tretman je obavezan',
+                        required: t('treatmentRequired'),
                       })}
-                      placeholder="Npr. Plomba, Vađenje, Čišćenje..."
+                      placeholder={t('treatmentPlaceholder')}
                     />
                     {errors.treatment && (
                       <p className="text-sm text-destructive">
@@ -298,29 +309,29 @@ export function AppointmentDetailsDrawer({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="tooth">Zub</Label>
+                    <Label htmlFor="tooth">{t('tooth')}</Label>
                     <Input
                       id="tooth"
                       {...register('tooth')}
-                      placeholder="Npr. 16, 21..."
+                      placeholder={t('toothPlaceholder')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="diagnosis">Dijagnoza</Label>
+                    <Label htmlFor="diagnosis">{t('diagnosis')}</Label>
                     <Input
                       id="diagnosis"
                       {...register('diagnosis')}
-                      placeholder="Npr. Karijes, Gingivitis..."
+                      placeholder={t('diagnosisPlaceholder')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="record-notes">Napomene</Label>
+                    <Label htmlFor="record-notes">{t('notes')}</Label>
                     <Textarea
                       id="record-notes"
                       {...register('notes')}
-                      placeholder="Dodatne napomene..."
+                      placeholder={t('recordNotesPlaceholder')}
                       rows={3}
                     />
                   </div>
@@ -335,7 +346,7 @@ export function AppointmentDetailsDrawer({
                   className="w-full"
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  Dodaj zapis
+                  {t('addRecord')}
                 </Button>
               ) : (
                 <Button
@@ -344,7 +355,7 @@ export function AppointmentDetailsDrawer({
                   disabled={isCreating}
                   className="w-full"
                 >
-                  {isCreating ? 'Čuvanje...' : 'Sačuvaj zapis'}
+                  {isCreating ? t('savingRecord') : t('saveRecord')}
                 </Button>
               )}
             </DrawerFooter>

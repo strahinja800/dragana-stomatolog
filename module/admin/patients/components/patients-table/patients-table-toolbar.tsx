@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { type Table } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
@@ -29,22 +31,23 @@ interface PatientsTableToolbarProps {
   setGlobalFilter: (value: string) => void;
 }
 
-const columnLabels: Record<string, string> = {
-  firstName: 'Ime',
-  lastName: 'Prezime',
-  email: 'Email',
-  phone: 'Telefon',
-  isMain: 'Status',
-};
-
 export function PatientsTableToolbar({
   table,
   globalFilter,
   setGlobalFilter,
 }: PatientsTableToolbarProps) {
+  const t = useTranslations('admin.patients');
   const isFiltered =
     globalFilter.length > 0 ||
     table.getColumn('isMain')?.getFilterValue() !== undefined;
+
+  const columnLabels: Record<string, string> = {
+    firstName: t('columnFirstName'),
+    lastName: t('columnLastName'),
+    email: t('columnEmail'),
+    phone: t('columnPhone'),
+    isMain: t('columnStatus'),
+  };
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -52,7 +55,7 @@ export function PatientsTableToolbar({
         <div className="relative flex-1 sm:max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Pretraži pacijente..."
+            placeholder={t('searchPlaceholder')}
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="bg-white pl-8"
@@ -69,12 +72,12 @@ export function PatientsTableToolbar({
           }
         >
           <SelectTrigger className="w-[130px] bg-white">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t('statusPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Svi</SelectItem>
-            <SelectItem value="main">Glavni</SelectItem>
-            <SelectItem value="secondary">Sekundarni</SelectItem>
+            <SelectItem value="all">{t('statusAll')}</SelectItem>
+            <SelectItem value="main">{t('statusMain')}</SelectItem>
+            <SelectItem value="secondary">{t('statusSecondary')}</SelectItem>
           </SelectContent>
         </Select>
         {isFiltered && (
@@ -95,11 +98,11 @@ export function PatientsTableToolbar({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="ml-auto bg-white">
             <SlidersHorizontal className="mr-2 h-4 w-4" />
-            Kolone
+            {t('columnsButton')}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[150px]">
-          <DropdownMenuLabel>Prikaži kolone</DropdownMenuLabel>
+          <DropdownMenuLabel>{t('showColumns')}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {table
             .getAllColumns()

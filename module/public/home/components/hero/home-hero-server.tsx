@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Phone, Star } from '@/constants/icons';
@@ -10,7 +11,9 @@ import {
   logoGoldTransparent,
 } from '@/data/data';
 
-export default function HeroSection() {
+export default async function HeroSection() {
+  const t = await getTranslations('home.hero');
+
   return (
     <section className="relative mt-20 min-h-[calc(100svh-5rem)] overflow-hidden">
       <div className="absolute inset-0">
@@ -34,15 +37,14 @@ export default function HeroSection() {
             className="mx-auto w-50 md:w-90 lg:w-110 h-auto"
           />
 
-          <p className="mx-auto max-w-3xl text-lg text-primary-foreground/88 ">
-            Precizna dijagnostika, individualni plan terapije i digitalno vođeno
-            iskustvo uz besprekoran standard nege.
+          <p className="mx-auto max-w-3xl text-lg text-primary-foreground/88">
+            {t('description')}
           </p>
 
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:items-center">
             <Button asChild size="xl" className="btn-shimmer rounded-full px-8">
               <Link href="#zakazivanje">
-                Zakaži online
+                {t('bookOnline')}
                 <ArrowRight className="ml-1 h-5 w-5" />
               </Link>
             </Button>
@@ -54,7 +56,7 @@ export default function HeroSection() {
             >
               <a href="tel:+381111234567">
                 <Phone className="mr-1 h-5 w-5" />
-                Pozovi odmah
+                {t('callNow')}
               </a>
             </Button>
           </div>
@@ -83,7 +85,7 @@ export default function HeroSection() {
                 ))}
               </div>
               <p className="mt-1 text-sm text-primary-foreground/84">
-                10.000+ zadovoljnih pacijenata i ocena 5.0
+                {t('patientsCount')}
               </p>
             </div>
           </div>

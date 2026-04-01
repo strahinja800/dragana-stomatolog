@@ -1,6 +1,7 @@
 'use client';
 
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 
 import {
   useMutation,
@@ -28,6 +29,7 @@ interface WorkingHoursFormData {
 }
 
 export function WorkingHoursTab() {
+  const t = useTranslations('admin.settings');
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -52,12 +54,11 @@ export function WorkingHoursTab() {
     trpc.settings.upsertWorkingHours.mutationOptions({
       onSuccess: async () => {
         await queryClient.refetchQueries({ queryKey: [['settings']] });
-        toast.success('Radno vreme sačuvano');
+        toast.success(t('saveSuccess'));
       },
       onError: (error) => {
-        toast.error('Greška pri čuvanju', {
-          description:
-            error instanceof Error ? error.message : 'Nepoznata greška',
+        toast.error(t('saveError'), {
+          description: error instanceof Error ? error.message : t('saveError'),
         });
       },
     })
@@ -71,7 +72,7 @@ export function WorkingHoursTab() {
     <Card className="overflow-hidden border-border/50 shadow-sm">
       <CardHeader className="border-b bg-muted/30 px-6 py-4">
         <CardTitle className="flex items-center justify-between text-lg font-semibold">
-          <span>Radno vreme po danima</span>
+          <span>{t('workingHoursPerDay')}</span>
           <Button
             onClick={handleSubmit(onSubmit)}
             disabled={isPending || !isDirty}
@@ -81,12 +82,12 @@ export function WorkingHoursTab() {
             {isPending ? (
               <>
                 <Loader2 className="size-4 animate-spin" />
-                Čuvanje...
+                {t('saving')}
               </>
             ) : (
               <>
                 <Check className="size-4" />
-                Sačuvaj
+                {t('save')}
               </>
             )}
           </Button>
@@ -128,7 +129,7 @@ export function WorkingHoursTab() {
                           : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                       )}
                     >
-                      {value.isOpen ? 'Otvoreno' : 'Zatvoreno'}
+                      {value.isOpen ? t('open') : t('closed')}
                     </span>
                   </div>
 
