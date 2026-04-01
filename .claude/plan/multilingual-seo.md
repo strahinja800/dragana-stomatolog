@@ -7,6 +7,7 @@ Implement complete SEO infrastructure for the multilingual dental clinic website
 **Key goal:** English pages must appear in Google search results for English-speaking users (medical tourism potential).
 
 ## Task Type
+
 - [x] Frontend (metadata, JSON-LD, OG tags)
 - [ ] Backend
 - [x] Fullstack (routing config, sitemap, robots)
@@ -37,6 +38,7 @@ Implement complete SEO infrastructure for the multilingual dental clinic website
 ## Implementation Steps
 
 ### Step 1: Harden routing config
+
 **File:** `i18n/routing.ts` (MODIFY)
 **Deliverable:** Add `localePrefix`, `localeDetection`, `alternateLinks` options
 
@@ -51,11 +53,13 @@ export const routing = defineRouting({
 ```
 
 **Why:**
+
 - `localePrefix: 'always'` - ensures `/sr/` is always in URL, prevents duplicate content (bare `/` vs `/sr/`)
 - `localeDetection: false` - Googlebot crawls without Accept-Language, auto-detection hides content from bots
 - `alternateLinks: false` - we'll manage hreflang via metadata API + sitemap instead of middleware headers
 
 ### Step 2: Create navigation module
+
 **File:** `i18n/navigation.ts` (NEW)
 **Deliverable:** Export `Link`, `redirect`, `usePathname`, `useRouter`, `getPathname`
 
@@ -68,6 +72,7 @@ export const { Link, redirect, usePathname, useRouter, getPathname } =
 ```
 
 ### Step 3: Create SEO helper module
+
 **File:** `lib/seo.ts` (NEW)
 **Deliverable:** `absoluteUrl()`, `buildAlternates()`, `SITE_URL` constant
 
@@ -77,7 +82,8 @@ import { routing } from '@/i18n/routing';
 
 type Locale = (typeof routing.locales)[number];
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://dentalholist.rs';
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://dentalholist.rs';
 
 export function absoluteUrl(locale: Locale, path: string): string {
   return `${SITE_URL}/${locale}${path === '/' ? '' : path}`;
@@ -85,7 +91,7 @@ export function absoluteUrl(locale: Locale, path: string): string {
 
 export function buildAlternates(
   locale: Locale,
-  path: string,
+  path: string
 ): NonNullable<Metadata['alternates']> {
   const languages: Record<string, string> = {};
   for (const loc of routing.locales) {
@@ -101,10 +107,12 @@ export function buildAlternates(
 ```
 
 ### Step 4: Add Metadata translations
+
 **Files:** `messages/sr.json`, `messages/en.json` (MODIFY)
 **Deliverable:** New `Metadata` namespace with per-page title/description
 
 Keys needed:
+
 ```json
 {
   "Metadata": {
@@ -143,6 +151,7 @@ Keys needed:
 English version with translated values.
 
 ### Step 5: Replace static metadata in layout with generateMetadata
+
 **File:** `app/[locale]/layout.tsx` (MODIFY)
 **Deliverable:** Dynamic `generateMetadata` with title template, metadataBase, OG defaults
 
@@ -168,10 +177,12 @@ export async function generateMetadata({ params }: Props) {
 Remove the existing static `export const metadata`.
 
 ### Step 6: Add generateMetadata to each public page
+
 **Files:** All public page.tsx files (MODIFY)
 **Deliverable:** Per-page `generateMetadata` with translated title, description, alternates, and OG
 
 Pages to update:
+
 - `app/[locale]/(public)/page.tsx` - Home
 - `app/[locale]/(public)/usluge/page.tsx` - Services
 - `app/[locale]/(public)/o-nama/page.tsx` - About
@@ -181,13 +192,18 @@ Pages to update:
 - `app/[locale]/(public)/rezultati/page.tsx` - Results
 
 Pattern for each page:
+
 ```ts
 import { getTranslations } from 'next-intl/server';
 import { buildAlternates } from '@/lib/seo';
 
 const OG_LOCALE = { sr: 'sr_RS', en: 'en_US' } as const;
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Metadata.services' });
 
@@ -209,6 +225,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 Blog post page: enhance existing `generateMetadata` to include `alternates` and `openGraph`.
 
 ### Step 7: Create robots.ts
+
 **File:** `app/robots.ts` (NEW)
 **Deliverable:** robots.txt blocking admin/api, referencing sitemap
 
@@ -231,6 +248,7 @@ export default function robots(): MetadataRoute.Robots {
 ```
 
 ### Step 8: Create sitemap.ts
+
 **File:** `app/sitemap.ts` (NEW)
 **Deliverable:** Multilingual sitemap with hreflang alternates for all public routes + dynamic blog posts
 
@@ -240,7 +258,14 @@ import { routing } from '@/i18n/routing';
 import { absoluteUrl, SITE_URL } from '@/lib/seo';
 import { prisma } from '@/lib/prisma';
 
-const staticRoutes = ['/', '/usluge', '/o-nama', '/kontakt', '/blog', '/rezultati'];
+const staticRoutes = [
+  '/',
+  '/usluge',
+  '/o-nama',
+  '/kontakt',
+  '/blog',
+  '/rezultati',
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
@@ -284,6 +309,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 ```
 
 ### Step 9: Add JSON-LD structured data to homepage
+
 **File:** `app/[locale]/(public)/page.tsx` or create `lib/json-ld.ts` helper (MODIFY/NEW)
 **Deliverable:** `Dentist` + `WebPage` schema.org markup
 
@@ -328,12 +354,14 @@ const jsonLd = {
 Render as `<script type="application/ld+json">` with sanitized JSON.
 
 ### Step 10: Add NEXT_PUBLIC_SITE_URL env variable
+
 **File:** `.env` / `.env.local` (MODIFY)
 **Deliverable:** `NEXT_PUBLIC_SITE_URL=https://dentalholist.rs`
 
 Also add to deployment environment (Vercel, etc.).
 
 ### Step 11: Verification
+
 - `tsc --noEmit` - type check
 - `npm run build` - ensure all metadata routes generate correctly
 - Manual checks:
@@ -346,6 +374,7 @@ Also add to deployment environment (Vercel, etc.).
   7. Verify `/sr/usluge` and `/en/usluge` both resolve (no redirect loop)
 
 ### Post-deploy: Google Search Console
+
 - Verify domain property
 - Submit sitemap URL
 - Inspect `/sr/` and `/en/` URLs
@@ -353,40 +382,42 @@ Also add to deployment environment (Vercel, etc.).
 
 ## Key Files
 
-| File | Operation | Description |
-|------|-----------|-------------|
-| i18n/routing.ts | Modify | Add localePrefix, localeDetection, alternateLinks |
-| i18n/navigation.ts | Create | Navigation helpers with createNavigation |
-| lib/seo.ts | Create | absoluteUrl, buildAlternates helpers |
-| messages/sr.json | Modify | Add Metadata namespace |
-| messages/en.json | Modify | Add Metadata namespace |
-| app/[locale]/layout.tsx | Modify | Replace static metadata with generateMetadata |
-| app/[locale]/(public)/page.tsx | Modify | Add generateMetadata + JSON-LD |
-| app/[locale]/(public)/usluge/page.tsx | Modify | Add generateMetadata |
-| app/[locale]/(public)/o-nama/page.tsx | Modify | Add generateMetadata |
-| app/[locale]/(public)/kontakt/page.tsx | Modify | Add generateMetadata |
-| app/[locale]/(public)/blog/page.tsx | Modify | Add generateMetadata |
-| app/[locale]/(public)/blog/[slug]/page.tsx | Modify | Enhance with alternates + OG |
-| app/[locale]/(public)/rezultati/page.tsx | Modify | Add generateMetadata |
-| app/robots.ts | Create | robots.txt generation |
-| app/sitemap.ts | Create | Multilingual sitemap with hreflang |
+| File                                       | Operation | Description                                       |
+| ------------------------------------------ | --------- | ------------------------------------------------- |
+| i18n/routing.ts                            | Modify    | Add localePrefix, localeDetection, alternateLinks |
+| i18n/navigation.ts                         | Create    | Navigation helpers with createNavigation          |
+| lib/seo.ts                                 | Create    | absoluteUrl, buildAlternates helpers              |
+| messages/sr.json                           | Modify    | Add Metadata namespace                            |
+| messages/en.json                           | Modify    | Add Metadata namespace                            |
+| app/[locale]/layout.tsx                    | Modify    | Replace static metadata with generateMetadata     |
+| app/[locale]/(public)/page.tsx             | Modify    | Add generateMetadata + JSON-LD                    |
+| app/[locale]/(public)/usluge/page.tsx      | Modify    | Add generateMetadata                              |
+| app/[locale]/(public)/o-nama/page.tsx      | Modify    | Add generateMetadata                              |
+| app/[locale]/(public)/kontakt/page.tsx     | Modify    | Add generateMetadata                              |
+| app/[locale]/(public)/blog/page.tsx        | Modify    | Add generateMetadata                              |
+| app/[locale]/(public)/blog/[slug]/page.tsx | Modify    | Enhance with alternates + OG                      |
+| app/[locale]/(public)/rezultati/page.tsx   | Modify    | Add generateMetadata                              |
+| app/robots.ts                              | Create    | robots.txt generation                             |
+| app/sitemap.ts                             | Create    | Multilingual sitemap with hreflang                |
 
 ## Risks and Mitigation
 
-| Risk | Mitigation |
-|------|------------|
-| `localeDetection: false` breaks existing UX | Bare `/` still redirects to `/sr/` via middleware default behavior |
-| Blog posts don't have per-locale content | Same slug/content served for both locales - acceptable for now, can add translations later |
-| Missing actual clinic address/phone for JSON-LD | Use placeholder, update with real data before deploy |
-| SITE_URL not set in env | Fallback to hardcoded domain in lib/seo.ts |
-| Static routes list in sitemap gets stale | Keep centralized in sitemap.ts, update when adding new public pages |
+| Risk                                            | Mitigation                                                                                 |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `localeDetection: false` breaks existing UX     | Bare `/` still redirects to `/sr/` via middleware default behavior                         |
+| Blog posts don't have per-locale content        | Same slug/content served for both locales - acceptable for now, can add translations later |
+| Missing actual clinic address/phone for JSON-LD | Use placeholder, update with real data before deploy                                       |
+| SITE_URL not set in env                         | Fallback to hardcoded domain in lib/seo.ts                                                 |
+| Static routes list in sitemap gets stale        | Keep centralized in sitemap.ts, update when adding new public pages                        |
 
 ## Assumptions
+
 - Blog posts are NOT translated (same content for both locales) - hreflang still valid
 - Route paths are NOT localized (same `/usluge` for both sr and en)
 - Clinic physical address and phone number to be provided for JSON-LD
 - Production domain is known (for SITE_URL)
 
 ## SESSION_ID (for /ccg:execute use)
+
 - CODEX_SESSION: (from codeagent-wrapper output)
 - GEMINI_SESSION: N/A
