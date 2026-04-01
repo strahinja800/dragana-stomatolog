@@ -750,6 +750,7 @@ export const appointmentRouter = createTRPCRouter({
           gte: startOfDay(now),
           lte: endOfDay(now),
         },
+        status: 'CONFIRMED',
       },
       include: { patient: true, serviceType: true },
       orderBy: { startTime: 'asc' },
