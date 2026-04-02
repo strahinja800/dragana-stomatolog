@@ -46,8 +46,7 @@ export function NewBookingModalPropose({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['appointment'] });
         toast.success('Predlog poslan', {
-          description:
-            'Pacijent će biti obavešten o novom predloženom terminu',
+          description: 'Pacijent će biti obavešten o novom predloženom terminu',
         });
         onSuccess();
       },
