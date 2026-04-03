@@ -6,6 +6,11 @@ Instructions for AI agents (Claude Code, Cursor, Copilot) working on this projec
 
 Dental clinic website ("DentalCare") - Next.js 16, React 19, Tailwind CSS 4. Serbian language for UI.
 
+### Project Management
+
+- **ClickUp Workspace ID:** 90152135570
+- **ClickUp Space:** Stomatolog (ID: 90158957290)
+
 ## Commands
 
 ```bash

@@ -79,8 +79,6 @@ export function ScheduleAppointmentDrawer({
             </DrawerHeader>
             <BookingForm
               patientId={selectedPatient.id}
-              defaultName={`${selectedPatient.firstName} ${selectedPatient.lastName}`.trim()}
-              defaultPhone={selectedPatient.phone ?? ''}
               onSuccess={handleSuccess}
               hideHeader
             />

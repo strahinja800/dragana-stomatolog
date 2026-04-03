@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { Prisma } from '@/lib/generated/prisma/client';
+import { resolvePatient } from '@/module/patient/server/patient-service';
 import {
   createPatientSchema,
   getPatientByIdSchema,
@@ -177,32 +178,15 @@ export const patientRouter = createTRPCRouter({
   createForSelf: protectedProcedure
     .input(createPatientSchema)
     .mutation(async ({ ctx, input }) => {
-      // Check if patient already exists for this user
-      const existingPatient = await ctx.prisma.patient.findUnique({
-        where: { userId: input.userId || ctx.session.user.id },
-      });
-
-      if (existingPatient) {
-        return existingPatient;
-      }
-
-      const patient = await ctx.prisma.patient.create({
-        data: {
+      return ctx.prisma.$transaction(async (tx) => {
+        return resolvePatient(tx, ctx.session.user, {
           firstName: input.firstName,
           lastName: input.lastName,
-          email: input.email || null,
-          phone: input.phone || null,
-          dateOfBirth: input.dateOfBirth || null,
-          gender: input.gender || null,
-          allergies: input.allergies || null,
-          medications: input.medications || null,
-          notes: input.notes || null,
-          userId: input.userId || ctx.session.user.id,
-          isMain: true,
-        },
+          phone: input.phone || undefined,
+          dateOfBirth: input.dateOfBirth || undefined,
+          gender: input.gender || undefined,
+        });
       });
-
-      return patient;
     }),
 
   /**

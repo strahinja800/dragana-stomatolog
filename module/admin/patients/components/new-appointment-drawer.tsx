@@ -12,15 +12,9 @@ import BookingForm from '@/module/public/home/components/booking-section/booking
 
 interface NewAppointmentDrawerProps {
   patientId: string;
-  patientName: string;
-  patientPhone: string;
 }
 
-export function NewAppointmentDrawer({
-  patientId,
-  patientName,
-  patientPhone,
-}: NewAppointmentDrawerProps) {
+export function NewAppointmentDrawer({ patientId }: NewAppointmentDrawerProps) {
   const [open, setOpen] = useState(false);
   const t = useTranslations('admin.patients');
 
@@ -40,8 +34,6 @@ export function NewAppointmentDrawer({
       <DrawerContent className="left-auto right-0 top-0 mt-0 h-screen w-full max-w-2xl rounded-none">
         <BookingForm
           patientId={patientId}
-          defaultName={patientName}
-          defaultPhone={patientPhone}
           onSuccess={handleSuccess}
           hideHeader
         />

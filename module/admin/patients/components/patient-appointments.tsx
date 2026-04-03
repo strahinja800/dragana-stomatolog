@@ -61,11 +61,7 @@ export function PatientAppointments({
                 {t('appointmentsDescription')} ({appointments.length})
               </CardDescription>
             </div>
-            <NewAppointmentDrawer
-              patientId={patient.id}
-              patientName={`${patient.firstName} ${patient.lastName}`}
-              patientPhone={patient.phone || ''}
-            />
+            <NewAppointmentDrawer patientId={patient.id} />
           </div>
         </CardHeader>
         <CardContent>

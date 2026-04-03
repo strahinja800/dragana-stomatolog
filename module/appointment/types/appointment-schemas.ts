@@ -80,6 +80,24 @@ export const getTimeSlotsSchema = z.object({
 
 export type GetTimeSlotsInput = z.infer<typeof getTimeSlotsSchema>;
 
+// Protected: Book appointment as logged-in patient
+export const bookAppointmentSchema = z.object({
+  date: z.date(),
+  time: z.string().regex(/^\d{2}:\d{2}$/, 'Format: HH:MM'),
+  symptoms: z.string().optional(),
+  profile: z
+    .object({
+      firstName: z.string().optional(),
+      lastName: z.string().optional(),
+      phone: z.string().optional(),
+      dateOfBirth: z.date().optional(),
+      gender: z.enum(['MALE', 'FEMALE']).optional(),
+    })
+    .optional(),
+});
+
+export type BookAppointmentInput = z.infer<typeof bookAppointmentSchema>;
+
 //  Propose new time for pending appointment (patient)
 export const proposeTimeSchema = z.object({
   id: z.string(),
