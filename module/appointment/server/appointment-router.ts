@@ -317,6 +317,9 @@ export const appointmentRouter = createTRPCRouter({
         patientName,
         serviceName: null,
         startTime: startTime.toISOString(),
+        phone: input.phone,
+        email: input.email,
+        symptoms: input.symptoms ?? null,
       });
 
       return appointment;

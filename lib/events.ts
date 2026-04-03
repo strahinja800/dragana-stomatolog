@@ -28,6 +28,9 @@ export type AppointmentCreatedEvent = {
   patientName: string;
   serviceName: string | null;
   startTime: string;
+  phone: string;
+  email: string;
+  symptoms: string | null;
   timestamp: number;
 };
 

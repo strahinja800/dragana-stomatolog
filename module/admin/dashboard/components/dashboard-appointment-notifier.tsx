@@ -1,42 +1,24 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
-import { toast } from 'sonner';
 
+import type { AppointmentCreatedEvent } from '@/lib/events';
 import { useTRPC } from '@/trpc/client';
 
+import { NewBookingModal } from './new-booking-modal/new-booking-modal';
+
 export function DashboardAppointmentNotifier() {
-  const t = useTranslations('admin.dashboard');
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const router = useRouter();
+  const [event, setEvent] = useState<AppointmentCreatedEvent | null>(null);
 
   useSubscription(
     trpc.subscriptions.onNewAppointment.subscriptionOptions(undefined, {
       onData: (trackedEvent) => {
-        const event = trackedEvent.data;
-        const date = new Date(event.startTime);
-        const formatted = date.toLocaleString('sr-RS', {
-          day: 'numeric',
-          month: 'long',
-          hour: '2-digit',
-          minute: '2-digit',
-          timeZone: 'Europe/Belgrade',
-        });
-
-        toast(t('newAppointmentRequest'), {
-          description: `${event.patientName} — ${formatted}`,
-          action: {
-            label: t('view'),
-            onClick: () => router.push('/admin'),
-          },
-          duration: 10000,
-        });
-
+        setEvent(trackedEvent.data);
         void queryClient.invalidateQueries({
           queryKey: trpc.appointment.getPending.queryKey(),
         });
@@ -47,5 +29,11 @@ export function DashboardAppointmentNotifier() {
     })
   );
 
-  return null;
+  return (
+    <NewBookingModal
+      event={event}
+      open={!!event}
+      onClose={() => setEvent(null)}
+    />
+  );
 }
