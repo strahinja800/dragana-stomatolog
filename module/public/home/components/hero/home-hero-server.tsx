@@ -15,7 +15,7 @@ export default async function HeroSection() {
   const t = await getTranslations('home.hero');
 
   return (
-    <section className="relative mt-20 min-h-[calc(100svh-5rem)] overflow-hidden">
+    <section className="relative mt-25 min-h-[calc(100svh-100px)] overflow-hidden">
       <div className="absolute inset-0">
         <Image
           src={heroImage}

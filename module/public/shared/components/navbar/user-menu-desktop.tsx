@@ -40,86 +40,68 @@ export function UserMenuDesktop({ user, onSignOut }: UserMenuDesktopProps) {
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              'group flex items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-3',
-              'border border-white/30 bg-white/10 hover:border-accent/50 hover:bg-white/16',
-              'text-primary-foreground',
+              'group flex items-center gap-1.5 rounded-full py-1 pl-1 pr-2',
+              'bg-white/8 hover:bg-white/14',
+              'text-white/90',
               'transition-all duration-200 ease-out',
-              'shadow-[0_8px_20px_-14px_rgba(0,0,0,0.48)]',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-primary'
+              'focus:outline-none focus-visible:ring-1 focus-visible:ring-accent'
             )}
           >
-            <Avatar className="ring-2 ring-white/45">
+            <Avatar size="sm" className="ring-1 ring-white/30">
               {user.image && <AvatarImage src={user.image} alt={user.name} />}
-              <AvatarFallback className="bg-accent text-foreground font-medium">
+              <AvatarFallback className="bg-accent text-foreground text-xs font-medium">
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <span className="max-w-24 truncate text-sm font-medium text-primary-foreground">
+            <span className="max-w-20 truncate text-xs font-medium">
               {firstName}
             </span>
-            <ChevronDown className="h-4 w-4 text-primary-foreground/75 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            <ChevronDown className="size-3 opacity-60 transition-transform duration-200 group-data-[state=open]:rotate-180" />
           </button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent
-          align="end"
-          sideOffset={8}
-          className={cn(
-            'w-72 p-2',
-            'animate-in fade-in-0 zoom-in-95 slide-in-from-top-2',
-            'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95'
-          )}
-        >
-          <div className="flex items-center gap-3 px-2 py-3">
-            <Avatar size="lg" className="ring-2 ring-primary/20">
+        <DropdownMenuContent align="end" sideOffset={8} className="w-52 p-1">
+          <div className="flex items-center gap-2 px-2 py-2">
+            <Avatar size="sm" className="ring-1 ring-primary/20">
               {user.image && <AvatarImage src={user.image} alt={user.name} />}
-              <AvatarFallback className="bg-primary/10 text-primary font-semibold text-base">
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <div className="flex flex-col min-w-0">
-              <span className="text-sm font-semibold text-foreground truncate">
+            <div className="flex min-w-0 flex-col">
+              <span className="truncate text-sm font-semibold text-foreground">
                 {user.name}
               </span>
-              <span className="text-xs text-muted-foreground truncate">
+              <span className="truncate text-xs text-muted-foreground">
                 {user.email}
               </span>
             </div>
           </div>
 
-          <DropdownMenuSeparator className="my-2" />
+          <DropdownMenuSeparator className="my-1" />
 
           <DropdownMenuItem
             asChild
-            className="group/item gap-3 px-3 py-2.5 rounded-lg cursor-pointer focus:bg-accent"
+            className="cursor-pointer gap-2 rounded-md px-2 py-1.5"
           >
             <Link href={dashboardHref}>
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 group-focus/item:bg-primary/20">
-                {isAdmin ? (
-                  <LayoutDashboard className="h-4 w-4 text-primary" />
-                ) : (
-                  <User className="h-4 w-4 text-primary" />
-                )}
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-medium">{dashboardLabel}</span>
-                <span className="text-xs text-muted-foreground group-focus/item:text-muted-foreground">
-                  {dashboardDescription}
-                </span>
-              </div>
+              {isAdmin ? (
+                <LayoutDashboard className="size-4 text-primary" />
+              ) : (
+                <User className="size-4 text-primary" />
+              )}
+              <span className="text-sm">{dashboardLabel}</span>
             </Link>
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator className="my-2" />
+          <DropdownMenuSeparator className="my-1" />
 
           <DropdownMenuItem
             onClick={onSignOut}
-            className="group/logout gap-3 px-3 py-2.5 rounded-lg cursor-pointer"
+            className="cursor-pointer gap-2 rounded-md px-2 py-1.5"
           >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted group-focus/logout:bg-primary/10">
-              <LogOut className="h-4 w-4 text-muted-foreground group-focus/logout:text-primary" />
-            </div>
-            <span className="text-sm font-medium">{t('logout')}</span>
+            <LogOut className="size-4 text-muted-foreground" />
+            <span className="text-sm">{t('logout')}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

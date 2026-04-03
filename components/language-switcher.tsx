@@ -4,17 +4,29 @@ import { useTransition } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ChevronDown, Globe } from '@/constants/icons';
 import { routing } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 
-interface LanguageSwitcherProps {
+const LOCALE_META: Record<string, { flag: string; label: string }> = {
+  sr: { flag: '🇷🇸', label: 'Srpski' },
+  en: { flag: '🇬🇧', label: 'English' },
+};
+
+type LanguageSwitcherProps = {
+  compact?: boolean;
   className?: string;
-  variant?: 'dark' | 'light';
-}
+};
 
 export function LanguageSwitcher({
+  compact,
   className,
-  variant = 'dark',
 }: LanguageSwitcherProps) {
   const t = useTranslations('languageSwitcher');
   const locale = useLocale();
@@ -32,30 +44,42 @@ export function LanguageSwitcher({
   };
 
   return (
-    <div
-      className={cn('flex items-center gap-1', className)}
-      aria-label={t('ariaLabel')}
-    >
-      {routing.locales.map((loc) => (
-        <button
-          key={loc}
-          type="button"
-          onClick={() => handleSwitch(loc)}
-          disabled={isPending}
-          className={cn(
-            'rounded-md px-2 py-1 text-xs font-semibold tracking-wider transition-colors',
-            variant === 'dark'
-              ? locale === loc
-                ? 'bg-white/20 text-white'
-                : 'text-white/60 hover:text-white'
-              : locale === loc
-                ? 'bg-primary/10 text-primary'
-                : 'text-muted-foreground hover:text-foreground'
-          )}
-        >
-          {t(loc)}
-        </button>
-      ))}
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        disabled={isPending}
+        className={cn(
+          'flex items-center gap-1 rounded-md px-1.5 py-1 text-xs transition-colors',
+          'text-white/90 hover:text-white',
+          'focus:outline-none focus-visible:ring-1 focus-visible:ring-accent',
+          className
+        )}
+        aria-label={t('ariaLabel')}
+      >
+        <Globe className="size-3.5" />
+        {!compact && <span className="font-medium uppercase">{locale}</span>}
+        <ChevronDown className="size-3 opacity-60" />
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" sideOffset={6} className="min-w-32.5">
+        {routing.locales.map((loc) => {
+          const meta = LOCALE_META[loc];
+          const isActive = loc === locale;
+
+          return (
+            <DropdownMenuItem
+              key={loc}
+              onClick={() => handleSwitch(loc)}
+              className={cn(
+                'gap-2.5 cursor-pointer',
+                isActive && 'bg-primary/10 text-primary font-semibold'
+              )}
+            >
+              <span className="text-base">{meta?.flag}</span>
+              <span className="text-sm">{meta?.label}</span>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
