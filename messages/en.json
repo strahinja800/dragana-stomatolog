@@ -919,7 +919,12 @@
       "description": "See the results of our treatments."
     },
     "structuredData": {
-      "businessDescription": "Premium holistic dental clinic in Belgrade."
+      "businessDescription": "Premium holistic dental clinic in Belgrade.",
+      "aboutPageName": "About Us | DENTALHOLIST KONCEPT",
+      "servicesPageName": "Services | DENTALHOLIST KONCEPT",
+      "contactPageName": "Contact | DENTALHOLIST KONCEPT",
+      "blogPageName": "Blog | DENTALHOLIST KONCEPT",
+      "resultsPageName": "Results | DENTALHOLIST KONCEPT"
     }
   }
 }

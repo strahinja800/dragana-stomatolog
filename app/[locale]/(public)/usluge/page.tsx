@@ -1,9 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
-import { buildAlternates } from '@/lib/seo';
+import { absoluteUrl, buildAlternates, OG_LOCALE, SITE_URL } from '@/lib/seo';
 import ServicesHero from '@/module/public/services/views/services-view/hero';
-
-const OG_LOCALE = { sr: 'sr_RS', en: 'en_US' } as const;
 
 export async function generateMetadata({
   params,
@@ -27,9 +25,35 @@ export async function generateMetadata({
   };
 }
 
-export default function ServicesPage() {
+export default async function ServicesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata.services' });
+  const pageUrl = absoluteUrl(locale as 'sr' | 'en', '/usluge');
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: t('title'),
+        inLanguage: locale,
+        about: { '@id': `${SITE_URL}/#business` },
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ServicesHero />
     </>
   );

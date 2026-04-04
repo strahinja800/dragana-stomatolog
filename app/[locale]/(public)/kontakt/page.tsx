@@ -1,10 +1,8 @@
 import { getTranslations } from 'next-intl/server';
 
-import { buildAlternates } from '@/lib/seo';
+import { absoluteUrl, buildAlternates, OG_LOCALE, SITE_URL } from '@/lib/seo';
 import Contact from '@/module/public/contact/views/contact-view/contact';
 import ContactHero from '@/module/public/contact/views/contact-view/hero';
-
-const OG_LOCALE = { sr: 'sr_RS', en: 'en_US' } as const;
 
 export async function generateMetadata({
   params,
@@ -28,13 +26,35 @@ export async function generateMetadata({
   };
 }
 
-export default function ContactPage() {
+export default async function ContactPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata.contact' });
+  const pageUrl = absoluteUrl(locale as 'sr' | 'en', '/kontakt');
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'ContactPage',
+        '@id': `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: t('title'),
+        inLanguage: locale,
+        about: { '@id': `${SITE_URL}/#business` },
+      },
+    ],
+  };
   return (
     <>
-      {/* Hero Section */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ContactHero />
-
-      {/* Contact Section */}
       <Contact />
     </>
   );

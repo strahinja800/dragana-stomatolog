@@ -4,6 +4,8 @@ import { routing } from '@/i18n/routing';
 
 type Locale = (typeof routing.locales)[number];
 
+export const OG_LOCALE = { sr: 'sr_RS', en: 'en_US' } as const;
+
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://dentalholist.rs';
 

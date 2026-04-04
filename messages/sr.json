@@ -920,7 +920,12 @@
       "description": "Pogledajte rezultate naših tretmana."
     },
     "structuredData": {
-      "businessDescription": "Premium holistička stomatološka ordinacija u Beogradu."
+      "businessDescription": "Premium holistička stomatološka ordinacija u Beogradu.",
+      "aboutPageName": "O nama | DENTALHOLIST KONCEPT",
+      "servicesPageName": "Usluge | DENTALHOLIST KONCEPT",
+      "contactPageName": "Kontakt | DENTALHOLIST KONCEPT",
+      "blogPageName": "Blog | DENTALHOLIST KONCEPT",
+      "resultsPageName": "Rezultati | DENTALHOLIST KONCEPT"
     }
   }
 }
