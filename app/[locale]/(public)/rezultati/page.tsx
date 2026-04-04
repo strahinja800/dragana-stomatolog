@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
-import { buildAlternates } from '@/lib/seo';
 import { beforeAfterCases } from '@/data/data';
+import { buildAlternates } from '@/lib/seo';
 import BeforeAfterCompareCard from '@/module/public/home/components/before-after/before-after-compare-card';
 
 const OG_LOCALE = { sr: 'sr_RS', en: 'en_US' } as const;
