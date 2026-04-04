@@ -929,5 +929,40 @@
     "facebook": "Facebook",
     "instagram": "Instagram",
     "linkedin": "LinkedIn"
+  },
+  "Metadata": {
+    "siteTitle": "DENTALHOLIST KONCEPT",
+    "home": {
+      "title": "DENTALHOLIST KONCEPT | Premium Stomatološka Ordinacija",
+      "description": "Premium holistički pristup stomatologiji. Online zakazivanje, podsetnici i savremena nega osmeha."
+    },
+    "services": {
+      "title": "Naše usluge",
+      "description": "Kompletna stomatološka nega - od preventive do estetske stomatologije."
+    },
+    "about": {
+      "title": "O nama",
+      "description": "Upoznajte naš tim i holistički pristup stomatologiji."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "description": "Zakažite pregled ili nas kontaktirajte za više informacija."
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Saveti i novosti iz sveta stomatologije."
+    },
+    "results": {
+      "title": "Rezultati",
+      "description": "Pogledajte rezultate naših tretmana."
+    },
+    "structuredData": {
+      "businessDescription": "Premium holistička stomatološka ordinacija u Beogradu.",
+      "aboutPageName": "O nama | DENTALHOLIST KONCEPT",
+      "servicesPageName": "Usluge | DENTALHOLIST KONCEPT",
+      "contactPageName": "Kontakt | DENTALHOLIST KONCEPT",
+      "blogPageName": "Blog | DENTALHOLIST KONCEPT",
+      "resultsPageName": "Rezultati | DENTALHOLIST KONCEPT"
+    }
   }
 }

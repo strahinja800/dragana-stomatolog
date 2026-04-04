@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 import { Manrope, Playfair_Display } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import { Toaster } from '@/components/ui/sonner';
 import { routing } from '@/i18n/routing';
+import { SITE_URL } from '@/lib/seo';
 import { TRPCReactProvider } from '@/trpc/client';
 
 import '@/app/globals.css';
@@ -24,15 +25,23 @@ const playfairDisplay = Playfair_Display({
   display: 'swap',
 });
 
-export const metadata: Metadata = {
-  title: 'DENTALHOLIST KONCEPT | Premium Stomatološka Ordinacija',
-  description:
-    'Premium holistički pristup stomatologiji. Online zakazivanje, podsetnici i savremena nega osmeha.',
-};
-
 interface Props {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: t('home.title'),
+      template: `%s | ${t('siteTitle')}`,
+    },
+    description: t('home.description'),
+  };
 }
 
 export default async function LocaleLayout({ children, params }: Props) {

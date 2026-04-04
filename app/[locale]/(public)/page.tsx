@@ -1,3 +1,6 @@
+import { getTranslations } from 'next-intl/server';
+
+import { absoluteUrl, buildAlternates, OG_LOCALE, SITE_URL } from '@/lib/seo';
 import BeforeAfterSection from '@/module/public/home/components/before-after/before-after-section';
 import BlogSection from '@/module/public/home/components/blog/blog-section';
 import BookingSection from '@/module/public/home/components/booking-section/booking-section-server';
@@ -12,11 +15,80 @@ import TestimonialsSection from '@/module/public/home/components/testimonials/te
 import { HydrateClient } from '@/trpc/hydrate-client';
 import { prefetch, trpc } from '@/trpc/server';
 
-export default async function HomePage() {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    title: t('home.title'),
+    description: t('home.description'),
+    alternates: buildAlternates(locale as 'sr' | 'en', '/'),
+    openGraph: {
+      title: t('home.title'),
+      description: t('home.description'),
+      locale: OG_LOCALE[locale as keyof typeof OG_LOCALE],
+      alternateLocale: locale === 'sr' ? ['en_US'] : ['sr_RS'],
+      type: 'website' as const,
+    },
+  };
+}
+
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
   void prefetch(trpc.blog.getPublishedPosts.queryOptions({ limit: 3 }));
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Dentist',
+        '@id': `${SITE_URL}/#business`,
+        name: 'DENTALHOLIST KONCEPT',
+        description: t('structuredData.businessDescription'),
+        url: absoluteUrl(locale as 'sr' | 'en', '/'),
+        telephone: '+381113000000',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Adresa ordinacije',
+          addressLocality: 'Beograd',
+          postalCode: '11000',
+          addressCountry: 'RS',
+        },
+        contactPoint: {
+          '@type': 'ContactPoint',
+          telephone: '+381113000000',
+          contactType: 'customer service',
+          availableLanguage: ['sr', 'en'],
+        },
+        knowsLanguage: ['sr', 'en'],
+      },
+      {
+        '@type': 'WebPage',
+        '@id': `${absoluteUrl(locale as 'sr' | 'en', '/')}#webpage`,
+        url: absoluteUrl(locale as 'sr' | 'en', '/'),
+        name: t('home.title'),
+        inLanguage: locale,
+        about: { '@id': `${SITE_URL}/#business` },
+      },
+    ],
+  };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <HeroSection />
       <BookingSection />
       <PortfolioSection />

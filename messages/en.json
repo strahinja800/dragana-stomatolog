@@ -928,5 +928,40 @@
     "facebook": "Facebook",
     "instagram": "Instagram",
     "linkedin": "LinkedIn"
+  },
+  "Metadata": {
+    "siteTitle": "DENTALHOLIST KONCEPT",
+    "home": {
+      "title": "DENTALHOLIST KONCEPT | Premium Holistic Dental Clinic",
+      "description": "Premium holistic approach to dentistry. Online booking, reminders, and modern smile care."
+    },
+    "services": {
+      "title": "Our Services",
+      "description": "Complete dental care - from prevention to cosmetic dentistry."
+    },
+    "about": {
+      "title": "About Us",
+      "description": "Meet our team and our holistic approach to dentistry."
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Schedule an appointment or contact us for more information."
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Tips and news from the world of dentistry."
+    },
+    "results": {
+      "title": "Results",
+      "description": "See the results of our treatments."
+    },
+    "structuredData": {
+      "businessDescription": "Premium holistic dental clinic in Belgrade.",
+      "aboutPageName": "About Us | DENTALHOLIST KONCEPT",
+      "servicesPageName": "Services | DENTALHOLIST KONCEPT",
+      "contactPageName": "Contact | DENTALHOLIST KONCEPT",
+      "blogPageName": "Blog | DENTALHOLIST KONCEPT",
+      "resultsPageName": "Results | DENTALHOLIST KONCEPT"
+    }
   }
 }
