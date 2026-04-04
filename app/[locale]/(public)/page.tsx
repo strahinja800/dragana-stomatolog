@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 
-import { absoluteUrl, buildAlternates, SITE_URL } from '@/lib/seo';
+import { absoluteUrl, buildAlternates, OG_LOCALE, SITE_URL } from '@/lib/seo';
 import BeforeAfterSection from '@/module/public/home/components/before-after/before-after-section';
 import BlogSection from '@/module/public/home/components/blog/blog-section';
 import BookingSection from '@/module/public/home/components/booking-section/booking-section-server';
@@ -14,8 +14,6 @@ import TeamSection from '@/module/public/home/components/team-section/team-secti
 import TestimonialsSection from '@/module/public/home/components/testimonials/testimonials-section';
 import { HydrateClient } from '@/trpc/hydrate-client';
 import { prefetch, trpc } from '@/trpc/server';
-
-const OG_LOCALE = { sr: 'sr_RS', en: 'en_US' } as const;
 
 export async function generateMetadata({
   params,
