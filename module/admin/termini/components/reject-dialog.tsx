@@ -50,7 +50,7 @@ export function RejectDialog({ appointment, onClose }: RejectDialogProps) {
   const { mutate: rejectAppointment, isPending } = useMutation(
     trpc.appointment.reject.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['appointment'] });
+        queryClient.invalidateQueries({ queryKey: [['appointment']] });
         toast.success('Termin odbijen', {
           description: 'Pacijent će biti obavešten o odbijanju termina',
         });
