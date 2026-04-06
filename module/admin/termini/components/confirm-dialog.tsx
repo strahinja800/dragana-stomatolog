@@ -64,7 +64,7 @@ export function ConfirmDialog({ appointment, onClose }: ConfirmDialogProps) {
   const { mutate: confirmAppointment, isPending } = useMutation(
     trpc.appointment.confirm.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['appointment'] });
+        queryClient.invalidateQueries({ queryKey: [['appointment']] });
         toast.success('Termin potvrđen', {
           description: 'Pacijent će biti obavešten o potvrdi termina',
         });
