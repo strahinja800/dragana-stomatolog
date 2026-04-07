@@ -78,13 +78,9 @@ export const subscriptionsRouter = createTRPCRouter({
   onAppointmentSlotChanged: publicProcedure
     .input(z.object({ lastEventId: z.string().nullish() }).optional())
     .subscription(async function* (opts) {
-      for await (const [data] of on(
-        ee,
-        EVENT_NAMES.APPOINTMENT_SLOT_CHANGED,
-        {
-          signal: opts.signal,
-        }
-      )) {
+      for await (const [data] of on(ee, EVENT_NAMES.APPOINTMENT_SLOT_CHANGED, {
+        signal: opts.signal,
+      })) {
         const event = data as AppointmentSlotChangedEvent;
         yield tracked(String(event.timestamp), event);
       }
