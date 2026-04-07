@@ -101,6 +101,16 @@ export default function BookingForm({
     })
   );
 
+  useSubscription(
+    trpc.subscriptions.onAppointmentSlotChanged.subscriptionOptions(undefined, {
+      onData: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.appointment.getTimeSlotsForDate.queryKey(),
+        });
+      },
+    })
+  );
+
   const { closedDaysOfWeek, disabledDates } = nonWorkingDays ?? {
     closedDaysOfWeek: [],
     disabledDates: [],

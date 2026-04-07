@@ -21,7 +21,10 @@ import AppointmentTimeProposal, {
   subject as appointmentTimeProposalSubject,
 } from '@/emails/appointment-time-proposal';
 import { sendEmail } from '@/lib/email/resend-client';
-import { emitAppointmentCreated } from '@/lib/events';
+import {
+  emitAppointmentCreated,
+  emitAppointmentSlotChanged,
+} from '@/lib/events';
 import { Prisma } from '@/lib/generated/prisma/client';
 import {
   formatLocalTime,
@@ -322,6 +325,7 @@ export const appointmentRouter = createTRPCRouter({
         symptoms: input.symptoms ?? null,
       });
 
+      emitAppointmentSlotChanged();
       return appointment;
     }),
 
@@ -447,6 +451,7 @@ export const appointmentRouter = createTRPCRouter({
         symptoms: input.symptoms ?? null,
       });
 
+      emitAppointmentSlotChanged();
       return appointment;
     }),
 
@@ -661,6 +666,7 @@ export const appointmentRouter = createTRPCRouter({
         }
       }
 
+      emitAppointmentSlotChanged();
       return updated;
     }),
 
@@ -704,7 +710,7 @@ export const appointmentRouter = createTRPCRouter({
           });
         }
       }
-
+      emitAppointmentSlotChanged();
       return updated;
     }),
 
