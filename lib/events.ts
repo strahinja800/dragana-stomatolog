@@ -8,6 +8,7 @@ ee.setMaxListeners(100);
 export const EVENT_NAMES = {
   SETTINGS_UPDATE: 'settings:update',
   APPOINTMENT_CREATED: 'appointment:created',
+  APPOINTMENT_SLOT_CHANGED: 'appointment:slot-changed',
 } as const;
 
 // Settings event type constants
@@ -22,6 +23,12 @@ export type SettingsUpdateEvent = {
   type: (typeof SETTINGS_EVENT_TYPES)[keyof typeof SETTINGS_EVENT_TYPES];
   timestamp: number;
 };
+
+export type AppointmentSlotChangedEvent = { timestamp: number };
+export function emitAppointmentSlotChanged() {
+  const event: AppointmentSlotChangedEvent = { timestamp: Date.now() };
+  ee.emit(EVENT_NAMES.APPOINTMENT_SLOT_CHANGED, event);
+}
 
 export type AppointmentCreatedEvent = {
   appointmentId: string;

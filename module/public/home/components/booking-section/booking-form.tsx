@@ -101,6 +101,23 @@ export default function BookingForm({
     })
   );
 
+  useSubscription(
+    trpc.subscriptions.onAppointmentSlotChanged.subscriptionOptions(undefined, {
+      onData: () => {
+        console.log('[SSE] onAppointmentSlotChanged received, invalidating slots');
+        queryClient.invalidateQueries({
+          queryKey: trpc.appointment.getTimeSlotsForDate.queryKey(),
+        });
+      },
+      onError: (err) => {
+        console.error('[SSE] onAppointmentSlotChanged error:', err);
+      },
+      onConnectionStateChange: (state) => {
+        console.log('[SSE] onAppointmentSlotChanged state:', state);
+      },
+    })
+  );
+
   const { closedDaysOfWeek, disabledDates } = nonWorkingDays ?? {
     closedDaysOfWeek: [],
     disabledDates: [],

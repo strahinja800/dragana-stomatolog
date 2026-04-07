@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import {
   type AppointmentCreatedEvent,
+  type AppointmentSlotChangedEvent,
   ee,
   EVENT_NAMES,
   type SettingsUpdateEvent,
@@ -73,4 +74,19 @@ export const subscriptionsRouter = createTRPCRouter({
       console.log(`[SSE] Appointment subscription ended`);
     }
   }),
+
+  onAppointmentSlotChanged: publicProcedure
+    .input(z.object({ lastEventId: z.string().nullish() }).optional())
+    .subscription(async function* (opts) {
+      for await (const [data] of on(
+        ee,
+        EVENT_NAMES.APPOINTMENT_SLOT_CHANGED,
+        {
+          signal: opts.signal,
+        }
+      )) {
+        const event = data as AppointmentSlotChangedEvent;
+        yield tracked(String(event.timestamp), event);
+      }
+    }),
 });
