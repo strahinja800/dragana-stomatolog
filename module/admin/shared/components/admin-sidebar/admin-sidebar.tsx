@@ -13,7 +13,6 @@ import { cn } from '@/lib/utils';
 export function AdminSidebar() {
   const pathname = usePathname();
   const t = useTranslations('admin.nav');
-
   const handleSignOut = async () => {
     await authClient.signOut();
     window.location.href = '/';
