@@ -1,24 +1,24 @@
 'use client';
 
-import { useState } from 'react';
-
 import { useQueryClient } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
 
-import type { AppointmentCreatedEvent } from '@/lib/events';
+import { useNotificationQueue } from '@/module/admin/dashboard/context/notification-context';
+import { playNotificationSound } from '@/module/admin/dashboard/utils/play-notification-sound';
 import { useTRPC } from '@/trpc/client';
 
 import { NewBookingModal } from './new-booking-modal/new-booking-modal';
 
-export function DashboardAppointmentNotifier() {
+export function AppointmentNotifier() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const [event, setEvent] = useState<AppointmentCreatedEvent | null>(null);
+  const { queue, addToQueue, removeFirst } = useNotificationQueue();
 
   useSubscription(
     trpc.subscriptions.onNewAppointment.subscriptionOptions(undefined, {
       onData: (trackedEvent) => {
-        setEvent(trackedEvent.data);
+        playNotificationSound();
+        addToQueue(trackedEvent.data);
         void queryClient.invalidateQueries({
           queryKey: trpc.appointment.getPending.queryKey(),
         });
@@ -29,11 +29,14 @@ export function DashboardAppointmentNotifier() {
     })
   );
 
+  const currentEvent = queue[0] ?? null;
+
   return (
     <NewBookingModal
-      event={event}
-      open={!!event}
-      onClose={() => setEvent(null)}
+      key={currentEvent?.appointmentId ?? 'empty'}
+      event={currentEvent}
+      open={!!currentEvent}
+      onClose={removeFirst}
     />
   );
 }

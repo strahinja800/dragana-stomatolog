@@ -37,26 +37,6 @@ interface NewBookingModalProps {
   onClose: () => void;
 }
 
-function playNotificationSound() {
-  try {
-    const ctx = new AudioContext();
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-    oscillator.connect(gain);
-    gain.connect(ctx.destination);
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(880, ctx.currentTime);
-    oscillator.frequency.setValueAtTime(660, ctx.currentTime + 0.15);
-    oscillator.frequency.setValueAtTime(880, ctx.currentTime + 0.3);
-    gain.gain.setValueAtTime(0.25, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-    oscillator.start(ctx.currentTime);
-    oscillator.stop(ctx.currentTime + 0.5);
-  } catch {
-    // Web Audio API not available
-  }
-}
-
 export function NewBookingModal({
   event,
   open,
@@ -76,13 +56,6 @@ export function NewBookingModal({
     }
   }, []);
 
-  // Play sound when opened
-  useEffect(() => {
-    if (open) {
-      playNotificationSound();
-    }
-  }, [open]);
-
   // Tab blinking when modal is open
   useEffect(() => {
     if (!open) {
@@ -95,7 +68,7 @@ export function NewBookingModal({
     blinkIntervalRef.current = setInterval(() => {
       document.title = isAlternate
         ? originalTitleRef.current
-        : '🔔 Nova rezervacija!';
+        : `🔔 Nova rezervacija!`;
       isAlternate = !isAlternate;
     }, 1000);
 

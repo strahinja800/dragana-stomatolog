@@ -4,7 +4,6 @@ import { useTranslations } from 'next-intl';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 
-import { DashboardAppointmentNotifier } from '@/module/admin/dashboard/components/dashboard-appointment-notifier';
 import { DashboardBlogStatus } from '@/module/admin/dashboard/components/dashboard-blog-status';
 import { DashboardPendingAppointments } from '@/module/admin/dashboard/components/dashboard-pending-appointments';
 import { DashboardQuickActions } from '@/module/admin/dashboard/components/dashboard-quick-actions';
@@ -28,7 +27,6 @@ export function AdminView() {
 
   return (
     <div className="space-y-8">
-      <DashboardAppointmentNotifier />
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
