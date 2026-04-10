@@ -475,6 +475,25 @@ export const appointmentRouter = createTRPCRouter({
     return appointments;
   }),
 
+  getUnseen: adminProcedure.query(async ({ ctx }) => {
+    const appointments = await ctx.prisma.appointment.findMany({
+      where: { status: 'PENDING', adminSeen: false },
+      include: { patient: true, serviceType: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    return appointments.map((a) => ({
+      appointmentId: a.id,
+      patientName: `${a.patient.firstName} ${a.patient.lastName}`,
+      serviceName: a.serviceType?.name ?? null,
+      startTime: a.startTime.toISOString(),
+      phone: a.phone ?? '',
+      email: a.email ?? '',
+      symptoms: a.symptoms ?? null,
+      timestamp: a.createdAt.getTime(),
+    }));
+  }),
+
   /**
    * Vraća sve termine sa filterima i paginacijom
    */
@@ -872,4 +891,14 @@ export const appointmentRouter = createTRPCRouter({
       orderBy: { startTime: 'asc' },
     });
   }),
+
+  //  Seen feature for admin dashboard notifications
+  markAsSeen: adminProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.appointment.update({
+        where: { id: input.id },
+        data: { adminSeen: true, adminSeenAt: new Date() },
+      });
+    }),
 });

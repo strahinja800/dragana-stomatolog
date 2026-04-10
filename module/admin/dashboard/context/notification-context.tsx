@@ -24,7 +24,11 @@ export function NotificationProvider({
   const [queue, setQueue] = useState<AppointmentCreatedEvent[]>([]);
 
   const addToQueue = useCallback((event: AppointmentCreatedEvent) => {
-    setQueue((prev) => [...prev, event]);
+    setQueue((prev) => {
+      if (prev.some((e) => e.appointmentId === event.appointmentId))
+        return prev;
+      return [...prev, event];
+    });
   }, []);
 
   const removeFirst = useCallback(() => {

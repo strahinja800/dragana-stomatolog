@@ -62,18 +62,48 @@ export const subscriptionsRouter = createTRPCRouter({
    * Subscribe to new appointment notifications (admin only).
    * Emitted when a patient submits a new booking request.
    */
-  onNewAppointment: adminProcedure.subscription(async function* (opts) {
-    const eventName = EVENT_NAMES.APPOINTMENT_CREATED;
+  onNewAppointment: adminProcedure
+    .input(z.object({ lastEventId: z.string().nullish() }).optional())
+    .subscription(async function* (opts) {
+      const eventName = EVENT_NAMES.APPOINTMENT_CREATED;
+      const lastEventId = opts.input?.lastEventId;
 
-    try {
-      for await (const [data] of on(ee, eventName, { signal: opts.signal })) {
-        const event = data as AppointmentCreatedEvent;
-        yield tracked(String(event.timestamp), event);
+      if (lastEventId) {
+        const lastTimestamp = new Date(Number(lastEventId));
+        const missed = await opts.ctx.prisma.appointment.findMany({
+          where: {
+            status: 'PENDING',
+            adminSeen: false,
+            createdAt: { gt: lastTimestamp },
+          },
+          include: { patient: true, serviceType: true },
+          orderBy: { createdAt: 'asc' },
+        });
+
+        for (const a of missed) {
+          const event: AppointmentCreatedEvent = {
+            appointmentId: a.id,
+            patientName: `${a.patient.firstName} ${a.patient.lastName}`,
+            serviceName: a.serviceType?.name ?? null,
+            startTime: a.startTime.toISOString(),
+            phone: a.phone ?? '',
+            email: a.email ?? '',
+            symptoms: a.symptoms ?? null,
+            timestamp: a.createdAt.getTime(),
+          };
+          yield tracked(String(event.timestamp), event);
+        }
       }
-    } finally {
-      console.log(`[SSE] Appointment subscription ended`);
-    }
-  }),
+
+      try {
+        for await (const [data] of on(ee, eventName, { signal: opts.signal })) {
+          const event = data as AppointmentCreatedEvent;
+          yield tracked(String(event.timestamp), event);
+        }
+      } finally {
+        console.log(`[SSE] Appointment subscription ended`);
+      }
+    }),
 
   onAppointmentSlotChanged: publicProcedure
     .input(z.object({ lastEventId: z.string().nullish() }).optional())

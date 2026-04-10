@@ -6,13 +6,15 @@ import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { ADMIN_BRAND, ADMIN_NAV_ITEMS } from '@/constants/admin-navigation';
-import { ExternalLink, LogOut, Stethoscope } from '@/constants/icons';
+import { BellRing, ExternalLink, LogOut, Stethoscope } from '@/constants/icons';
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
+import { useNotificationCount } from '@/module/admin/dashboard/context/notification-context';
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const t = useTranslations('admin.nav');
+  const count = useNotificationCount();
   const handleSignOut = async () => {
     await authClient.signOut();
     window.location.href = '/';
@@ -29,6 +31,14 @@ export function AdminSidebar() {
           <span className="text-sm font-semibold">{ADMIN_BRAND.name}</span>
           <span className="text-xs text-muted-foreground">{t('subtitle')}</span>
         </div>
+        {count > 0 && (
+          <div className="relative ml-auto">
+            <BellRing className="size-5 animate-pulse text-amber-500" />
+            <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+              {count}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}

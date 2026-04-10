@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { sr } from 'date-fns/locale';
 
@@ -25,6 +26,8 @@ import {
   X,
 } from '@/constants/icons';
 import type { AppointmentCreatedEvent } from '@/lib/events';
+import { useNotificationCount } from '@/module/admin/dashboard/context/notification-context';
+import { useTRPC } from '@/trpc/client';
 
 import { NewBookingModalConfirm } from './new-booking-modal-confirm';
 import { NewBookingModalPropose } from './new-booking-modal-propose';
@@ -42,7 +45,12 @@ export function NewBookingModal({
   open,
   onClose,
 }: NewBookingModalProps) {
+  const trpc = useTRPC();
+  const { mutate: markAsSeen } = useMutation(
+    trpc.appointment.markAsSeen.mutationOptions()
+  );
   const [view, setView] = useState<ModalView>('info');
+  const count = useNotificationCount();
   const originalTitleRef = useRef('');
   const blinkIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -68,7 +76,7 @@ export function NewBookingModal({
     blinkIntervalRef.current = setInterval(() => {
       document.title = isAlternate
         ? originalTitleRef.current
-        : `🔔 Nova rezervacija!`;
+        : `🔔 Nova rezervacija! (${count})`;
       isAlternate = !isAlternate;
     }, 1000);
 
@@ -84,12 +92,18 @@ export function NewBookingModal({
       stopBlinking();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [open, stopBlinking]);
+  }, [open, stopBlinking, count]);
 
   // Reset view when modal opens
   useEffect(() => {
     if (open) setView('info');
   }, [open]);
+
+  useEffect(() => {
+    if (open && event) {
+      markAsSeen({ id: event.appointmentId });
+    }
+  }, [event, open, markAsSeen]);
 
   if (!event) return null;
 
