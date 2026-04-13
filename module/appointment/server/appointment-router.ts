@@ -323,6 +323,7 @@ export const appointmentRouter = createTRPCRouter({
         phone: input.phone,
         email: input.email,
         symptoms: input.symptoms ?? null,
+        createdAt: appointment.createdAt,
       });
 
       emitAppointmentSlotChanged();
@@ -449,6 +450,7 @@ export const appointmentRouter = createTRPCRouter({
         email: appointment.email ?? ctx.session.user.email,
         phone: appointment.phone ?? 'N/A',
         symptoms: input.symptoms ?? null,
+        createdAt: appointment.createdAt,
       });
 
       emitAppointmentSlotChanged();
@@ -896,9 +898,17 @@ export const appointmentRouter = createTRPCRouter({
   markAsSeen: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.appointment.update({
+      const result = await ctx.prisma.appointment.updateMany({
         where: { id: input.id },
         data: { adminSeen: true, adminSeenAt: new Date() },
       });
+
+      if (result.count === 0) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Termin nije pronađen.',
+        });
+      }
+      return { success: true };
     }),
 });

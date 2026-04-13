@@ -68,8 +68,9 @@ export const subscriptionsRouter = createTRPCRouter({
       const eventName = EVENT_NAMES.APPOINTMENT_CREATED;
       const lastEventId = opts.input?.lastEventId;
 
-      if (lastEventId) {
-        const lastTimestamp = new Date(Number(lastEventId));
+      const lastTimestampMs = lastEventId ? Number(lastEventId) : NaN;
+      if (!Number.isNaN(lastTimestampMs)) {
+        const lastTimestamp = new Date(lastTimestampMs);
         const missed = await opts.ctx.prisma.appointment.findMany({
           where: {
             status: 'PENDING',

@@ -42,9 +42,12 @@ export type AppointmentCreatedEvent = {
 };
 
 export function emitAppointmentCreated(
-  payload: Omit<AppointmentCreatedEvent, 'timestamp'>
+  payload: Omit<AppointmentCreatedEvent, 'timestamp'> & { createdAt: Date }
 ) {
-  const event: AppointmentCreatedEvent = { ...payload, timestamp: Date.now() };
+  const event: AppointmentCreatedEvent = {
+    ...payload,
+    timestamp: payload.createdAt.getTime(),
+  };
   ee.emit(EVENT_NAMES.APPOINTMENT_CREATED, event);
 }
 
