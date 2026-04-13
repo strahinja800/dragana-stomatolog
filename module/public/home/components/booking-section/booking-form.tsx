@@ -261,6 +261,7 @@ export default function BookingForm({
             onClick={() => {
               setIsSuccess(false);
               form.reset();
+              setSelectedDate(today);
             }}
             className="text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
