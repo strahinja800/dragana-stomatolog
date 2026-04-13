@@ -1,6 +1,8 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
 
 import { useNotificationQueue } from '@/module/admin/dashboard/context/notification-context';
@@ -14,8 +16,23 @@ export function AppointmentNotifier() {
   const queryClient = useQueryClient();
   const { queue, addToQueue, removeFirst } = useNotificationQueue();
 
+  const { data: unseenAppointments } = useQuery(
+    trpc.appointment.getUnseen.queryOptions()
+  );
+
+  useEffect(() => {
+    if (!unseenAppointments?.length) return;
+    unseenAppointments.forEach((event) => addToQueue(event));
+    playNotificationSound();
+  }, [unseenAppointments, addToQueue]);
+
   useSubscription(
     trpc.subscriptions.onNewAppointment.subscriptionOptions(undefined, {
+      onStarted: () => {
+        void queryClient.invalidateQueries({
+          queryKey: trpc.appointment.getUnseen.queryKey(),
+        });
+      },
       onData: (trackedEvent) => {
         playNotificationSound();
         addToQueue(trackedEvent.data);

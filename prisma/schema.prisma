@@ -216,6 +216,9 @@ model Appointment {
   proposedStartTime DateTime?
   proposedEndTime   DateTime?
 
+  adminSeen   Boolean   @default(false)
+  adminSeenAt DateTime?
+
   @@index([patientId])
   @@index([dentistId])
   @@index([serviceTypeId])

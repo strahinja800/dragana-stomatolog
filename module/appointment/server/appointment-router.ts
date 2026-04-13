@@ -323,6 +323,7 @@ export const appointmentRouter = createTRPCRouter({
         phone: input.phone,
         email: input.email,
         symptoms: input.symptoms ?? null,
+        createdAt: appointment.createdAt,
       });
 
       emitAppointmentSlotChanged();
@@ -449,6 +450,7 @@ export const appointmentRouter = createTRPCRouter({
         email: appointment.email ?? ctx.session.user.email,
         phone: appointment.phone ?? 'N/A',
         symptoms: input.symptoms ?? null,
+        createdAt: appointment.createdAt,
       });
 
       emitAppointmentSlotChanged();
@@ -473,6 +475,25 @@ export const appointmentRouter = createTRPCRouter({
     });
 
     return appointments;
+  }),
+
+  getUnseen: adminProcedure.query(async ({ ctx }) => {
+    const appointments = await ctx.prisma.appointment.findMany({
+      where: { status: 'PENDING', adminSeen: false },
+      include: { patient: true, serviceType: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    return appointments.map((a) => ({
+      appointmentId: a.id,
+      patientName: `${a.patient.firstName} ${a.patient.lastName}`,
+      serviceName: a.serviceType?.name ?? null,
+      startTime: a.startTime.toISOString(),
+      phone: a.phone ?? '',
+      email: a.email ?? '',
+      symptoms: a.symptoms ?? null,
+      timestamp: a.createdAt.getTime(),
+    }));
   }),
 
   /**
@@ -872,4 +893,22 @@ export const appointmentRouter = createTRPCRouter({
       orderBy: { startTime: 'asc' },
     });
   }),
+
+  //  Seen feature for admin dashboard notifications
+  markAsSeen: adminProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const result = await ctx.prisma.appointment.updateMany({
+        where: { id: input.id },
+        data: { adminSeen: true, adminSeenAt: new Date() },
+      });
+
+      if (result.count === 0) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Termin nije pronađen.',
+        });
+      }
+      return { success: true };
+    }),
 });

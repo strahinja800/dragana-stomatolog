@@ -6,13 +6,13 @@ import type { AppointmentCreatedEvent } from '@/lib/events';
 
 interface NotificationContextValue {
   queue: AppointmentCreatedEvent[];
-  addToQueue: (event: AppointmentCreatedEvent) => void;
+  addToQueue: (event: AppointmentCreatedEvent) => boolean;
   removeFirst: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextValue>({
   queue: [],
-  addToQueue: () => {},
+  addToQueue: () => false,
   removeFirst: () => {},
 });
 
@@ -24,7 +24,14 @@ export function NotificationProvider({
   const [queue, setQueue] = useState<AppointmentCreatedEvent[]>([]);
 
   const addToQueue = useCallback((event: AppointmentCreatedEvent) => {
-    setQueue((prev) => [...prev, event]);
+    let added = false;
+    setQueue((prev) => {
+      if (prev.some((e) => e.appointmentId === event.appointmentId))
+        return prev;
+      added = true;
+      return [...prev, event];
+    });
+    return added;
   }, []);
 
   const removeFirst = useCallback(() => {
