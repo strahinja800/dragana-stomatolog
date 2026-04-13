@@ -260,7 +260,11 @@ export default function BookingForm({
             type="button"
             onClick={() => {
               setIsSuccess(false);
-              form.reset();
+              form.reset({
+                date: today,
+                time: '',
+                symptoms: '',
+              });
               setSelectedDate(today);
             }}
             className="text-sm font-medium text-primary underline-offset-4 hover:underline"
