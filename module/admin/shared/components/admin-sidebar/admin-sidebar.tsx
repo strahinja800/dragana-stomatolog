@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
 import { ADMIN_BRAND, ADMIN_NAV_ITEMS } from '@/constants/admin-navigation';
 import { BellRing, ExternalLink, LogOut, Stethoscope } from '@/constants/icons';
@@ -73,6 +74,10 @@ export function AdminSidebar() {
 
       {/* Footer */}
       <div className="border-t border-border/50 p-4 space-y-1">
+        <LanguageSwitcher
+          fullLabel
+          className="w-full justify-start gap-3 rounded-xl px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+        />
         <Button
           variant="ghost"
           className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground"
@@ -83,6 +88,7 @@ export function AdminSidebar() {
             {t('backToSite')}
           </Link>
         </Button>
+
         <Button
           variant="ghost"
           className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive"

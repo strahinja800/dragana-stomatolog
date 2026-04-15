@@ -21,11 +21,13 @@ const LOCALE_META: Record<string, { flag: string; label: string }> = {
 
 type LanguageSwitcherProps = {
   compact?: boolean;
+  fullLabel?: boolean;
   className?: string;
 };
 
 export function LanguageSwitcher({
   compact,
+  fullLabel,
   className,
 }: LanguageSwitcherProps) {
   const t = useTranslations('languageSwitcher');
@@ -56,8 +58,12 @@ export function LanguageSwitcher({
         aria-label={t('ariaLabel')}
       >
         <Globe className="size-3.5" />
-        {!compact && <span className="font-medium uppercase">{locale}</span>}
-        <ChevronDown className="size-3 opacity-60" />
+        {!compact && (
+          <span className="font-medium">
+            {fullLabel ? (LOCALE_META[locale]?.label ?? locale.toUpperCase()) : locale.toUpperCase()}
+          </span>
+        )}
+        <ChevronDown className={cn('size-3 opacity-60', fullLabel && 'ml-auto')} />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" sideOffset={6} className="min-w-32.5">
