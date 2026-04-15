@@ -60,10 +60,14 @@ export function LanguageSwitcher({
         <Globe className="size-3.5" />
         {!compact && (
           <span className="font-medium">
-            {fullLabel ? (LOCALE_META[locale]?.label ?? locale.toUpperCase()) : locale.toUpperCase()}
+            {fullLabel
+              ? (LOCALE_META[locale]?.label ?? locale.toUpperCase())
+              : locale.toUpperCase()}
           </span>
         )}
-        <ChevronDown className={cn('size-3 opacity-60', fullLabel && 'ml-auto')} />
+        <ChevronDown
+          className={cn('size-3 opacity-60', fullLabel && 'ml-auto')}
+        />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" sideOffset={6} className="min-w-32.5">
