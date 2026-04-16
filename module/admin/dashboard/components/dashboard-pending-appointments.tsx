@@ -46,7 +46,7 @@ export function DashboardPendingAppointments() {
               className="gap-1.5 text-xs text-muted-foreground"
               asChild
             >
-              <Link href="/admin/appointments">
+              <Link href="/admin/termini">
                 <ExternalLink className="size-3.5" />
                 {t('allAppointments')}
               </Link>
