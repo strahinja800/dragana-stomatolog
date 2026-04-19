@@ -1,7 +1,13 @@
 import { getTranslations } from 'next-intl/server';
 
 import { beforeAfterCases } from '@/data/data';
-import { absoluteUrl, buildAlternates, OG_LOCALE, SITE_URL } from '@/lib/seo';
+import {
+  absoluteUrl,
+  buildAlternates,
+  buildOgImages,
+  OG_LOCALE,
+  SITE_URL,
+} from '@/lib/seo';
 import BeforeAfterCompareCard from '@/module/public/home/components/before-after/before-after-compare-card';
 
 export async function generateMetadata({
@@ -19,9 +25,11 @@ export async function generateMetadata({
     openGraph: {
       title: t('title'),
       description: t('description'),
+      url: absoluteUrl(locale as 'sr' | 'en', '/rezultati'),
       locale: OG_LOCALE[locale as keyof typeof OG_LOCALE],
       alternateLocale: locale === 'sr' ? ['en_US'] : ['sr_RS'],
       type: 'website' as const,
+      images: buildOgImages(),
     },
   };
 }

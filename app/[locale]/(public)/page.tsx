@@ -1,6 +1,12 @@
 import { getTranslations } from 'next-intl/server';
 
-import { absoluteUrl, buildAlternates, OG_LOCALE, SITE_URL } from '@/lib/seo';
+import {
+  absoluteUrl,
+  buildAlternates,
+  buildOgImages,
+  OG_LOCALE,
+  SITE_URL,
+} from '@/lib/seo';
 import BeforeAfterSection from '@/module/public/home/components/before-after/before-after-section';
 import BlogSection from '@/module/public/home/components/blog/blog-section';
 import BookingSection from '@/module/public/home/components/booking-section/booking-section-server';
@@ -30,9 +36,11 @@ export async function generateMetadata({
     openGraph: {
       title: t('home.title'),
       description: t('home.description'),
+      url: absoluteUrl(locale as 'sr' | 'en', '/'),
       locale: OG_LOCALE[locale as keyof typeof OG_LOCALE],
       alternateLocale: locale === 'sr' ? ['en_US'] : ['sr_RS'],
       type: 'website' as const,
+      images: buildOgImages(),
     },
   };
 }

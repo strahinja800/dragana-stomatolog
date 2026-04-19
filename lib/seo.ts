@@ -9,6 +9,19 @@ export const OG_LOCALE = { sr: 'sr_RS', en: 'en_US' } as const;
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://dentalholist.rs';
 
+export const OG_IMAGE = `${SITE_URL}/assets/hero-dental.jpg`;
+
+export function buildOgImages(imageUrl?: string | null) {
+  return [
+    {
+      url: imageUrl ?? OG_IMAGE,
+      width: 1200,
+      height: 630,
+      alt: 'DENTALHOLIST KONCEPT',
+    },
+  ];
+}
+
 export function absoluteUrl(locale: Locale, path: string): string {
   return `${SITE_URL}/${locale}${path === '/' ? '' : path}`;
 }

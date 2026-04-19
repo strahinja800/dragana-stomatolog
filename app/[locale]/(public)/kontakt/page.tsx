@@ -1,6 +1,12 @@
 import { getTranslations } from 'next-intl/server';
 
-import { absoluteUrl, buildAlternates, OG_LOCALE, SITE_URL } from '@/lib/seo';
+import {
+  absoluteUrl,
+  buildAlternates,
+  buildOgImages,
+  OG_LOCALE,
+  SITE_URL,
+} from '@/lib/seo';
 import Contact from '@/module/public/contact/views/contact-view/contact';
 import ContactHero from '@/module/public/contact/views/contact-view/hero';
 
@@ -19,9 +25,11 @@ export async function generateMetadata({
     openGraph: {
       title: t('title'),
       description: t('description'),
+      url: absoluteUrl(locale as 'sr' | 'en', '/kontakt'),
       locale: OG_LOCALE[locale as keyof typeof OG_LOCALE],
       alternateLocale: locale === 'sr' ? ['en_US'] : ['sr_RS'],
       type: 'website' as const,
+      images: buildOgImages(),
     },
   };
 }
