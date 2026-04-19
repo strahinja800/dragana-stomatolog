@@ -8,7 +8,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import { Toaster } from '@/components/ui/sonner';
 import { routing } from '@/i18n/routing';
-import { SITE_URL } from '@/lib/seo';
+import { buildOgImages, OG_IMAGE, SITE_URL } from '@/lib/seo';
 import { TRPCReactProvider } from '@/trpc/client';
 
 import '@/app/globals.css';
@@ -41,6 +41,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       template: `%s | ${t('siteTitle')}`,
     },
     description: t('home.description'),
+    openGraph: {
+      siteName: t('siteTitle'),
+      images: buildOgImages(),
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: [OG_IMAGE],
+    },
   };
 }
 
