@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 
@@ -53,6 +53,9 @@ interface BookingFormProps {
 }
 
 const today = startOfDay(new Date());
+const subscribeToHydration = () => () => undefined;
+const getHydratedSnapshot = () => true;
+const getServerHydratedSnapshot = () => false;
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
@@ -89,6 +92,11 @@ export default function BookingForm({
 
   const { data: session, isPending: isSessionPending } = useSession();
   const isLoggedIn = !!session?.user;
+  const isHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getHydratedSnapshot,
+    getServerHydratedSnapshot
+  );
 
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -113,6 +121,7 @@ export default function BookingForm({
 
   const isPendingData =
     isPendingNonWorkingDays || isLoadingNonWorkingDays || isLoadingTimeSlots;
+  const isFormDisabled = !isHydrated || isPendingData;
 
   useSubscription(
     trpc.subscriptions.onSettingsUpdate.subscriptionOptions(undefined, {
@@ -354,7 +363,7 @@ export default function BookingForm({
                 timeSlots={timeSlots ?? []}
                 disabledDates={disabledDates}
                 disabledDaysOfWeek={closedDaysOfWeek}
-                disabled={isPendingData}
+                disabled={isFormDisabled}
                 isLoadingSlots={isLoadingTimeSlots}
                 density={compact ? 'compact' : 'default'}
               />
@@ -393,7 +402,7 @@ export default function BookingForm({
                       compact ? 'min-h-16' : 'min-h-20',
                       'resize-none'
                     )}
-                    disabled={isPendingData}
+                    disabled={isFormDisabled}
                   />
                 )}
               />
@@ -405,7 +414,7 @@ export default function BookingForm({
             >
               <button
                 type="submit"
-                disabled={isSubmitting || isPendingData || isSessionPending}
+                disabled={isSubmitting || isFormDisabled || isSessionPending}
                 className={cn(
                   'group relative w-full overflow-hidden font-semibold text-white',
                   compact

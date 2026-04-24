@@ -35,7 +35,7 @@ export default async function BookingSectionServer() {
   return (
     <section
       id="zakazivanje"
-      className="relative overflow-hidden py-16 md:py-24"
+      className="relative scroll-mt-28 overflow-hidden py-16 md:scroll-mt-32 md:py-24"
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background via-primary/[0.04] to-primary/[0.09]" />
       <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
