@@ -333,7 +333,7 @@ export const appointmentRouter = createTRPCRouter({
   /**
    * Briše termin
    */
-  delete: publicProcedure
+  delete: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const appointment = await ctx.prisma.appointment.findUnique({

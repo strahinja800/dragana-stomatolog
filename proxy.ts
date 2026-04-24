@@ -10,7 +10,27 @@ const authRoutes = ['/login', '/register'];
 
 const intlMiddleware = createMiddleware(routing);
 
-export default function middleware(request: NextRequest) {
+function getLocaleAwarePath(pathname: string) {
+  const segments = pathname.split('/').filter(Boolean);
+  const firstSegment = segments[0];
+  const hasLocale = routing.locales.includes(
+    firstSegment as (typeof routing.locales)[number]
+  );
+  const locale = hasLocale ? firstSegment : routing.defaultLocale;
+  const pathWithoutLocale = hasLocale
+    ? `/${segments.slice(1).join('/')}`
+    : pathname;
+
+  return {
+    locale,
+    pathWithoutLocale:
+      pathWithoutLocale === '/' || pathWithoutLocale === ''
+        ? '/'
+        : pathWithoutLocale.replace(/\/$/, ''),
+  };
+}
+
+export function proxy(request: NextRequest) {
   // 1. Apply i18n middleware first to set locale
   const intlResponse = intlMiddleware(request);
   if (intlResponse.status !== 200) {
@@ -18,23 +38,26 @@ export default function middleware(request: NextRequest) {
   }
 
   const path = request.nextUrl.pathname;
+  const { locale, pathWithoutLocale } = getLocaleAwarePath(path);
   const sessionCookie = getSessionCookie(request);
 
   const isProtectedRoute = protectedRoutes.some((route) =>
-    path.startsWith(route)
+    pathWithoutLocale.startsWith(route)
   );
-  const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
+  const isAuthRoute = authRoutes.some((route) =>
+    pathWithoutLocale.startsWith(route)
+  );
 
   // Redirect unauthenticated users from protected routes to login
   if (isProtectedRoute && !sessionCookie) {
-    const loginUrl = new URL('/login', request.url);
+    const loginUrl = new URL(`/${locale}/login`, request.url);
     loginUrl.searchParams.set('redirect', path);
     return NextResponse.redirect(loginUrl);
   }
 
   // Redirect authenticated users from auth routes to home
   if (isAuthRoute && sessionCookie) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL(`/${locale}`, request.url));
   }
 
   return intlResponse;

@@ -17,6 +17,7 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer';
 import { Paperclip, Upload } from '@/constants/icons';
+import { allowedUploadTypes } from '@/module/upload/types/upload-schemas';
 import { useTRPC } from '@/trpc/client';
 
 import { AttachmentRow } from './attachment-row';
@@ -24,6 +25,30 @@ import { AttachmentRow } from './attachment-row';
 interface Props {
   medicalRecordId: string;
   triggerLabel?: string;
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
+function getAllowedUploadType(fileType: string) {
+  return allowedUploadTypes.find((type) => type === fileType);
+}
+
+function assertSuccessfulUpload(response: Response) {
+  if (response.ok) {
+    return;
+  }
+
+  throw new Error('Upload nije uspeo');
+}
+
+function resetFileInput(input: HTMLInputElement | null) {
+  if (!input) {
+    return;
+  }
+
+  input.value = '';
 }
 
 export function MedicalRecordAttachmentsDrawer({
@@ -63,10 +88,10 @@ export function MedicalRecordAttachmentsDrawer({
         });
       },
       onError: (error) => {
-        const message =
-          error instanceof Error
-            ? error.message
-            : 'Greška prilikom brisanja fajla';
+        const message = getErrorMessage(
+          error,
+          'Greška prilikom brisanja fajla'
+        );
         toast.error(message);
       },
     })
@@ -75,40 +100,48 @@ export function MedicalRecordAttachmentsDrawer({
   const onPickFile = () => inputRef.current?.click();
 
   const onUpload = async (file: File) => {
+    const fileType = getAllowedUploadType(file.type);
+
+    if (!fileType) {
+      toast.error('Dozvoljeni su samo PDF, JPG, PNG i WebP fajlovi');
+      resetFileInput(inputRef.current);
+      return;
+    }
+
     try {
       setIsUploading(true);
 
       const { uploadUrl, fileUrl } = await getUploadUrl({
         fileName: file.name,
-        fileType: file.type || 'application/octet-stream',
+        fileType,
+        fileSize: file.size,
         folder: 'attachments',
       });
 
       const res = await fetch(uploadUrl, {
         method: 'PUT',
-        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        headers: { 'Content-Type': fileType },
         body: file,
       });
 
-      if (!res.ok) throw new Error('Upload nije uspeo');
+      assertSuccessfulUpload(res);
 
       await createAttachment({
         medicalRecordId,
         fileUrl,
         fileName: file.name,
-        fileType: file.type || 'application/octet-stream',
+        fileType,
         fileSize: file.size,
       });
 
       toast.success('Fajl je uspešno dodat');
     } catch (e) {
-      const message =
-        e instanceof Error ? e.message : 'Greška prilikom uploada fajla';
+      const message = getErrorMessage(e, 'Greška prilikom uploada fajla');
       toast.error(message);
-    } finally {
-      setIsUploading(false);
-      if (inputRef.current) inputRef.current.value = '';
     }
+
+    setIsUploading(false);
+    resetFileInput(inputRef.current);
   };
 
   const onInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

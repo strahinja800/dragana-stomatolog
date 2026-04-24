@@ -36,6 +36,14 @@ interface BookingDraft {
   symptoms?: string;
 }
 
+interface BookingProfile {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  dateOfBirth?: Date;
+  gender?: 'MALE' | 'FEMALE';
+}
+
 interface BookingFormProps {
   patientId?: string;
   onSuccess?: () => void;
@@ -45,6 +53,24 @@ interface BookingFormProps {
 }
 
 const today = startOfDay(new Date());
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
+function toBookingProfile(profile?: BookingProfile) {
+  if (!profile) {
+    return undefined;
+  }
+
+  return {
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    phone: profile.phone,
+    dateOfBirth: profile.dateOfBirth,
+    gender: profile.gender,
+  };
+}
 
 export default function BookingForm({
   patientId,
@@ -79,7 +105,7 @@ export default function BookingForm({
     isPending: isPendingNonWorkingDays,
   } = useSuspenseQuery(trpc.appointment.getNonWorkingDays.queryOptions());
 
-  const { data: timeSlots, isFetching: isLoadingTimeSlots } = useQuery(
+  const { data: timeSlots, isLoading: isLoadingTimeSlots } = useQuery(
     trpc.appointment.getTimeSlotsForDate.queryOptions({
       date: selectedDate ?? today,
     })
@@ -202,33 +228,20 @@ export default function BookingForm({
 
   const handleAuthenticatedBook = async (
     draft: BookingDraft,
-    profile?: {
-      firstName: string;
-      lastName: string;
-      phone: string;
-      dateOfBirth?: Date;
-      gender?: 'MALE' | 'FEMALE';
-    }
+    profile?: BookingProfile
   ): Promise<{ ok: boolean; error?: string }> => {
+    const bookingProfile = toBookingProfile(profile);
+
     try {
       await bookAppointment({
         date: draft.date,
         time: draft.time,
         symptoms: draft.symptoms,
-        profile: profile
-          ? {
-              firstName: profile.firstName,
-              lastName: profile.lastName,
-              phone: profile.phone,
-              dateOfBirth: profile.dateOfBirth,
-              gender: profile.gender,
-            }
-          : undefined,
+        profile: bookingProfile,
       });
       return { ok: true };
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : t('authModal.slotTaken');
+      const message = getErrorMessage(error, t('authModal.slotTaken'));
       return { ok: false, error: message };
     }
   };
