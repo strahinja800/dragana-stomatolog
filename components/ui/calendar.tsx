@@ -39,7 +39,7 @@ function Calendar({
       className={cn(
         'bg-background group/calendar p-3 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',
         isCompact &&
-          'p-2.5 [--cell-size:--spacing(6.5)] sm:[--cell-size:--spacing(6.75)]',
+          'p-2.5 [--cell-size:--spacing(9)] sm:[--cell-size:--spacing(9.5)]',
         'rtl:**:[.rdp-button\\_next>svg]:rotate-180',
         'rtl:**:[.rdp-button\\_previous>svg]:rotate-180',
         className
@@ -59,7 +59,7 @@ function Calendar({
         ),
         month: cn(
           'flex flex-col w-full gap-4',
-          isCompact && 'gap-3',
+          isCompact && 'items-center gap-3',
           defaultClassNames.month
         ),
         nav: cn(
@@ -104,16 +104,21 @@ function Calendar({
           isCompact && 'text-xs sm:text-sm',
           defaultClassNames.caption_label
         ),
-        table: 'w-full border-collapse',
-        weekdays: cn('flex', defaultClassNames.weekdays),
+        table: cn('w-full border-collapse', isCompact && 'w-auto'),
+        weekdays: cn(
+          'flex',
+          isCompact && 'justify-center gap-1',
+          defaultClassNames.weekdays
+        ),
         weekday: cn(
           'text-muted-foreground rounded-(--cell-radius) flex-1 font-normal text-[0.8rem] select-none',
-          isCompact && 'text-[0.7rem]',
+          isCompact &&
+            'flex h-6 w-(--cell-size) flex-none items-center justify-center text-[0.7rem]',
           defaultClassNames.weekday
         ),
         week: cn(
           'flex w-full mt-2',
-          isCompact && 'mt-1.5',
+          isCompact && 'mt-1.5 justify-center gap-1',
           defaultClassNames.week
         ),
         week_number_header: cn(
@@ -126,10 +131,16 @@ function Calendar({
         ),
         day: cn(
           'relative w-full rounded-(--cell-radius) h-full p-0 text-center [&:last-child[data-selected=true]_button]:rounded-r-(--cell-radius) group/day aspect-square select-none',
+          isCompact &&
+            'size-(--cell-size) w-(--cell-size) min-w-(--cell-size) max-w-(--cell-size) flex-none aspect-auto',
           props.showWeekNumber
             ? '[&:nth-child(2)[data-selected=true]_button]:rounded-l-(--cell-radius)'
             : '[&:first-child[data-selected=true]_button]:rounded-l-(--cell-radius)',
           defaultClassNames.day
+        ),
+        day_button: cn(
+          isCompact &&
+            'size-(--cell-size) w-(--cell-size) min-w-0 max-w-(--cell-size)'
         ),
         range_start: cn(
           'rounded-l-(--cell-radius) bg-muted elative after:bg-muted after:absolute after:inset-y-0 after:w-4 after:right-0 -z-0 isolate',

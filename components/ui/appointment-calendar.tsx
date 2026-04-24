@@ -1,5 +1,6 @@
 'use client';
 
+import { useSyncExternalStore } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { CircleCheckIcon } from 'lucide-react';
@@ -17,6 +18,10 @@ interface TimeSlot {
 const EMPTY_TIME_SLOTS: TimeSlot[] = [];
 const EMPTY_DISABLED_DATES: number[] = [];
 const EMPTY_DISABLED_DAYS_OF_WEEK: number[] = [];
+
+const subscribeToHydration = () => () => undefined;
+const getHydratedSnapshot = () => true;
+const getServerHydratedSnapshot = () => false;
 
 interface AppointmentCalendarProps {
   selectedDate?: Date;
@@ -54,11 +59,18 @@ function AppointmentCalendar({
   const t = useTranslations('home.booking');
 
   // Map next-intl locale to Intl.Locale
-  const intlLocale = locale === 'sr' ? 'sr-Latn' : 'en-US';
+  const activeLocale = localeProp ?? locale;
+  const intlLocale = activeLocale === 'sr' ? 'sr-Latn' : 'en-US';
 
   // Convert timestamps to Date objects for react-day-picker
   const disabledDateObjects = disabledTimestamps.map((ts) => new Date(ts));
   const isCompact = density === 'compact';
+  const isHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getHydratedSnapshot,
+    getServerHydratedSnapshot
+  );
+  const isShowingLoadingSlots = !isHydrated || isLoadingSlots;
 
   const calendarDisabledDates = [
     ...(disablePastDates ? [{ before: new Date() }] : []),
@@ -107,10 +119,15 @@ function AppointmentCalendar({
           <div
             className={cn(
               'relative min-h-48 w-full',
-              isCompact && 'min-h-40 md:w-[220px] '
+              isCompact && 'min-h-0 md:min-h-40 md:w-[220px]'
             )}
           >
-            <div className="absolute inset-0 grid gap-4">
+            <div
+              className={cn(
+                'absolute inset-0 grid gap-4',
+                isCompact && 'static gap-3 md:absolute md:inset-0 md:gap-4'
+              )}
+            >
               <div
                 className={cn('space-y-2 px-4 pt-4', isCompact && 'px-3 pt-3')}
               >
@@ -122,22 +139,28 @@ function AppointmentCalendar({
                 >
                   {!selectedDate
                     ? t('calendarSelectDate')
-                    : isLoadingSlots
+                    : isShowingLoadingSlots
                       ? t('calendarLoading')
                       : timeSlots.length === 0
                         ? t('calendarNoSlots')
                         : t('calendarAvailableSlots')}
                 </p>
               </div>
-              <ScrollArea className="h-full overflow-y-auto">
+              <ScrollArea
+                className={cn(
+                  'h-full overflow-y-auto',
+                  isCompact && 'max-h-28 md:max-h-none'
+                )}
+              >
                 <div
                   className={cn(
                     'grid grid-cols-1 gap-2 px-4 pb-4',
-                    isCompact && 'gap-1.5 px-3 pb-3'
+                    isCompact &&
+                      'grid-cols-2 gap-1.5 px-3 pb-3 sm:grid-cols-3 md:grid-cols-1'
                   )}
                 >
                   {selectedDate &&
-                    !isLoadingSlots &&
+                    !isShowingLoadingSlots &&
                     timeSlots.map((slot) => (
                       <Button
                         key={slot.time}
