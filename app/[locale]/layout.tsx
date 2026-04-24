@@ -65,6 +65,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale}>
       <body
+        suppressHydrationWarning
         className={`${manrope.variable} ${playfairDisplay.variable} bg-background text-foreground font-sans antialiased`}
       >
         <TRPCReactProvider>

@@ -4,50 +4,58 @@ import {
   CircleCheckBig,
   Shield,
 } from '@/constants/icons';
+import case1After from '@/public/assets/case-1-after.jpg';
+import case1Before from '@/public/assets/case-1-before.jpg';
+import case2After from '@/public/assets/case-2-after.jpg';
+import case2Before from '@/public/assets/case-2-before.jpg';
+import case3After from '@/public/assets/case-3-after.jpg';
+import case3Before from '@/public/assets/case-3-before.jpg';
 import logoGoldTransparent from '@/public/assets/dentalholist-logo-gold-transparent.svg';
 import logoHorizontal from '@/public/assets/dentalholist-logo-horizontal.svg';
 import logoIcon from '@/public/assets/dentalholist-logo-icon.svg';
 import logoText from '@/public/assets/dentalholist-logo-text.svg';
-import dentist1 from '@/public/assets/dentist-1.jpg';
-import dentist2 from '@/public/assets/dentist-2.jpg';
-import heroImage from '@/public/assets/hero-dental.jpg';
+import heroImage from '@/public/assets/hero-dental-realistic.jpg';
 import logoNegativ from '@/public/assets/logo-negativ.jpg';
-import portfolio1 from '@/public/assets/portfolio-1.png';
-import portfolio2 from '@/public/assets/portfolio-2.png';
-import portfolio3 from '@/public/assets/portfolio-3.png';
-import portfolio4 from '@/public/assets/portfolio-4.png';
-import portfolio5 from '@/public/assets/portfolio-5.png';
+import serviceDiagnostics from '@/public/assets/service-diagnostics.jpg';
+import serviceImplantology from '@/public/assets/service-implantology.jpg';
+import serviceOrthodontics from '@/public/assets/service-orthodontics.jpg';
+import servicePreventive from '@/public/assets/service-preventive.jpg';
+import serviceProsthetics from '@/public/assets/service-prosthetics.jpg';
+import teamDoctor1 from '@/public/assets/team-doctor-1.jpg';
+import teamDoctor2 from '@/public/assets/team-doctor-2.jpg';
+import teamDoctor3 from '@/public/assets/team-doctor-3.jpg';
+import teamDoctor4 from '@/public/assets/team-doctor-4.jpg';
 
 export const portfolioItems = [
   {
     number: '01',
     title: 'Preventivna nega',
     description: 'Kompletna zaštita i održavanje zdravog osmeha.',
-    image: portfolio1,
+    image: servicePreventive,
   },
   {
     number: '02',
     title: 'Implantologija',
     description: 'Precizna i dugotrajna implantološka rešenja.',
-    image: portfolio2,
+    image: serviceImplantology,
   },
   {
     number: '03',
     title: 'Digitalna dijagnostika',
     description: 'Tačno planiranje terapije uz savremenu tehnologiju.',
-    image: portfolio3,
+    image: serviceDiagnostics,
   },
   {
     number: '04',
     title: 'Ortodoncija',
     description: 'Funkcionalno i estetsko ispravljanje zuba.',
-    image: portfolio4,
+    image: serviceOrthodontics,
   },
   {
     number: '05',
     title: 'Protetika',
     description: 'Krunice, mostovi i rešenja prirodnog izgleda.',
-    image: portfolio5,
+    image: serviceProsthetics,
   },
 ];
 
@@ -103,25 +111,25 @@ export const team = [
     name: 'Dr. Ana Jovanović',
     role: 'Glavni stomatolog',
     specialty: 'Estetska stomatologija',
-    image: dentist1,
+    image: teamDoctor1,
   },
   {
     name: 'Dr. Marko Petrović',
     role: 'Oralni hirurg',
     specialty: 'Implantologija',
-    image: dentist2,
+    image: teamDoctor2,
   },
   {
     name: 'Dr. Jelena Marković',
     role: 'Specijalista ortodoncije',
     specialty: 'Fiksna i providna ortodoncija',
-    image: dentist1,
+    image: teamDoctor3,
   },
   {
     name: 'Dr. Nikola Stanković',
     role: 'Specijalista endodoncije',
     specialty: 'Mikroskopsko lečenje kanala',
-    image: dentist2,
+    image: teamDoctor4,
   },
 ];
 
@@ -129,24 +137,24 @@ export const beforeAfterCases = [
   {
     title: 'Estetska rekonstrukcija prednjih zuba',
     summary: 'Kombinacija faseta i minimalno invazivne preparacije.',
-    beforeImage: dentist1,
-    afterImage: dentist2,
+    beforeImage: case1Before,
+    afterImage: case1After,
     beforeLabel: 'PRE',
     afterLabel: 'POSLE',
   },
   {
     title: 'Implantološka rehabilitacija',
     summary: 'Povrat funkcije i prirodnog izgleda osmeha.',
-    beforeImage: dentist2,
-    afterImage: dentist1,
+    beforeImage: case2Before,
+    afterImage: case2After,
     beforeLabel: 'PRE',
     afterLabel: 'POSLE',
   },
   {
     title: 'Profesionalna oralna rehabilitacija',
     summary: 'Konzervativni pristup sa dugoročnim planom kontrole.',
-    beforeImage: dentist1,
-    afterImage: dentist2,
+    beforeImage: case3Before,
+    afterImage: case3After,
     beforeLabel: 'PRE',
     afterLabel: 'POSLE',
   },
@@ -203,12 +211,16 @@ export const features = [
 ];
 
 export {
-  dentist1,
-  dentist2,
+  teamDoctor1 as dentist1,
+  teamDoctor2 as dentist2,
   heroImage,
   logoGoldTransparent,
   logoHorizontal,
   logoIcon,
   logoNegativ,
   logoText,
+  teamDoctor1,
+  teamDoctor2,
+  teamDoctor3,
+  teamDoctor4,
 };

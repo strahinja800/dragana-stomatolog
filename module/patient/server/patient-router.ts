@@ -13,7 +13,6 @@ import {
   adminProcedure,
   createTRPCRouter,
   protectedProcedure,
-  publicProcedure,
 } from '@/trpc/init';
 
 export const patientRouter = createTRPCRouter({
@@ -125,10 +124,16 @@ export const patientRouter = createTRPCRouter({
   /**
    * Pretraga pacijenata (za autocomplete)
    */
-  search: publicProcedure
+  search: adminProcedure
     .input(z.object({ query: z.string().min(2) }))
     .query(async ({ ctx, input }) => {
       const patients = await ctx.prisma.patient.findMany({
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+        },
         where: {
           OR: [
             { firstName: { contains: input.query, mode: 'insensitive' } },

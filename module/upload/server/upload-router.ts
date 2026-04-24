@@ -1,3 +1,5 @@
+import { TRPCError } from '@trpc/server';
+
 import {
   deleteFile,
   generateFileKey,
@@ -10,13 +12,29 @@ import {
   getDownloadUrlSchema,
   getUploadUrlSchema,
 } from '@/module/upload/types/upload-schemas';
-import { createTRPCRouter, protectedProcedure } from '@/trpc/init';
+import { adminProcedure, createTRPCRouter } from '@/trpc/init';
+
+function assertManagedStorageKey(key: string) {
+  const isManagedAttachmentKey =
+    key.startsWith('attachments/') &&
+    !key.includes('..') &&
+    !key.includes('\\') &&
+    !key.includes('//') &&
+    !key.startsWith('/');
+
+  if (!isManagedAttachmentKey) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Nevažeći storage ključ',
+    });
+  }
+}
 
 export const uploadRouter = createTRPCRouter({
   /**
    * Generiše presigned URL za upload fajla
    */
-  getUploadUrl: protectedProcedure
+  getUploadUrl: adminProcedure
     .input(getUploadUrlSchema)
     .mutation(async ({ input }) => {
       const key = generateFileKey(input.folder, input.fileName);
@@ -33,9 +51,10 @@ export const uploadRouter = createTRPCRouter({
   /**
    * Generiše presigned URL za download fajla
    */
-  getDownloadUrl: protectedProcedure
+  getDownloadUrl: adminProcedure
     .input(getDownloadUrlSchema)
     .query(async ({ input }) => {
+      assertManagedStorageKey(input.key);
       const url = await getPresignedDownloadUrl(input.key);
 
       return { url };
@@ -44,9 +63,10 @@ export const uploadRouter = createTRPCRouter({
   /**
    * Briše fajl iz storage-a
    */
-  deleteFile: protectedProcedure
+  deleteFile: adminProcedure
     .input(deleteFileSchema)
     .mutation(async ({ input }) => {
+      assertManagedStorageKey(input.key);
       await deleteFile(input.key);
 
       return { success: true };

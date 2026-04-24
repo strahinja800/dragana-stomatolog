@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 
 import { GraduationCap } from '@/constants/icons';
+import { teamDoctor1, teamDoctor2, teamDoctor3 } from '@/data/data';
 
 export default async function AboutTeam() {
   const t = await getTranslations('about.team');
@@ -13,6 +14,7 @@ export default async function AboutTeam() {
     specialty: t('lead.specialty'),
     bio: t('lead.bio'),
     imageUrl: null as string | null,
+    image: teamDoctor1,
     imageAlt: t('lead.name'),
   };
 
@@ -24,6 +26,7 @@ export default async function AboutTeam() {
       specialty: t('member2.specialty'),
       bio: t('member2.bio'),
       imageUrl: null as string | null,
+      image: teamDoctor2,
       imageAlt: t('member2.name'),
     },
     {
@@ -33,6 +36,7 @@ export default async function AboutTeam() {
       specialty: t('member3.specialty'),
       bio: t('member3.bio'),
       imageUrl: null as string | null,
+      image: teamDoctor3,
       imageAlt: t('member3.name'),
     },
   ];
@@ -57,7 +61,7 @@ export default async function AboutTeam() {
             <div className="relative shrink-0">
               <div className="overflow-hidden rounded-3xl border-2 border-primary/20">
                 <Image
-                  src={lead.imageUrl ?? '/assets/dentist-1.jpg'}
+                  src={lead.imageUrl ?? lead.image}
                   alt={lead.imageAlt}
                   className="h-52 w-52 object-cover sm:h-60 sm:w-60"
                   width={240}
@@ -98,7 +102,7 @@ export default async function AboutTeam() {
             >
               <div className="mx-auto mb-5 overflow-hidden rounded-2xl border border-border/60">
                 <Image
-                  src={member.imageUrl ?? '/assets/dentist-1.jpg'}
+                  src={member.imageUrl ?? member.image}
                   alt={member.imageAlt}
                   className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   width={320}
