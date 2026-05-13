@@ -1,9 +1,13 @@
-import React from 'react';
 import { NextResponse } from 'next/server';
 
-import { Body, Html, Section, Text } from '@react-email/components';
 import { z } from 'zod';
 
+import ContactConfirmation, {
+  subject as confirmationSubject,
+} from '@/emails/contact-confirmation';
+import ContactInquiry, {
+  subject as inquirySubject,
+} from '@/emails/contact-inquiry';
 import { sendEmail } from '@/lib/email/resend-client';
 
 export const runtime = 'nodejs';
@@ -44,35 +48,26 @@ export async function POST(request: Request) {
 
   const { firstName, lastName, email, phone, service, message } = parsed.data;
   const fullName = `${firstName} ${lastName}`;
+  const props = { firstName, lastName, email, phone, service, message };
 
-  const emailResult = await sendEmail({
-    to: clinicEmail,
-    subject: `Novi kontakt upit: ${fullName}`,
-    react: React.createElement(
-      Html,
-      null,
-      React.createElement(
-        Body,
-        null,
-        React.createElement(
-          Section,
-          null,
-          React.createElement(Text, null, `Ime i prezime: ${fullName}`),
-          React.createElement(Text, null, `Email: ${email}`),
-          React.createElement(Text, null, `Telefon: ${phone}`),
-          React.createElement(Text, null, `Usluga: ${service}`),
-          React.createElement(Text, null, `Poruka:`),
-          React.createElement(Text, null, message)
-        )
-      )
-    ),
-  });
+  const [clinicResult, senderResult] = await Promise.all([
+    sendEmail({
+      to: clinicEmail,
+      subject: inquirySubject(fullName),
+      react: <ContactInquiry {...props} />,
+    }),
+    sendEmail({
+      to: email,
+      subject: confirmationSubject,
+      react: <ContactConfirmation {...props} />,
+    }),
+  ]);
 
-  if (!emailResult.success) {
+  if (!clinicResult.success || !senderResult.success) {
     return NextResponse.json(
       {
         success: false,
-        message: emailResult.message ?? 'Slanje poruke nije uspelo.',
+        message: 'Slanje poruke nije uspelo.',
       },
       { status: 502 }
     );
