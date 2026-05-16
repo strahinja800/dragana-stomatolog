@@ -52,6 +52,7 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Metadata' });
+  const tFaq = await getTranslations({ locale, namespace: 'home.faq' });
 
   void prefetch(trpc.blog.getPublishedPosts.queryOptions({ limit: 3 }));
 
@@ -87,6 +88,32 @@ export default async function HomePage({
         name: t('home.title'),
         inLanguage: locale,
         about: { '@id': `${SITE_URL}/#business` },
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${absoluteUrl(locale as 'sr' | 'en', '/')}#faq`,
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: tFaq('q1'),
+            acceptedAnswer: { '@type': 'Answer', text: tFaq('a1') },
+          },
+          {
+            '@type': 'Question',
+            name: tFaq('q2'),
+            acceptedAnswer: { '@type': 'Answer', text: tFaq('a2') },
+          },
+          {
+            '@type': 'Question',
+            name: tFaq('q3'),
+            acceptedAnswer: { '@type': 'Answer', text: tFaq('a3') },
+          },
+          {
+            '@type': 'Question',
+            name: tFaq('q4'),
+            acceptedAnswer: { '@type': 'Answer', text: tFaq('a4') },
+          },
+        ],
       },
     ],
   };
