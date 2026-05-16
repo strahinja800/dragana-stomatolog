@@ -52,6 +52,7 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Metadata' });
+  const tFaq = await getTranslations({ locale, namespace: 'home.faq' });
 
   void prefetch(trpc.blog.getPublishedPosts.queryOptions({ limit: 3 }));
 
@@ -94,23 +95,23 @@ export default async function HomePage({
         mainEntity: [
           {
             '@type': 'Question',
-            name: t('home.faq.q1'),
-            acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a1') },
+            name: tFaq('q1'),
+            acceptedAnswer: { '@type': 'Answer', text: tFaq('a1') },
           },
           {
             '@type': 'Question',
-            name: t('home.faq.q2'),
-            acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a2') },
+            name: tFaq('q2'),
+            acceptedAnswer: { '@type': 'Answer', text: tFaq('a2') },
           },
           {
             '@type': 'Question',
-            name: t('home.faq.q3'),
-            acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a3') },
+            name: tFaq('q3'),
+            acceptedAnswer: { '@type': 'Answer', text: tFaq('a3') },
           },
           {
             '@type': 'Question',
-            name: t('home.faq.q4'),
-            acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a4') },
+            name: tFaq('q4'),
+            acceptedAnswer: { '@type': 'Answer', text: tFaq('a4') },
           },
         ],
       },
