@@ -55,7 +55,9 @@ export default function AdminAppointmentResponse({
             <Text style={detailLabel}>Pacijent</Text>
             <Text style={detailValue}>{patientName}</Text>
             <Text style={detailLabel}>Termin</Text>
-            <Text style={detailValue}>{format(startTime, 'dd.MM.yyyy. HH:mm')}</Text>
+            <Text style={detailValue}>
+              {format(startTime, 'dd.MM.yyyy. HH:mm')}
+            </Text>
             {serviceName && (
               <>
                 <Text style={detailLabel}>Usluga</Text>

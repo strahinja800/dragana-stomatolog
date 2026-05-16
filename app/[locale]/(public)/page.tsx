@@ -92,10 +92,26 @@ export default async function HomePage({
         '@type': 'FAQPage',
         '@id': `${absoluteUrl(locale as 'sr' | 'en', '/')}#faq`,
         mainEntity: [
-          { '@type': 'Question', name: t('home.faq.q1'), acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a1') } },
-          { '@type': 'Question', name: t('home.faq.q2'), acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a2') } },
-          { '@type': 'Question', name: t('home.faq.q3'), acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a3') } },
-          { '@type': 'Question', name: t('home.faq.q4'), acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a4') } },
+          {
+            '@type': 'Question',
+            name: t('home.faq.q1'),
+            acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a1') },
+          },
+          {
+            '@type': 'Question',
+            name: t('home.faq.q2'),
+            acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a2') },
+          },
+          {
+            '@type': 'Question',
+            name: t('home.faq.q3'),
+            acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a3') },
+          },
+          {
+            '@type': 'Question',
+            name: t('home.faq.q4'),
+            acceptedAnswer: { '@type': 'Answer', text: t('home.faq.a4') },
+          },
         ],
       },
     ],
