@@ -13,7 +13,11 @@ export function assertSuccessfulUpload(response: Response) {
     return;
   }
 
-  throw new Error('Upload nije uspeo');
+  // Status je ovde jedini trag, jer presigned upload ide direktno na storage
+  // pa greška nikad ne prođe kroz nas. 403 obično znači neslaganje Content-Type.
+  throw new Error(
+    `Upload nije uspeo: HTTP ${response.status} ${response.statusText}`.trim()
+  );
 }
 
 export function resetFileInput(input: HTMLInputElement | null) {

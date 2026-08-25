@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "next dev",
     "email:dev": "email dev --dir emails",
-    "build": "prisma generate && prisma migrate deploy && next build",
+    "build": "prisma generate && next build",
+    "build:production": "prisma migrate deploy && npm run build",
     "start": "next start",
     "postinstall": "prisma generate",
     "ts:check": "tsc --noEmit",

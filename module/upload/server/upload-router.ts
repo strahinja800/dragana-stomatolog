@@ -20,14 +20,14 @@ function assertManagedStorageKey(key: string) {
     key.startsWith(`${folder}/`)
   );
 
-  const isManagedAttachmentKey =
+  const isManagedKey =
     isInManagedFolder &&
     !key.includes('..') &&
     !key.includes('\\') &&
     !key.includes('//') &&
     !key.startsWith('/');
 
-  if (!isManagedAttachmentKey) {
+  if (!isManagedKey) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'Nevažeći storage ključ',

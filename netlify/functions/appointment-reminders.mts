@@ -22,7 +22,9 @@ export default async () => {
     throw new Error('CRON_SECRET nije postavljen');
   }
 
-  const response = await fetch(`${siteUrl}/api/cron/appointment-reminders`, {
+  const baseUrl = siteUrl.replace(/\/+$/, '');
+
+  const response = await fetch(`${baseUrl}/api/cron/appointment-reminders`, {
     method: 'POST',
     headers: { authorization: `Bearer ${cronSecret}` },
   });

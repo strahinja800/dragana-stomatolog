@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -84,6 +84,31 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
     defaultValues: emptyDefaults,
   });
 
+  // Preview je ili udaljena adresa postojece slike ili blob iz izabranog fajla.
+  // Blob mora rucno da se oslobodi, inace svaka izmena slike ostavlja curenje.
+  const previewBlobRef = useRef<string | null>(null);
+
+  const setPreview = useCallback((next: string | null) => {
+    if (previewBlobRef.current) {
+      URL.revokeObjectURL(previewBlobRef.current);
+      previewBlobRef.current = null;
+    }
+
+    if (next?.startsWith('blob:')) {
+      previewBlobRef.current = next;
+    }
+
+    setPreviewUrl(next);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (previewBlobRef.current) {
+        URL.revokeObjectURL(previewBlobRef.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (isEditMode && post) {
       reset({
@@ -92,18 +117,18 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
         status: post.status,
         imageAlt: post.imageAlt ?? '',
       });
-      setPreviewUrl(post.featuredImage || null);
+      setPreview(post.featuredImage || null);
       setSelectedFile(null);
     } else if (blogPostId === 'new') {
       reset(emptyDefaults);
-      setPreviewUrl(null);
+      setPreview(null);
       setSelectedFile(null);
     }
-  }, [blogPostId, post, isEditMode, reset]);
+  }, [blogPostId, post, isEditMode, reset, setPreview]);
 
   const handleClose = () => {
     reset(emptyDefaults);
-    setPreviewUrl(null);
+    setPreview(null);
     setSelectedFile(null);
     setRemovingImage(false);
     onClose();
@@ -180,13 +205,13 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
     }
 
     setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
+    setPreview(URL.createObjectURL(file));
     setRemovingImage(false);
   };
 
   const handleRemoveImage = () => {
     setSelectedFile(null);
-    setPreviewUrl(null);
+    setPreview(null);
     setRemovingImage(true);
     resetFileInput(fileInputRef.current);
   };
@@ -241,8 +266,12 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
       try {
         setIsUploading(true);
         featuredImage = (await uploadFeaturedImage(selectedFile)) ?? undefined;
-      } catch {
-        toast.error(t('fileReadError'));
+      } catch (error) {
+        // Greška ovde dolazi sa storage-a ili iz mreže, ne od čitanja fajla,
+        // pa prikazujemo stvarni uzrok umesto opšte poruke.
+        toast.error(
+          error instanceof Error ? error.message : t('fileReadError')
+        );
         return;
       } finally {
         setIsUploading(false);
