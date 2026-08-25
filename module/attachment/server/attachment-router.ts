@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { deleteFile } from '@/lib/minio';
+import { deleteFile } from '@/lib/storage';
 import { adminProcedure, createTRPCRouter } from '@/trpc/init';
 
 export const attachmentRouter = createTRPCRouter({
@@ -38,7 +38,7 @@ export const attachmentRouter = createTRPCRouter({
       });
 
       if (attachment) {
-        // Extract key from fileUrl and delete from MinIO
+        // Extract key from fileUrl and delete from storage
         try {
           const url = new URL(attachment.fileUrl);
           const key = url.pathname.slice(1); // Remove leading slash

@@ -21,10 +21,6 @@ import AppointmentTimeProposal, {
   subject as appointmentTimeProposalSubject,
 } from '@/emails/appointment-time-proposal';
 import { sendEmail } from '@/lib/email/resend-client';
-import {
-  emitAppointmentCreated,
-  emitAppointmentSlotChanged,
-} from '@/lib/events';
 import { Prisma } from '@/lib/generated/prisma/client';
 import {
   formatLocalTime,
@@ -314,19 +310,6 @@ export const appointmentRouter = createTRPCRouter({
         }
       }
 
-      // SSE notification to admin dashboard
-      emitAppointmentCreated({
-        appointmentId: appointment.id,
-        patientName,
-        serviceName: null,
-        startTime: startTime.toISOString(),
-        phone: input.phone,
-        email: input.email,
-        symptoms: input.symptoms ?? null,
-        createdAt: appointment.createdAt,
-      });
-
-      emitAppointmentSlotChanged();
       return appointment;
     }),
 
@@ -442,18 +425,6 @@ export const appointmentRouter = createTRPCRouter({
         }
       }
 
-      emitAppointmentCreated({
-        appointmentId: appointment.id,
-        patientName,
-        serviceName: null,
-        startTime: startTime.toISOString(),
-        email: appointment.email ?? ctx.session.user.email,
-        phone: appointment.phone ?? 'N/A',
-        symptoms: input.symptoms ?? null,
-        createdAt: appointment.createdAt,
-      });
-
-      emitAppointmentSlotChanged();
       return appointment;
     }),
 
@@ -687,7 +658,6 @@ export const appointmentRouter = createTRPCRouter({
         }
       }
 
-      emitAppointmentSlotChanged();
       return updated;
     }),
 
@@ -731,7 +701,6 @@ export const appointmentRouter = createTRPCRouter({
           });
         }
       }
-      emitAppointmentSlotChanged();
       return updated;
     }),
 

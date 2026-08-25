@@ -10,6 +10,10 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    url: process.env['DATABASE_URL'],
+    // Ovaj config čita samo Prisma CLI (migracije, studio), ne i aplikacija,
+    // koja ide preko lib/prisma.ts i DATABASE_URL varijable.
+    // Zato ovde ima prednost direktna konekcija, jer PgBouncer ne podržava
+    // DDL operacije pouzdano.
+    url: process.env['DATABASE_URL_UNPOOLED'] ?? process.env['DATABASE_URL'],
   },
 });

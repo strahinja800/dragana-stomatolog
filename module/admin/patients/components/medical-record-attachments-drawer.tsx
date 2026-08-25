@@ -17,7 +17,11 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer';
 import { Paperclip, Upload } from '@/constants/icons';
-import { allowedUploadTypes } from '@/module/upload/types/upload-schemas';
+import {
+  assertSuccessfulUpload,
+  getAllowedUploadType,
+  resetFileInput,
+} from '@/module/upload/utils/upload-helpers';
 import { useTRPC } from '@/trpc/client';
 
 import { AttachmentRow } from './attachment-row';
@@ -29,26 +33,6 @@ interface Props {
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
-}
-
-function getAllowedUploadType(fileType: string) {
-  return allowedUploadTypes.find((type) => type === fileType);
-}
-
-function assertSuccessfulUpload(response: Response) {
-  if (response.ok) {
-    return;
-  }
-
-  throw new Error('Upload nije uspeo');
-}
-
-function resetFileInput(input: HTMLInputElement | null) {
-  if (!input) {
-    return;
-  }
-
-  input.value = '';
 }
 
 export function MedicalRecordAttachmentsDrawer({

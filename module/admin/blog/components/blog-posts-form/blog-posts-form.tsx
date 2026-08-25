@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -40,6 +40,11 @@ import {
   type BlogPostFormInput,
   blogPostFormSchema,
 } from '@/module/blog/types/blog-schemas';
+import {
+  assertSuccessfulUpload,
+  getAllowedUploadType,
+  resetFileInput,
+} from '@/module/upload/utils/upload-helpers';
 import { useTRPC } from '@/trpc/client';
 
 interface BlogPostFormProps {
@@ -47,24 +52,11 @@ interface BlogPostFormProps {
   onClose: () => void;
 }
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result.split(',')[1]);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 const emptyDefaults: BlogPostFormInput = {
   title: '',
   content: '',
   status: 'DRAFT',
   imageAlt: '',
-  featuredImageFile: undefined,
 };
 
 export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
@@ -73,6 +65,8 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
   const isEditMode = blogPostId !== null && blogPostId !== 'new';
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [removingImage, setRemovingImage] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,12 +79,35 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
     enabled: isEditMode,
   });
 
-  const { handleSubmit, control, reset, setValue } = useForm<BlogPostFormInput>(
-    {
-      resolver: zodResolver(blogPostFormSchema),
-      defaultValues: emptyDefaults,
+  const { handleSubmit, control, reset } = useForm<BlogPostFormInput>({
+    resolver: zodResolver(blogPostFormSchema),
+    defaultValues: emptyDefaults,
+  });
+
+  // Preview je ili udaljena adresa postojece slike ili blob iz izabranog fajla.
+  // Blob mora rucno da se oslobodi, inace svaka izmena slike ostavlja curenje.
+  const previewBlobRef = useRef<string | null>(null);
+
+  const setPreview = useCallback((next: string | null) => {
+    if (previewBlobRef.current) {
+      URL.revokeObjectURL(previewBlobRef.current);
+      previewBlobRef.current = null;
     }
-  );
+
+    if (next?.startsWith('blob:')) {
+      previewBlobRef.current = next;
+    }
+
+    setPreviewUrl(next);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (previewBlobRef.current) {
+        URL.revokeObjectURL(previewBlobRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (isEditMode && post) {
@@ -99,18 +116,20 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
         content: post.content,
         status: post.status,
         imageAlt: post.imageAlt ?? '',
-        featuredImageFile: undefined,
       });
-      setPreviewUrl(post.featuredImage || null);
+      setPreview(post.featuredImage || null);
+      setSelectedFile(null);
     } else if (blogPostId === 'new') {
       reset(emptyDefaults);
-      setPreviewUrl(null);
+      setPreview(null);
+      setSelectedFile(null);
     }
-  }, [blogPostId, post, isEditMode, reset]);
+  }, [blogPostId, post, isEditMode, reset, setPreview]);
 
   const handleClose = () => {
     reset(emptyDefaults);
-    setPreviewUrl(null);
+    setPreview(null);
+    setSelectedFile(null);
     setRemovingImage(false);
     onClose();
   };
@@ -149,6 +168,10 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
   const { mutateAsync: generateSlug, isPending: isGeneratingSlug } =
     useMutation(trpc.blog.generateSlug.mutationOptions());
 
+  const { mutateAsync: getUploadUrl } = useMutation(
+    trpc.upload.getUploadUrl.mutationOptions()
+  );
+
   const { mutate: deletePost, isPending: isDeleting } = useMutation(
     trpc.blog.deletePost.mutationOptions({
       onSuccess: () => {
@@ -169,36 +192,59 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
     deletePost({ id: blogPostId });
   };
 
-  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    resetFileInput(fileInputRef.current);
+
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
+    // Storage prihvata samo tipove sa liste, pa se GIF i SVG odbijaju ovde.
+    if (!getAllowedUploadType(file.type)) {
       toast.error(t('selectImageError'));
       return;
     }
 
-    try {
-      const base64 = await fileToBase64(file);
-      setValue('featuredImageFile', {
-        fileBase64: base64,
-        fileName: file.name,
-        fileType: file.type,
-      });
-      setPreviewUrl(URL.createObjectURL(file));
-      setRemovingImage(false);
-    } catch {
-      toast.error(t('fileReadError'));
-    } finally {
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
+    setSelectedFile(file);
+    setPreview(URL.createObjectURL(file));
+    setRemovingImage(false);
   };
 
   const handleRemoveImage = () => {
-    setValue('featuredImageFile', undefined);
-    setPreviewUrl(null);
+    setSelectedFile(null);
+    setPreview(null);
     setRemovingImage(true);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    resetFileInput(fileInputRef.current);
+  };
+
+  /**
+   * Slika ide direktno na storage preko presigned URL-a, pa server prima
+   * samo gotovu adresu. Upload se dešava tek pri slanju forme, tako da
+   * odustajanje ne ostavlja fajl bez vlasnika.
+   */
+  const uploadFeaturedImage = async (file: File): Promise<string | null> => {
+    const fileType = getAllowedUploadType(file.type);
+
+    if (!fileType) {
+      toast.error(t('selectImageError'));
+      return null;
+    }
+
+    const { uploadUrl, fileUrl } = await getUploadUrl({
+      fileName: file.name,
+      fileType,
+      fileSize: file.size,
+      folder: 'blog',
+    });
+
+    const response = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': fileType },
+      body: file,
+    });
+
+    assertSuccessfulUpload(response);
+
+    return fileUrl;
   };
 
   const onSubmit = async (data: BlogPostFormInput) => {
@@ -214,28 +260,47 @@ export function BlogPostForm({ blogPostId, onClose }: BlogPostFormProps) {
       }
     }
 
-    const { featuredImageFile, ...rest } = data;
+    let featuredImage: string | undefined = undefined;
+
+    if (selectedFile) {
+      try {
+        setIsUploading(true);
+        featuredImage = (await uploadFeaturedImage(selectedFile)) ?? undefined;
+      } catch (error) {
+        // Greška ovde dolazi sa storage-a ili iz mreže, ne od čitanja fajla,
+        // pa prikazujemo stvarni uzrok umesto opšte poruke.
+        toast.error(
+          error instanceof Error ? error.message : t('fileReadError')
+        );
+        return;
+      } finally {
+        setIsUploading(false);
+      }
+
+      if (!featuredImage) return;
+    }
 
     if (!post) {
       createPost({
-        ...rest,
+        ...data,
         slug,
-        imageAlt: rest.imageAlt || undefined,
-        featuredImageFile: featuredImageFile || undefined,
+        imageAlt: data.imageAlt || undefined,
+        featuredImage,
       });
     } else {
       updatePost({
         id: post.id,
-        ...rest,
+        ...data,
         slug,
-        imageAlt: rest.imageAlt || undefined,
-        featuredImageFile: featuredImageFile || undefined,
+        imageAlt: data.imageAlt || undefined,
+        featuredImage,
         removeFeaturedImage: removingImage,
       });
     }
   };
 
-  const isPending = isCreating || isUpdating || isGeneratingSlug || isDeleting;
+  const isPending =
+    isCreating || isUpdating || isGeneratingSlug || isDeleting || isUploading;
 
   return (
     <>

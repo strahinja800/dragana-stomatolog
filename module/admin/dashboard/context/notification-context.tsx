@@ -2,11 +2,11 @@
 
 import { createContext, useCallback, useContext, useState } from 'react';
 
-import type { AppointmentCreatedEvent } from '@/lib/events';
+import type { UnseenAppointment } from '@/module/admin/dashboard/types/notification-types';
 
 interface NotificationContextValue {
-  queue: AppointmentCreatedEvent[];
-  addToQueue: (event: AppointmentCreatedEvent) => boolean;
+  queue: UnseenAppointment[];
+  addToQueue: (event: UnseenAppointment) => boolean;
   removeFirst: () => void;
 }
 
@@ -21,9 +21,9 @@ export function NotificationProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [queue, setQueue] = useState<AppointmentCreatedEvent[]>([]);
+  const [queue, setQueue] = useState<UnseenAppointment[]>([]);
 
-  const addToQueue = useCallback((event: AppointmentCreatedEvent) => {
+  const addToQueue = useCallback((event: UnseenAppointment) => {
     let added = false;
     setQueue((prev) => {
       if (prev.some((e) => e.appointmentId === event.appointmentId))

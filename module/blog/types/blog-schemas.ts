@@ -10,13 +10,9 @@ export type BlogPostStatus = z.infer<typeof blogPostStatusSchema>;
 
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-export const fileUploadSchema = z.object({
-  fileBase64: z.string().min(1),
-  fileName: z.string().min(1),
-  fileType: z.string().min(1),
-});
-
-export type FileUploadInput = z.infer<typeof fileUploadSchema>;
+// Slika se uploaduje direktno na storage preko presigned URL-a,
+// pa server prima samo gotovu adresu.
+const featuredImageSchema = z.url().optional().nullable();
 
 export const createBlogPostSchema = z.object({
   title: z.string().min(1, 'Naslov je obavezan'),
@@ -29,13 +25,15 @@ export const createBlogPostSchema = z.object({
   imageAlt: z.string().optional().nullable(),
   publishedAt: z.date().optional().nullable(),
   sortOrder: z.number().optional(),
-  featuredImageFile: fileUploadSchema.optional().nullable(),
+  featuredImage: featuredImageSchema,
 });
 
 export type CreateBlogPostInput = z.infer<typeof createBlogPostSchema>;
 
+// Forma ne barata adresom slike, nju popunjava upload pri slanju.
 export const blogPostFormSchema = createBlogPostSchema.omit({
   slug: true,
+  featuredImage: true,
 });
 
 export type BlogPostFormInput = z.infer<typeof blogPostFormSchema>;
@@ -54,7 +52,7 @@ export const updateBlogPostSchema = z.object({
   status: blogPostStatusSchema.optional(),
   publishedAt: z.date().optional().nullable(),
   sortOrder: z.number().optional(),
-  featuredImageFile: fileUploadSchema.optional().nullable(),
+  featuredImage: featuredImageSchema,
   removeFeaturedImage: z.boolean().optional(),
 });
 
