@@ -25,8 +25,8 @@ import {
   User,
   X,
 } from '@/constants/icons';
-import type { AppointmentCreatedEvent } from '@/lib/events';
 import { useNotificationCount } from '@/module/admin/dashboard/context/notification-context';
+import type { UnseenAppointment } from '@/module/admin/dashboard/types/notification-types';
 import { useTRPC } from '@/trpc/client';
 
 import { NewBookingModalConfirm } from './new-booking-modal-confirm';
@@ -35,7 +35,7 @@ import { NewBookingModalPropose } from './new-booking-modal-propose';
 type ModalView = 'info' | 'confirm' | 'propose';
 
 interface NewBookingModalProps {
-  event: AppointmentCreatedEvent | null;
+  event: UnseenAppointment | null;
   open: boolean;
   onClose: () => void;
 }

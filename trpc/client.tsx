@@ -5,12 +5,7 @@ import { useState } from 'react';
 import type { QueryClient } from '@tanstack/react-query';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import {
-  createTRPCClient,
-  httpBatchLink,
-  httpSubscriptionLink,
-  splitLink,
-} from '@trpc/client';
+import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import { createTRPCContext } from '@trpc/tanstack-react-query';
 import superjson from 'superjson';
 
@@ -32,8 +27,19 @@ function getQueryClient() {
 }
 function getUrl() {
   const base = (() => {
+    // U browseru relativna putanja uvek pogađa isti origin.
     if (typeof window !== 'undefined') return '';
+
+    // Na serveru je potrebna apsolutna adresa, a svaki host je zove drugačije.
+    // Netlify: DEPLOY_PRIME_URL za preview deploy, URL za produkciju.
+    const hostUrl = process.env.DEPLOY_PRIME_URL || process.env.URL;
+    if (hostUrl) return hostUrl.replace(/\/+$/, '');
+
     if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    if (siteUrl) return siteUrl.replace(/\/+$/, '');
+
     return 'http://localhost:3000';
   })();
   return `${base}/api/trpc`;
@@ -51,16 +57,9 @@ export function TRPCReactProvider(
   const [trpcClient] = useState(() =>
     createTRPCClient<AppRouter>({
       links: [
-        splitLink({
-          condition: (op) => op.type === 'subscription',
-          true: httpSubscriptionLink({
-            transformer: superjson,
-            url: getUrl(),
-          }),
-          false: httpBatchLink({
-            transformer: superjson,
-            url: getUrl(),
-          }),
+        httpBatchLink({
+          transformer: superjson,
+          url: getUrl(),
         }),
       ],
     })

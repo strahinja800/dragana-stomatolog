@@ -6,17 +6,22 @@ import {
   getPresignedDownloadUrl,
   getPresignedUploadUrl,
   getPublicFileUrl,
-} from '@/lib/minio';
+} from '@/lib/storage';
 import {
   deleteFileSchema,
   getDownloadUrlSchema,
   getUploadUrlSchema,
+  managedUploadFolders,
 } from '@/module/upload/types/upload-schemas';
 import { adminProcedure, createTRPCRouter } from '@/trpc/init';
 
 function assertManagedStorageKey(key: string) {
+  const isInManagedFolder = managedUploadFolders.some((folder) =>
+    key.startsWith(`${folder}/`)
+  );
+
   const isManagedAttachmentKey =
-    key.startsWith('attachments/') &&
+    isInManagedFolder &&
     !key.includes('..') &&
     !key.includes('\\') &&
     !key.includes('//') &&
@@ -38,7 +43,7 @@ export const uploadRouter = createTRPCRouter({
     .input(getUploadUrlSchema)
     .mutation(async ({ input }) => {
       const key = generateFileKey(input.folder, input.fileName);
-      const uploadUrl = await getPresignedUploadUrl(key);
+      const uploadUrl = await getPresignedUploadUrl(key, input.fileType);
       const fileUrl = getPublicFileUrl(key);
 
       return {

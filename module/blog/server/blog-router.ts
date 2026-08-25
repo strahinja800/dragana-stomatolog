@@ -1,13 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
-import {
-  BUCKET_NAME,
-  deleteFile,
-  generateFileKey,
-  getPublicFileUrl,
-  uploadFile,
-} from '@/lib/minio';
+import { deleteFile } from '@/lib/storage';
 import {
   createBlogPostSchema,
   deleteBlogPostSchema,
@@ -47,25 +41,8 @@ function generateSlugFromTitle(title: string): string {
     .replace(/-+/g, '-');
 }
 
-async function uploadFeaturedImage(file: {
-  fileBase64: string;
-  fileName: string;
-  fileType: string;
-}): Promise<string> {
-  const key = generateFileKey('blog', file.fileName);
-  const buffer = Buffer.from(file.fileBase64, 'base64');
-  await uploadFile(key, buffer, file.fileType);
-
-  return getPublicFileUrl(key);
-}
-
 function extractFileKeyFromUrl(fileUrl: string): string {
-  const url = new URL(fileUrl);
-  const path = url.pathname.slice(1);
-  if (path.startsWith(`${BUCKET_NAME}/`)) {
-    return path.slice(BUCKET_NAME.length + 1);
-  }
-  return path;
+  return new URL(fileUrl).pathname.slice(1);
 }
 
 async function deleteFeaturedImage(imageUrl: string): Promise<void> {
@@ -196,17 +173,12 @@ export const blogRouter = createTRPCRouter({
         sortOrder = last ? last.sortOrder + 1 : 1;
       }
 
-      let featuredImage: string | null = null;
-      if (input.featuredImageFile) {
-        featuredImage = await uploadFeaturedImage(input.featuredImageFile);
-      }
-
       const post = await ctx.prisma.blogPost.create({
         data: {
           title: input.title.trim(),
           slug: input.slug.trim(),
           content: input.content,
-          featuredImage,
+          featuredImage: input.featuredImage ?? null,
           imageAlt: input.imageAlt?.trim() || null,
           status: input.status,
           publishedAt:
@@ -226,7 +198,12 @@ export const blogRouter = createTRPCRouter({
   updatePost: adminProcedure
     .input(updateBlogPostSchema)
     .mutation(async ({ ctx, input }) => {
-      const { id, featuredImageFile, removeFeaturedImage, ...data } = input;
+      const {
+        id,
+        featuredImage: newFeaturedImage,
+        removeFeaturedImage,
+        ...data
+      } = input;
 
       if (data.slug) {
         const existingPost = await ctx.prisma.blogPost.findFirst({
@@ -261,11 +238,11 @@ export const blogRouter = createTRPCRouter({
 
       let featuredImage: string | null | undefined = undefined;
 
-      if (featuredImageFile) {
+      if (newFeaturedImage) {
         if (currentPost?.featuredImage) {
           await deleteFeaturedImage(currentPost.featuredImage);
         }
-        featuredImage = await uploadFeaturedImage(featuredImageFile);
+        featuredImage = newFeaturedImage;
       } else if (removeFeaturedImage) {
         if (currentPost?.featuredImage) {
           await deleteFeaturedImage(currentPost.featuredImage);

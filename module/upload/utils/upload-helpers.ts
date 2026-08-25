@@ -1,0 +1,25 @@
+import { allowedUploadTypes } from '@/module/upload/types/upload-schemas';
+
+/**
+ * Vraća tip fajla samo ako je na listi dozvoljenih, inače undefined.
+ * Sužavanje tipa je potrebno jer getUploadUrl prima enum, a ne bilo koji string.
+ */
+export function getAllowedUploadType(fileType: string) {
+  return allowedUploadTypes.find((type) => type === fileType);
+}
+
+export function assertSuccessfulUpload(response: Response) {
+  if (response.ok) {
+    return;
+  }
+
+  throw new Error('Upload nije uspeo');
+}
+
+export function resetFileInput(input: HTMLInputElement | null) {
+  if (!input) {
+    return;
+  }
+
+  input.value = '';
+}

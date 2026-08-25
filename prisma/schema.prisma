@@ -256,7 +256,7 @@ model Attachment {
   id              String        @id @default(cuid())
   medicalRecordId String
   medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
-  fileUrl         String // URL from MinIO storage
+  fileUrl         String // Public URL from object storage
   fileName        String
   fileType        String
   fileSize        Int?

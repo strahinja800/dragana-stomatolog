@@ -11,13 +11,13 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from '@tanstack/react-query';
-import { useSubscription } from '@trpc/tanstack-react-query';
 import { startOfDay } from 'date-fns';
 import { z } from 'zod';
 
 import { AppointmentCalendar } from '@/components/ui/appointment-calendar';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowRight, CheckCircle, Loader2 } from '@/constants/icons';
+import { POLL_INTERVALS } from '@/constants/polling';
 import { useSession } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
@@ -111,40 +111,22 @@ export default function BookingForm({
     data: nonWorkingDays,
     isLoading: isLoadingNonWorkingDays,
     isPending: isPendingNonWorkingDays,
-  } = useSuspenseQuery(trpc.appointment.getNonWorkingDays.queryOptions());
+  } = useSuspenseQuery(
+    trpc.appointment.getNonWorkingDays.queryOptions(undefined, {
+      refetchInterval: POLL_INTERVALS.BOOKING_SLOTS,
+    })
+  );
 
   const { data: timeSlots, isLoading: isLoadingTimeSlots } = useQuery(
-    trpc.appointment.getTimeSlotsForDate.queryOptions({
-      date: selectedDate ?? today,
-    })
+    trpc.appointment.getTimeSlotsForDate.queryOptions(
+      { date: selectedDate ?? today },
+      { refetchInterval: POLL_INTERVALS.BOOKING_SLOTS }
+    )
   );
 
   const isPendingData =
     isPendingNonWorkingDays || isLoadingNonWorkingDays || isLoadingTimeSlots;
   const isFormDisabled = !isHydrated || isPendingData;
-
-  useSubscription(
-    trpc.subscriptions.onSettingsUpdate.subscriptionOptions(undefined, {
-      onData: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.appointment.getNonWorkingDays.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.appointment.getTimeSlotsForDate.queryKey(),
-        });
-      },
-    })
-  );
-
-  useSubscription(
-    trpc.subscriptions.onAppointmentSlotChanged.subscriptionOptions(undefined, {
-      onData: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.appointment.getTimeSlotsForDate.queryKey(),
-        });
-      },
-    })
-  );
 
   const { closedDaysOfWeek, disabledDates } = nonWorkingDays ?? {
     closedDaysOfWeek: [],

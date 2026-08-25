@@ -14,7 +14,14 @@ function createPrismaClient() {
     throw new Error('DATABASE_URL is not defined');
   }
 
-  const pool = new Pool({ connectionString });
+  // Serverless instance se množe pod opterećenjem, pa pool mora biti mali
+  // i brzo vraćati neiskorišćene konekcije pooler-u.
+  const pool = new Pool({
+    connectionString,
+    max: 5,
+    idleTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 10_000,
+  });
   const adapter = new PrismaPg(pool);
 
   return new PrismaClient({

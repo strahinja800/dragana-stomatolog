@@ -9,7 +9,7 @@ export const allowedUploadTypes = [
   'image/webp',
 ] as const;
 
-export const managedUploadFolders = ['attachments'] as const;
+export const managedUploadFolders = ['attachments', 'blog'] as const;
 
 export const getUploadUrlSchema = z.object({
   fileName: z.string().min(1),
