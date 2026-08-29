@@ -10,6 +10,7 @@
     "email:dev": "email dev --dir emails",
     "build": "prisma generate && next build",
     "build:production": "prisma migrate deploy && npm run build",
+    "vercel-build": "if [ \"$VERCEL_ENV\" = \"production\" ]; then npm run build:production; else npm run build; fi",
     "start": "next start",
     "postinstall": "prisma generate",
     "ts:check": "tsc --noEmit",
@@ -83,7 +84,6 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@netlify/functions": "^6.0.0",
     "@react-email/preview-server": "^5.2.10",
     "@tailwindcss/postcss": "^4.2.1",
     "@tanstack/react-query-devtools": "^5.91.3",

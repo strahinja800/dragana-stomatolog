@@ -83,5 +83,6 @@
 
   // Auto-save
 "files.autoSave": "onFocusChange",
-"prisma.pinToPrisma6": false
+"prisma.pinToPrisma6": false,
+"window.density.editorTabHeight": "default"
 }

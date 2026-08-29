@@ -30,11 +30,6 @@ function getUrl() {
     // U browseru relativna putanja uvek pogađa isti origin.
     if (typeof window !== 'undefined') return '';
 
-    // Na serveru je potrebna apsolutna adresa, a svaki host je zove drugačije.
-    // Netlify: DEPLOY_PRIME_URL za preview deploy, URL za produkciju.
-    const hostUrl = process.env.DEPLOY_PRIME_URL || process.env.URL;
-    if (hostUrl) return hostUrl.replace(/\/+$/, '');
-
     if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
